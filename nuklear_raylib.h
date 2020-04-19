@@ -281,6 +281,12 @@ nk_raylib_input(struct nk_context * ctx)
     }
     nk_input_motion(ctx, GetMouseX(), GetMouseY());
 
+    int mouseWheel = GetMouseWheelMove();
+    if (mouseWheel != 0) {
+        struct nk_vec2 mouseWheelMove = (struct nk_vec2){0, mouseWheel};
+        nk_input_scroll(ctx, mouseWheelMove);
+    }
+
     // TODO: Add Keyboard
 
     nk_input_end(ctx);
