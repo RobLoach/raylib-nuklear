@@ -1,0 +1,8 @@
+[submodule "vendor/raylib"]
+	path = vendor/raylib
+	url = https://github.com/raysan5/raylib.git
+    ignore = dirty
+[submodule "vendor/nuklear"]
+	path = vendor/nuklear
+	url = https://github.com/Immediate-Mode-UI/Nuklear.git
+    ignore = dirty
