@@ -38,18 +38,18 @@
 #ifndef NK_RAYLIB_H_
 #define NK_RAYLIB_H_
 
-static struct nk_context* nk_raylib_init();
-static void nk_raylib_input(struct nk_context * ctx);
-static void nk_raylib_render(struct nk_context * ctx);
-static Color nk_color_to_raylib_color(struct nk_color color);
-static int nk_raylib_translate_mouse_button(int button);
-static void nk_raylib_free(struct nk_context * ctx);
+NK_API struct nk_context* nk_raylib_init();
+NK_API void nk_raylib_input(struct nk_context * ctx);
+NK_API void nk_raylib_render(struct nk_context * ctx);
+NK_API Color nk_color_to_raylib_color(struct nk_color color);
+NK_API int nk_raylib_translate_mouse_button(int button);
+NK_API void nk_raylib_free(struct nk_context * ctx);
 
 #endif
 
 #ifdef NK_RAYLIB_IMPLEMENTATION
 
-static float
+NK_API float
 nk_raylib_font_get_text_width(nk_handle handle, float height, const char *text, int len)
 {
     if (TextLength(text) == 0) {
@@ -64,25 +64,48 @@ nk_raylib_font_get_text_width(nk_handle handle, float height, const char *text, 
     return MeasureText(text, 10);
 }
 
-static struct nk_context*
+NK_API void
+nk_raylib_clipboard_paste(nk_handle usr, struct nk_text_edit *edit)
+{
+    const char *text = GetClipboardText();
+    if (text != NULL) {
+        nk_textedit_paste(edit, text, TextLength(text));
+    }
+    (void)usr;
+}
+
+NK_API void
+nk_raylib_clipboard_copy(nk_handle usr, const char *text, int len) {
+    SetClipboardText(text);
+}
+
+NK_API struct nk_context*
 nk_raylib_init()
 {
     struct nk_context* ctx = (struct nk_context*) calloc(1, sizeof(struct nk_context));
+
+    // Initialize the default font.
     struct Font* font = (struct Font*) calloc(1, sizeof(struct Font));
     struct nk_user_font* userFont = (struct nk_user_font*) calloc(1, sizeof(struct nk_user_font));
     userFont->userdata = nk_handle_ptr(font);
     userFont->height = 10;
     userFont->width = nk_raylib_font_get_text_width;
 
+    // Create the nuklear environment.
     if (nk_init_default(ctx, userFont) == 0) {
         TraceLog(LOG_ERROR, "[NUKLEAR] Failed to initialize nuklear.");
         return NULL;
     }
 
+    // Clipboard
+    ctx->clip.copy = nk_raylib_clipboard_copy;
+    ctx->clip.paste = nk_raylib_clipboard_paste;
+    ctx->clip.userdata = nk_handle_ptr(0);
+
     return ctx;
 }
 
-static Color
+NK_API Color
 nk_color_to_raylib_color(struct nk_color color)
 {
     Color rc;
@@ -93,13 +116,13 @@ nk_color_to_raylib_color(struct nk_color color)
     return rc;
 }
 
-static Color
+NK_API Color
 nk_colorf_to_raylib_color(struct nk_colorf color)
 {
     return nk_color_to_raylib_color(nk_rgba_cf(color));
 }
 
-static void
+NK_API void
 nk_raylib_render(struct nk_context * ctx)
 {
     const struct nk_command *cmd;
@@ -251,7 +274,7 @@ nk_raylib_render(struct nk_context * ctx)
     nk_clear(ctx);
 }
 
-static int
+NK_API int
 nk_raylib_translate_mouse_button(int button)
 {
     switch (button) {
@@ -266,7 +289,7 @@ nk_raylib_translate_mouse_button(int button)
     return NK_BUTTON_MAX;
 }
 
-static void
+NK_API void
 nk_raylib_input(struct nk_context * ctx)
 {
     nk_input_begin(ctx);
@@ -292,7 +315,7 @@ nk_raylib_input(struct nk_context * ctx)
     nk_input_end(ctx);
 }
 
-static void
+NK_API void
 nk_raylib_free(struct nk_context * ctx)
 {
     // Unload the given font.
