@@ -58,6 +58,7 @@ int main(void)
     ctx = nk_raylib_init();
 
     // Main game loop
+    bg.r = 0.10f, bg.g = 0.18f, bg.b = 0.24f, bg.a = 1.0f;
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
         // Update
@@ -102,7 +103,7 @@ int main(void)
         //----------------------------------------------------------------------------------
         BeginDrawing();
 
-            ClearBackground(RAYWHITE);
+            ClearBackground(nk_colorf_to_raylib_color(bg));
 
             nk_raylib_render(ctx);
 

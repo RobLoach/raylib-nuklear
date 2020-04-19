@@ -29,10 +29,21 @@ target_include_directories(nuklear_raylib INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 # Example
 option(BUILD_NUKLEAR_RAYLIB_EXAMPLES "nuklear_raylib Examples" ON)
 if (BUILD_NUKLEAR_RAYLIB_EXAMPLES)
+    # nuklear_raylib_example
     add_executable(nuklear_raylib_example
         example/nuklear_raylib_example.c
     )
     target_link_libraries(nuklear_raylib_example PUBLIC
+        raylib
+        nuklear
+        nuklear_raylib
+    )
+
+    # nuklear_raylib_demo
+    add_executable(nuklear_raylib_demo
+        example/nuklear_raylib_demo.c
+    )
+    target_link_libraries(nuklear_raylib_demo PUBLIC
         raylib
         nuklear
         nuklear_raylib

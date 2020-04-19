@@ -93,6 +93,12 @@ nk_color_to_raylib_color(struct nk_color color)
     return rc;
 }
 
+static Color
+nk_colorf_to_raylib_color(struct nk_colorf color)
+{
+    return nk_color_to_raylib_color(nk_rgba_cf(color));
+}
+
 static void
 nk_raylib_render(struct nk_context * ctx)
 {
