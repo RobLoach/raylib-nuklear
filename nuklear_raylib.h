@@ -171,14 +171,14 @@ nk_raylib_render(struct nk_context * ctx)
             case NK_COMMAND_TRIANGLE: {
                 const struct nk_command_triangle *t = (const struct nk_command_triangle*)cmd;
                 color = nk_color_to_raylib_color(t->color);
-                DrawTriangleLines((Vector2){t->a.x, t->a.y}, (Vector2){t->b.x, t->b.y}, (Vector2){t->c.x, t->c.y}, color);
+                DrawTriangleLines((Vector2){t->b.x, t->b.y}, (Vector2){t->a.x, t->a.y}, (Vector2){t->c.x, t->c.y}, color);
             } break;
 
             case NK_COMMAND_TRIANGLE_FILLED: {
                 const struct nk_command_triangle_filled *t = (const struct nk_command_triangle_filled*)cmd;
                 color = nk_color_to_raylib_color(t->color);
                 // TODO: Fix needing counter-clockwise order?
-                DrawTriangle((Vector2){t->a.x, t->a.y}, (Vector2){t->b.x, t->b.y}, (Vector2){t->c.x, t->c.y}, color);
+                DrawTriangle((Vector2){t->b.x, t->b.y}, (Vector2){t->a.x, t->a.y}, (Vector2){t->c.x, t->c.y}, color);
             } break;
 
             case NK_COMMAND_POLYGON: {
