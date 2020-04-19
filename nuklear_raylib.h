@@ -177,6 +177,7 @@ nk_raylib_render(struct nk_context * ctx)
             case NK_COMMAND_TRIANGLE_FILLED: {
                 const struct nk_command_triangle_filled *t = (const struct nk_command_triangle_filled*)cmd;
                 color = nk_color_to_raylib_color(t->color);
+                // TODO: Fix needing counter-clockwise order?
                 DrawTriangle((Vector2){t->a.x, t->a.y}, (Vector2){t->b.x, t->b.y}, (Vector2){t->c.x, t->c.y}, color);
             } break;
 
@@ -289,6 +290,97 @@ nk_raylib_translate_mouse_button(int button)
     return NK_BUTTON_MAX;
 }
 
+/**
+ * Returns 1 when pressed, 2 when released, or 0 when no change.
+ */
+NK_API int nk_raylib_input_changed(int key) {
+    if (IsKeyPressed(key)) {
+        return 1;
+    }
+    else if (IsKeyReleased(key)) {
+        return 0;
+    }
+    return -1;
+}
+
+NK_API void nk_raylib_input_keyboard(struct nk_context * ctx)
+{
+    int down;
+    if ((down = nk_raylib_input_changed(KEY_LEFT_SHIFT)) >= 0) {
+        nk_input_key(ctx, NK_KEY_SHIFT, down);
+    }
+    if ((down = nk_raylib_input_changed(KEY_RIGHT_SHIFT)) >= 0) {
+        nk_input_key(ctx, NK_KEY_SHIFT, down);
+    }
+    if ((down = nk_raylib_input_changed(KEY_LEFT_CONTROL)) >= 0) {
+        nk_input_key(ctx, NK_KEY_CTRL, down);
+    }
+    if ((down = nk_raylib_input_changed(KEY_RIGHT_CONTROL)) >= 0) {
+        nk_input_key(ctx, NK_KEY_CTRL, down);
+    }
+    if ((down = nk_raylib_input_changed(KEY_DELETE)) >= 0) {
+        nk_input_key(ctx, NK_KEY_DEL, down);
+    }
+    if ((down = nk_raylib_input_changed(KEY_ENTER)) >= 0) {
+        nk_input_key(ctx, NK_KEY_ENTER, down);
+    }
+    if ((down = nk_raylib_input_changed(KEY_TAB)) >= 0) {
+        nk_input_key(ctx, NK_KEY_TAB, down);
+    }
+    if ((down = nk_raylib_input_changed(KEY_BACKSPACE)) >= 0) {
+        nk_input_key(ctx, NK_KEY_BACKSPACE, down);
+    }
+    if ((down = nk_raylib_input_changed(KEY_C)) >= 0) {
+        nk_input_key(ctx, NK_KEY_COPY, (down == 1) && IsKeyDown(KEY_LEFT_CONTROL));
+    }
+    if ((down = nk_raylib_input_changed(KEY_X)) >= 0) {
+        nk_input_key(ctx, NK_KEY_CUT, (down == 1) && IsKeyDown(KEY_LEFT_CONTROL));
+    }
+    if ((down = nk_raylib_input_changed(KEY_V)) >= 0) {
+        nk_input_key(ctx, NK_KEY_PASTE, (down == 1) && IsKeyDown(KEY_LEFT_CONTROL));
+    }
+    if ((down = nk_raylib_input_changed(KEY_UP)) >= 0) {
+        nk_input_key(ctx, NK_KEY_UP, down);
+    }
+    if ((down = nk_raylib_input_changed(KEY_DOWN)) >= 0) {
+        nk_input_key(ctx, NK_KEY_DOWN, down);
+    }
+    if ((down = nk_raylib_input_changed(KEY_LEFT)) >= 0) {
+        if (IsKeyDown(KEY_LEFT_CONTROL)) {
+            nk_input_key(ctx, NK_KEY_TEXT_WORD_LEFT, down);
+        }
+        else {
+            nk_input_key(ctx, NK_KEY_LEFT, down);
+        }
+    }
+    if ((down = nk_raylib_input_changed(KEY_RIGHT)) >= 0) {
+        if (IsKeyDown(KEY_LEFT_CONTROL)) {
+            nk_input_key(ctx, NK_KEY_TEXT_WORD_RIGHT, down);
+        }
+        else {
+            nk_input_key(ctx, NK_KEY_RIGHT, down);
+        }
+    }
+
+    // TODO: Add remaining keyboard actions.
+    // NK_KEY_TEXT_INSERT_MODE
+    // NK_KEY_TEXT_REPLACE_MODE
+    // NK_KEY_TEXT_RESET_MODE
+    // NK_KEY_TEXT_LINE_START
+    // NK_KEY_TEXT_LINE_END
+    // NK_KEY_TEXT_START
+    // NK_KEY_TEXT_END
+    // NK_KEY_TEXT_UNDO
+    // NK_KEY_TEXT_REDO
+    // NK_KEY_TEXT_SELECT_ALL
+    // NK_KEY_TEXT_WORD_LEFT
+    // NK_KEY_TEXT_WORD_RIGHT
+    // NK_KEY_SCROLL_START
+    // NK_KEY_SCROLL_END
+    // NK_KEY_SCROLL_DOWN
+    // NK_KEY_SCROLL_UP
+}
+
 NK_API void
 nk_raylib_input(struct nk_context * ctx)
 {
@@ -304,13 +396,14 @@ nk_raylib_input(struct nk_context * ctx)
     }
     nk_input_motion(ctx, GetMouseX(), GetMouseY());
 
+    // Mouse Wheel
     int mouseWheel = GetMouseWheelMove();
     if (mouseWheel != 0) {
         struct nk_vec2 mouseWheelMove = (struct nk_vec2){0, mouseWheel};
         nk_input_scroll(ctx, mouseWheelMove);
     }
 
-    // TODO: Add Keyboard
+    nk_raylib_input_keyboard(ctx);
 
     nk_input_end(ctx);
 }
