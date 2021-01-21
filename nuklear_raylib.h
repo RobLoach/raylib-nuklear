@@ -93,7 +93,7 @@ nk_raylib_init()
 
     // Create the nuklear environment.
     if (nk_init_default(ctx, userFont) == 0) {
-        TraceLog(LOG_ERROR, "[NUKLEAR] Failed to initialize nuklear.");
+        TraceLog(LOG_ERROR, "NUKLEAR: Failed to initialize nuklear.");
         return NULL;
     }
 
@@ -258,16 +258,16 @@ nk_raylib_render(struct nk_context * ctx)
 
             case NK_COMMAND_IMAGE: {
                 // TODO NK_COMMAND_IMAGE
-                TraceLog(LOG_WARNING, "[NUKLEAR] Missing implementation NK_COMMAND_IMAGE");
+                TraceLog(LOG_WARNING, "NUKLEAR: Missing implementation NK_COMMAND_IMAGE");
             } break;
 
             case NK_COMMAND_ARC_FILLED: {
                 // TODO: NK_COMMAND_ARC_FILLED
-                TraceLog(LOG_WARNING, "[NUKLEAR] Missing implementation NK_COMMAND_ARC_FILLED");
+                TraceLog(LOG_WARNING, "NUKLEAR: Missing implementation NK_COMMAND_ARC_FILLED");
             } break;
 
             default: {
-                TraceLog(LOG_WARNING, "[NUKLEAR] Missing implementation %i", cmd->type);
+                TraceLog(LOG_WARNING, "NUKLEAR: Missing implementation %i", cmd->type);
             } break;
         }
     }
