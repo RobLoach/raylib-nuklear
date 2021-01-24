@@ -126,6 +126,7 @@ NK_API void
 nk_raylib_render(struct nk_context * ctx)
 {
     const struct nk_command *cmd;
+    bool scissor_mode = false;
 
     nk_foreach(cmd, ctx) {
         Color color;
@@ -135,25 +136,57 @@ nk_raylib_render(struct nk_context * ctx)
             }
 
             case NK_COMMAND_SCISSOR: {
-                // TODO: NK_COMMAND_SCISSOR
+                // TODO: Verify if NK_COMMAND_SCISSOR works.
+                const struct nk_command_scissor *s =(const struct nk_command_scissor*)cmd;
+                BeginScissorMode(s->x, s->y, s->w, s->h);
+                scissor_mode = true;
             } break;
 
             case NK_COMMAND_LINE: {
                 const struct nk_command_line *l = (const struct nk_command_line *)cmd;
                 color = nk_color_to_raylib_color(l->color);
-                DrawLine(l->begin.x, l->begin.y, l->end.x, l->end.y, color);
+                Vector2 startPos = (Vector2){l->begin.x, l->begin.y};
+                Vector2 endPos = (Vector2){l->end.x, l->end.y};
+
+                DrawLineEx(startPos, endPos, l->line_thickness, color);
             } break;
 
             case NK_COMMAND_RECT: {
                 const struct nk_command_rect *r = (const struct nk_command_rect *)cmd;
                 color = nk_color_to_raylib_color(r->color);
-                DrawRectangleLines(r->x, r->y, r->w, r->h, color);
+                Rectangle rect = (Rectangle){r->x, r->y, r->w, r->h};
+                if (r->rounding > 0) {
+                    // TODO: Figure our appropriate roundness.
+                    float roundness = (float)r->rounding / 20.0f;
+                    DrawRectangleRoundedLines(rect, roundness, 1, r->line_thickness, color);
+                }
+                else {
+                    DrawRectangleLinesEx(rect, r->line_thickness, color);
+                }
             } break;
 
             case NK_COMMAND_RECT_FILLED: {
                 const struct nk_command_rect_filled *r = (const struct nk_command_rect_filled *)cmd;
                 color = nk_color_to_raylib_color(r->color);
-                DrawRectangle(r->x, r->y, r->w, r->h, color);
+                Rectangle rect = (Rectangle){r->x, r->y, r->w, r->h};
+                if (r->rounding > 0) {
+                    // TODO: Figure our appropriate roundness.
+                    float roundness = (float)r->rounding / 20.0f;
+                    DrawRectangleRounded(rect, roundness, 1, color);
+                }
+                else {
+                    DrawRectangleRec(rect, color);
+                }
+            } break;
+
+            case NK_COMMAND_RECT_MULTI_COLOR: {
+                const struct nk_command_rect_multi_color* rectangle = (const struct nk_command_rect_multi_color *)cmd;
+                    Rectangle position = (Rectangle){rectangle->x, rectangle->y, rectangle->w, rectangle->h};
+                    Color left = nk_color_to_raylib_color(rectangle->left);
+                    Color top = nk_color_to_raylib_color(rectangle->top);
+                    Color bottom = nk_color_to_raylib_color(rectangle->bottom);
+                    Color right = nk_color_to_raylib_color(rectangle->right);
+                    DrawRectangleGradientEx(position, left, bottom, right, top);
             } break;
 
             case NK_COMMAND_CIRCLE: {
@@ -237,39 +270,68 @@ nk_raylib_render(struct nk_context * ctx)
             } break;
 
             case NK_COMMAND_ARC: {
-                TraceLog(LOG_INFO, "NK_COMMAND_ARC");
+                TraceLog(LOG_WARNING, "NUKLEAR: Untested implementation NK_COMMAND_ARC");
                 const struct nk_command_arc *a = (const struct nk_command_arc *)cmd;
                 color = nk_color_to_raylib_color(a->color);
 
                 // TODO: Fix NK_COMMAND_ARC
-                //DrawEllipseLines(a->cx, a->cy, a->r, a->a[0],
-                //    a->a[1], color, (float)a->line_thickness);
-            } break;
-
-            case NK_COMMAND_RECT_MULTI_COLOR: {
-                const struct nk_command_rect_multi_color* rectangle = (const struct nk_command_rect_multi_color *)cmd;
-                    Rectangle position = (Rectangle){rectangle->x, rectangle->y, rectangle->w, rectangle->h};
-                    Color left = nk_color_to_raylib_color(rectangle->left);
-                    Color top = nk_color_to_raylib_color(rectangle->top);
-                    Color bottom = nk_color_to_raylib_color(rectangle->bottom);
-                    Color right = nk_color_to_raylib_color(rectangle->right);
-                    DrawRectangleGradientEx(position, left, bottom, right, top);
-            } break;
-
-            case NK_COMMAND_IMAGE: {
-                // TODO NK_COMMAND_IMAGE
-                TraceLog(LOG_WARNING, "NUKLEAR: Missing implementation NK_COMMAND_IMAGE");
+                Vector2 center = {a->cx, a->cy};
+                float radius = a->r;
+                int startAngle = a->a[0];
+                int endAngle = a->a[1];
+                int segments = 20; // How many segments do we need?
+                DrawCircleSectorLines(center, radius, startAngle, endAngle, segments, color);
             } break;
 
             case NK_COMMAND_ARC_FILLED: {
-                // TODO: NK_COMMAND_ARC_FILLED
-                TraceLog(LOG_WARNING, "NUKLEAR: Missing implementation NK_COMMAND_ARC_FILLED");
+                // TODO: Fix NK_COMMAND_ARC_FILLED
+                TraceLog(LOG_WARNING, "NUKLEAR: Untested implementation NK_COMMAND_ARC_FILLED");
+                const struct nk_command_arc *a = (const struct nk_command_arc *)cmd;
+                color = nk_color_to_raylib_color(a->color);
+
+                Vector2 center = {a->cx, a->cy};
+                float radius = a->r;
+                int startAngle = a->a[0];
+                int endAngle = a->a[1];
+                int segments = 20; // How many segments do we need?
+                DrawCircleSector(center, radius, startAngle, endAngle, segments, color);
+            } break;
+
+            case NK_COMMAND_IMAGE: {
+                // TODO: Fix NK_COMMAND_IMAGE
+                TraceLog(LOG_WARNING, "NUKLEAR: Broken implementation NK_COMMAND_IMAGE");
+                const struct nk_command_image *i = (const struct nk_command_image *)cmd;
+                struct Image image;
+                image.data = i->img.handle.ptr;
+                image.width = i->w;
+                image.height = i->h;
+                image.mipmaps = 1;
+                image.format = UNCOMPRESSED_R8G8B8A8;
+
+                Texture texture = LoadTextureFromImage(image);
+                Rectangle source = {0, 0, image.width, image.height};
+                Rectangle dest = {i->x, i->y, i->w, i->h};
+                Vector2 origin = {0, 0};
+                float rotation = 0;
+                Color tint = nk_color_to_raylib_color(i->col);
+                DrawTexturePro(texture, source, dest, origin, rotation, tint);
+                UnloadTexture(texture);
+            } break;
+
+            case NK_COMMAND_CUSTOM: {
+                // TODO: NK_COMMAND_CUSTOM
+                TraceLog(LOG_WARNING, "NUKLEAR: Missing implementation NK_COMMAND_CUSTOM");
             } break;
 
             default: {
                 TraceLog(LOG_WARNING, "NUKLEAR: Missing implementation %i", cmd->type);
             } break;
         }
+    }
+
+    // Finish the scissor mode if it was in use.
+    if (scissor_mode) {
+        EndScissorMode();
     }
 
     nk_clear(ctx);
@@ -379,6 +441,13 @@ NK_API void nk_raylib_input_keyboard(struct nk_context * ctx)
     // NK_KEY_SCROLL_END
     // NK_KEY_SCROLL_DOWN
     // NK_KEY_SCROLL_UP
+
+    // TODO: Verify that this unicode keyboard input works.
+    for (int i = 32; i < 126; i++) {
+        if (IsKeyPressed(i)) {
+            nk_input_unicode(ctx, i);
+        }
+    }
 }
 
 NK_API void
@@ -388,11 +457,7 @@ nk_raylib_input(struct nk_context * ctx)
 
     // Mouse
     for (int button = MOUSE_LEFT_BUTTON; button <= MOUSE_MIDDLE_BUTTON; button++) {
-        if (IsMouseButtonPressed(button)) {
-            nk_input_button(ctx, nk_raylib_translate_mouse_button(button), GetMouseX(), GetMouseY(), 1);
-        } else if (IsMouseButtonReleased(button)) {
-            nk_input_button(ctx, nk_raylib_translate_mouse_button(button), GetMouseX(), GetMouseY(), 0);
-        }
+       nk_input_button(ctx, nk_raylib_translate_mouse_button(button), GetMouseX(), GetMouseY(), IsMouseButtonDown(button));
     }
     nk_input_motion(ctx, GetMouseX(), GetMouseY());
 
@@ -413,7 +478,9 @@ nk_raylib_free(struct nk_context * ctx)
 {
     // Unload the given font.
     struct Font* font = (struct Font*)ctx->style.font->userdata.ptr;
-    UnloadFont(*font);
+    if (font != NULL) {
+        UnloadFont(*font);
+    }
 
     // Unload the nuklear context.
     nk_free(ctx);

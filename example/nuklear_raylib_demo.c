@@ -14,7 +14,7 @@
 
 //#define NK_INCLUDE_FIXED_TYPES
 //#define NK_INCLUDE_STANDARD_IO
-//#define NK_INCLUDE_STANDARD_VARARGS
+#define NK_INCLUDE_STANDARD_VARARGS
 #define NK_INCLUDE_DEFAULT_ALLOCATOR
 //#define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
 //#define NK_INCLUDE_FONT_BAKING
@@ -34,7 +34,7 @@
  * ===============================================================*/
 /* This are some code examples to provide a small overview of what can be
  * done with this library. To try out an example uncomment the defines */
-/*#define INCLUDE_ALL */
+#define INCLUDE_ALL
 /*#define INCLUDE_STYLE */
 /*#define INCLUDE_CALCULATOR */
 /*#define INCLUDE_OVERVIEW */
