@@ -5,11 +5,9 @@
 *   FEATURES:
 *       - Use the nuklear immediate-mode graphical user interface in raylib.
 *
-*   NOTES:
-*       To use this, you must...
-*         1. Open up raylib/src/external/stb_rect_pack.h
-*         2. Delete its contents
-*         3. Without emptying raylib's stb_rect_pack.h, you will have redeclation errors
+*   DEPENDENCIES:
+*       - raylib https://www.raylib.com/
+*       - nuklear modified version at vendor/nuklear/nuklear.h
 *
 *   LICENSE: zlib/libpng
 *
@@ -37,6 +35,8 @@
 
 #ifndef NK_RAYLIB_H_
 #define NK_RAYLIB_H_
+
+#include "raylib.h"
 
 NK_API struct nk_context* nk_raylib_init();
 NK_API void nk_raylib_input(struct nk_context * ctx);
@@ -151,6 +151,19 @@ nk_raylib_render(struct nk_context * ctx)
                 DrawLineEx(startPos, endPos, l->line_thickness, color);
             } break;
 
+            case NK_COMMAND_CURVE: {
+                const struct nk_command_curve *q = (const struct nk_command_curve *)cmd;
+                color = nk_color_to_raylib_color(q->color);
+
+                Vector2 points[4];
+                points[0] = (Vector2){q->begin.x, q->begin.y};
+                points[1] = (Vector2){q->ctrl[0].x, q->ctrl[0].y};
+                points[2] = (Vector2){q->ctrl[1].x, q->ctrl[1].y};
+                points[3] = (Vector2){q->end.x, q->end.y};
+                // TODO: Confirm NK_COMMAND_CURVE
+                DrawLineStrip(points, 4, color);
+            } break;
+
             case NK_COMMAND_RECT: {
                 const struct nk_command_rect *r = (const struct nk_command_rect *)cmd;
                 color = nk_color_to_raylib_color(r->color);
@@ -181,12 +194,12 @@ nk_raylib_render(struct nk_context * ctx)
 
             case NK_COMMAND_RECT_MULTI_COLOR: {
                 const struct nk_command_rect_multi_color* rectangle = (const struct nk_command_rect_multi_color *)cmd;
-                    Rectangle position = (Rectangle){rectangle->x, rectangle->y, rectangle->w, rectangle->h};
-                    Color left = nk_color_to_raylib_color(rectangle->left);
-                    Color top = nk_color_to_raylib_color(rectangle->top);
-                    Color bottom = nk_color_to_raylib_color(rectangle->bottom);
-                    Color right = nk_color_to_raylib_color(rectangle->right);
-                    DrawRectangleGradientEx(position, left, bottom, right, top);
+                Rectangle position = (Rectangle){rectangle->x, rectangle->y, rectangle->w, rectangle->h};
+                Color left = nk_color_to_raylib_color(rectangle->left);
+                Color top = nk_color_to_raylib_color(rectangle->top);
+                Color bottom = nk_color_to_raylib_color(rectangle->bottom);
+                Color right = nk_color_to_raylib_color(rectangle->right);
+                DrawRectangleGradientEx(position, left, bottom, right, top);
             } break;
 
             case NK_COMMAND_CIRCLE: {
@@ -199,6 +212,34 @@ nk_raylib_render(struct nk_context * ctx)
                 const struct nk_command_circle_filled *c = (const struct nk_command_circle_filled *)cmd;
                 color = nk_color_to_raylib_color(c->color);
                 DrawEllipse(c->x + c->w / 2, c->y + c->h / 2, c->w / 2, c->h / 2, color);
+            } break;
+
+            case NK_COMMAND_ARC: {
+                TraceLog(LOG_WARNING, "NUKLEAR: Untested implementation NK_COMMAND_ARC");
+                const struct nk_command_arc *a = (const struct nk_command_arc *)cmd;
+                color = nk_color_to_raylib_color(a->color);
+
+                // TODO: Fix NK_COMMAND_ARC
+                Vector2 center = {a->cx, a->cy};
+                float radius = a->r;
+                int startAngle = a->a[0];
+                int endAngle = a->a[1];
+                int segments = 20; // How many segments do we need?
+                DrawCircleSectorLines(center, radius, startAngle, endAngle, segments, color);
+            } break;
+
+            case NK_COMMAND_ARC_FILLED: {
+                // TODO: Fix NK_COMMAND_ARC_FILLED
+                TraceLog(LOG_WARNING, "NUKLEAR: Untested implementation NK_COMMAND_ARC_FILLED");
+                const struct nk_command_arc *a = (const struct nk_command_arc *)cmd;
+                color = nk_color_to_raylib_color(a->color);
+
+                Vector2 center = {a->cx, a->cy};
+                float radius = a->r;
+                int startAngle = a->a[0];
+                int endAngle = a->a[1];
+                int segments = 20; // How many segments do we need?
+                DrawCircleSector(center, radius, startAngle, endAngle, segments, color);
             } break;
 
             case NK_COMMAND_TRIANGLE: {
@@ -254,47 +295,6 @@ nk_raylib_render(struct nk_context * ctx)
                 const struct nk_command_text *text = (const struct nk_command_text*)cmd;
                 color = nk_color_to_raylib_color(text->foreground);
                 DrawText((const char*)text->string, text->x, text->y, 10, color);
-            } break;
-
-            case NK_COMMAND_CURVE: {
-                const struct nk_command_curve *q = (const struct nk_command_curve *)cmd;
-                color = nk_color_to_raylib_color(q->color);
-
-                Vector2 points[4];
-                points[0] = (Vector2){q->begin.x, q->begin.y};
-                points[1] = (Vector2){q->ctrl[0].x, q->ctrl[0].y};
-                points[2] = (Vector2){q->ctrl[1].x, q->ctrl[1].y};
-                points[3] = (Vector2){q->end.x, q->end.y};
-                // TODO: Confirm NK_COMMAND_CURVE
-                DrawLineStrip(points, 4, color);
-            } break;
-
-            case NK_COMMAND_ARC: {
-                TraceLog(LOG_WARNING, "NUKLEAR: Untested implementation NK_COMMAND_ARC");
-                const struct nk_command_arc *a = (const struct nk_command_arc *)cmd;
-                color = nk_color_to_raylib_color(a->color);
-
-                // TODO: Fix NK_COMMAND_ARC
-                Vector2 center = {a->cx, a->cy};
-                float radius = a->r;
-                int startAngle = a->a[0];
-                int endAngle = a->a[1];
-                int segments = 20; // How many segments do we need?
-                DrawCircleSectorLines(center, radius, startAngle, endAngle, segments, color);
-            } break;
-
-            case NK_COMMAND_ARC_FILLED: {
-                // TODO: Fix NK_COMMAND_ARC_FILLED
-                TraceLog(LOG_WARNING, "NUKLEAR: Untested implementation NK_COMMAND_ARC_FILLED");
-                const struct nk_command_arc *a = (const struct nk_command_arc *)cmd;
-                color = nk_color_to_raylib_color(a->color);
-
-                Vector2 center = {a->cx, a->cy};
-                float radius = a->r;
-                int startAngle = a->a[0];
-                int endAngle = a->a[1];
-                int segments = 20; // How many segments do we need?
-                DrawCircleSector(center, radius, startAngle, endAngle, segments, color);
             } break;
 
             case NK_COMMAND_IMAGE: {
@@ -468,6 +468,7 @@ nk_raylib_input(struct nk_context * ctx)
         nk_input_scroll(ctx, mouseWheelMove);
     }
 
+    // Keyboard
     nk_raylib_input_keyboard(ctx);
 
     nk_input_end(ctx);
