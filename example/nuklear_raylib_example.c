@@ -47,6 +47,7 @@ int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "raylib [nuklear] example");
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second

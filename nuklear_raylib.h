@@ -129,7 +129,6 @@ nk_raylib_render(struct nk_context * ctx)
     bool scissor_mode = false;
 
     nk_foreach(cmd, ctx) {
-        Color color;
         switch (cmd->type) {
             case NK_COMMAND_NOP: {
                 break;
@@ -144,7 +143,7 @@ nk_raylib_render(struct nk_context * ctx)
 
             case NK_COMMAND_LINE: {
                 const struct nk_command_line *l = (const struct nk_command_line *)cmd;
-                color = nk_color_to_raylib_color(l->color);
+                Color color = nk_color_to_raylib_color(l->color);
                 Vector2 startPos = (Vector2){l->begin.x, l->begin.y};
                 Vector2 endPos = (Vector2){l->end.x, l->end.y};
 
@@ -153,7 +152,7 @@ nk_raylib_render(struct nk_context * ctx)
 
             case NK_COMMAND_CURVE: {
                 const struct nk_command_curve *q = (const struct nk_command_curve *)cmd;
-                color = nk_color_to_raylib_color(q->color);
+                Color color = nk_color_to_raylib_color(q->color);
 
                 Vector2 points[4];
                 points[0] = (Vector2){q->begin.x, q->begin.y};
@@ -166,7 +165,7 @@ nk_raylib_render(struct nk_context * ctx)
 
             case NK_COMMAND_RECT: {
                 const struct nk_command_rect *r = (const struct nk_command_rect *)cmd;
-                color = nk_color_to_raylib_color(r->color);
+                Color color = nk_color_to_raylib_color(r->color);
                 Rectangle rect = (Rectangle){r->x, r->y, r->w, r->h};
                 if (r->rounding > 0) {
                     // TODO: Figure our appropriate roundness.
@@ -180,7 +179,7 @@ nk_raylib_render(struct nk_context * ctx)
 
             case NK_COMMAND_RECT_FILLED: {
                 const struct nk_command_rect_filled *r = (const struct nk_command_rect_filled *)cmd;
-                color = nk_color_to_raylib_color(r->color);
+                Color color = nk_color_to_raylib_color(r->color);
                 Rectangle rect = (Rectangle){r->x, r->y, r->w, r->h};
                 if (r->rounding > 0) {
                     // TODO: Figure our appropriate roundness.
@@ -204,20 +203,20 @@ nk_raylib_render(struct nk_context * ctx)
 
             case NK_COMMAND_CIRCLE: {
                 const struct nk_command_circle *c = (const struct nk_command_circle *)cmd;
-                color = nk_color_to_raylib_color(c->color);
+                Color color = nk_color_to_raylib_color(c->color);
                 DrawEllipseLines(c->x + c->w / 2, c->y + c->h / 2, c->w / 2, c->h / 2, color);
             } break;
 
             case NK_COMMAND_CIRCLE_FILLED: {
                 const struct nk_command_circle_filled *c = (const struct nk_command_circle_filled *)cmd;
-                color = nk_color_to_raylib_color(c->color);
+                Color color = nk_color_to_raylib_color(c->color);
                 DrawEllipse(c->x + c->w / 2, c->y + c->h / 2, c->w / 2, c->h / 2, color);
             } break;
 
             case NK_COMMAND_ARC: {
                 TraceLog(LOG_WARNING, "NUKLEAR: Untested implementation NK_COMMAND_ARC");
                 const struct nk_command_arc *a = (const struct nk_command_arc *)cmd;
-                color = nk_color_to_raylib_color(a->color);
+                Color color = nk_color_to_raylib_color(a->color);
 
                 // TODO: Fix NK_COMMAND_ARC
                 Vector2 center = {a->cx, a->cy};
@@ -232,7 +231,7 @@ nk_raylib_render(struct nk_context * ctx)
                 // TODO: Fix NK_COMMAND_ARC_FILLED
                 TraceLog(LOG_WARNING, "NUKLEAR: Untested implementation NK_COMMAND_ARC_FILLED");
                 const struct nk_command_arc *a = (const struct nk_command_arc *)cmd;
-                color = nk_color_to_raylib_color(a->color);
+                Color color = nk_color_to_raylib_color(a->color);
 
                 Vector2 center = {a->cx, a->cy};
                 float radius = a->r;
@@ -244,20 +243,20 @@ nk_raylib_render(struct nk_context * ctx)
 
             case NK_COMMAND_TRIANGLE: {
                 const struct nk_command_triangle *t = (const struct nk_command_triangle*)cmd;
-                color = nk_color_to_raylib_color(t->color);
+                Color color = nk_color_to_raylib_color(t->color);
                 DrawTriangleLines((Vector2){t->b.x, t->b.y}, (Vector2){t->a.x, t->a.y}, (Vector2){t->c.x, t->c.y}, color);
             } break;
 
             case NK_COMMAND_TRIANGLE_FILLED: {
                 const struct nk_command_triangle_filled *t = (const struct nk_command_triangle_filled*)cmd;
-                color = nk_color_to_raylib_color(t->color);
+                Color color = nk_color_to_raylib_color(t->color);
                 // TODO: Fix needing counter-clockwise order?
                 DrawTriangle((Vector2){t->b.x, t->b.y}, (Vector2){t->a.x, t->a.y}, (Vector2){t->c.x, t->c.y}, color);
             } break;
 
             case NK_COMMAND_POLYGON: {
                 const struct nk_command_polygon *p = (const struct nk_command_polygon*)cmd;
-                color = nk_color_to_raylib_color(p->color);
+                Color color = nk_color_to_raylib_color(p->color);
                 Vector2 points[p->point_count];
 
                 for (int i = 0; i < p->point_count; i++) {
@@ -269,7 +268,7 @@ nk_raylib_render(struct nk_context * ctx)
 
             case NK_COMMAND_POLYGON_FILLED: {
                 const struct nk_command_polygon_filled *p = (const struct nk_command_polygon_filled*)cmd;
-                color = nk_color_to_raylib_color(p->color);
+                Color color = nk_color_to_raylib_color(p->color);
                 Vector2 points[p->point_count];
 
                 for (int i = 0; i < p->point_count; i++) {
@@ -281,7 +280,7 @@ nk_raylib_render(struct nk_context * ctx)
 
             case NK_COMMAND_POLYLINE: {
                 const struct nk_command_polyline *p = (const struct nk_command_polyline *)cmd;
-                color = nk_color_to_raylib_color(p->color);
+                Color color = nk_color_to_raylib_color(p->color);
                 int i;
                 Vector2 points[p->point_count];
                 for (i = 0; i < p->point_count; i++) {
@@ -293,7 +292,7 @@ nk_raylib_render(struct nk_context * ctx)
 
             case NK_COMMAND_TEXT: {
                 const struct nk_command_text *text = (const struct nk_command_text*)cmd;
-                color = nk_color_to_raylib_color(text->foreground);
+                Color color = nk_color_to_raylib_color(text->foreground);
                 DrawText((const char*)text->string, text->x, text->y, 10, color);
             } break;
 
