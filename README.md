@@ -2,7 +2,7 @@
 
 Use the [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear) immediate mode cross-platform GUI library in [raylib](https://www.raylib.com/).
 
-![nuklear_raylib_example screenshot](example/nuklear_raylib_example.png)
+![nuklear_raylib_example screenshot](examples/nuklear_raylib_example.png)
 
 ## Example
 
