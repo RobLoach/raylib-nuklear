@@ -21,7 +21,6 @@
 //#define NK_INCLUDE_DEFAULT_FONT
 #define NK_IMPLEMENTATION
 #define NK_RAYLIB_IMPLEMENTATION
-#include "nuklear.h"
 #include "nuklear_raylib.h"
 
 #define WINDOW_WIDTH 1200
