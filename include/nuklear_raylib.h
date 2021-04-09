@@ -36,6 +36,7 @@
 #ifndef NK_RAYLIB_H_
 #define NK_RAYLIB_H_
 
+#include "./nuklear_raylib_nuklear.h"
 #include "raylib.h"
 
 NK_API struct nk_context* nk_raylib_init();
