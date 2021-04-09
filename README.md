@@ -1,6 +1,6 @@
 # Nuklear Raylib
 
-Use [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear) in [raylib](https://www.raylib.com/).
+Use the [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear) immediate mode cross-platform GUI library in [raylib](https://www.raylib.com/).
 
 ![nuklear_raylib_example screenshot](example/nuklear_raylib_example.png)
 
@@ -19,7 +19,9 @@ int main() {
         // Input
         nk_raylib_input(ctx);
 
-        // Create the Nuklear GUI
+        // Add your own Nuklear GUI
+        // See the Nuklear Wiki for examples:
+        // https://github.com/Immediate-Mode-UI/Nuklear/wiki/Window
         // ...
 
         // Render
