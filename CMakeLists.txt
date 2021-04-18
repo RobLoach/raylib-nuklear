@@ -6,19 +6,19 @@ project(nuklear_raylib
     LANGUAGES C
 )
 
+# raylib-nuklear
+add_subdirectory(include)
+
 # raylib
 find_package(raylib QUIET)
 if (NOT raylib_FOUND)
     set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
     set(BUILD_GAMES    OFF CACHE BOOL "" FORCE)
-    set(BUILD_TESTING  OFF CACHE BOOL "" FORCE)
     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vendor/raylib)
 endif()
 
-add_subdirectory(include)
-
-# Example
-option(BUILD_NUKLEAR_RAYLIB_EXAMPLES "nuklear_raylib Examples" ON)
-if (BUILD_NUKLEAR_RAYLIB_EXAMPLES)
+# Examples
+option(BUILD_RAYLIB_NUKLEAR_EXAMPLES "Build Examples" ON)
+if (BUILD_RAYLIB_NUKLEAR_EXAMPLES)
     add_subdirectory(examples)
 endif()
