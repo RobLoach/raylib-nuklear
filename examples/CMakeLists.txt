@@ -7,7 +7,7 @@ target_link_libraries(raylib-nuklear-example PUBLIC
     raylib-nuklear
 )
 
-# nuklear_raylib_demo
+# raylib-nuklear-demo
 add_executable(raylib-nuklear-demo
     raylib-nuklear-demo.c
 )

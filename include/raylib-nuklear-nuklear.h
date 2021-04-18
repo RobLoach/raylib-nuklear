@@ -10615,7 +10615,7 @@ nk__draw_next(const struct nk_draw_command *cmd,
 /*  More docs to come. */
 /*  */
 /*  No memory allocations; uses qsort() and assert() from stdlib. */
-/*  Can override those by defining STBRP_SORT and STBRP_ASSERT. */
+/*  Can override those by defining nuklear_stbrp_SORT and nuklear_stbrp_ASSERT. */
 /*  */
 /*  This library currently uses the Skyline Bottom-Left algorithm. */
 /*  */
@@ -10644,9 +10644,9 @@ nk__draw_next(const struct nk_draw_command *cmd,
 /*      0.09  (2016-08-27)  fix compiler warnings */
 /*      0.08  (2015-09-13)  really fix bug with empty rects (w=0 or h=0) */
 /*      0.07  (2015-09-13)  fix bug with empty rects (w=0 or h=0) */
-/*      0.06  (2015-04-15)  added STBRP_SORT to allow replacing qsort */
-/*      0.05:  added STBRP_ASSERT to allow replacing assert */
-/*      0.04:  fixed minor bug in STBRP_LARGE_RECTS support */
+/*      0.06  (2015-04-15)  added nuklear_stbrp_SORT to allow replacing qsort */
+/*      0.05:  added nuklear_stbrp_ASSERT to allow replacing assert */
+/*      0.04:  fixed minor bug in nuklear_stbrp_LARGE_RECTS support */
 /*      0.01:  initial release */
 /*  */
 /*  LICENSE */
@@ -10663,10 +10663,10 @@ nk__draw_next(const struct nk_draw_command *cmd,
 
 #define STB_RECT_PACK_VERSION  1
 
-#ifdef STBRP_STATIC
-#define STBRP_DEF static
+#ifdef nuklear_stbrp_STATIC
+#define nuklear_stbrp_DEF static
 #else
-#define STBRP_DEF extern
+#define nuklear_stbrp_DEF extern
 #endif
 
 #ifdef __cplusplus
@@ -10677,13 +10677,13 @@ typedef struct nuklear_stbrp_context nuklear_stbrp_context;
 typedef struct nuklear_stbrp_node    nuklear_stbrp_node;
 typedef struct nuklear_stbrp_rect    nuklear_stbrp_rect;
 
-#ifdef STBRP_LARGE_RECTS
+#ifdef nuklear_stbrp_LARGE_RECTS
 typedef int            nuklear_stbrp_coord;
 #else
 typedef unsigned short nuklear_stbrp_coord;
 #endif
 
-STBRP_DEF int nuklear_stbrp_pack_rects (nuklear_stbrp_context *context, nuklear_stbrp_rect *rects, int num_rects);
+nuklear_stbrp_DEF int nuklear_stbrp_pack_rects (nuklear_stbrp_context *context, nuklear_stbrp_rect *rects, int num_rects);
 /*  Assign packed locations to rectangles. The rectangles are of type */
 /*  'nuklear_stbrp_rect' defined below, stored in the array 'rects', and there */
 /*  are 'num_rects' many of them. */
@@ -10723,7 +10723,7 @@ struct nuklear_stbrp_rect
 }; /*  16 bytes, nominally */
 
 
-STBRP_DEF void nuklear_stbrp_init_target (nuklear_stbrp_context *context, int width, int height, nuklear_stbrp_node *nodes, int num_nodes);
+nuklear_stbrp_DEF void nuklear_stbrp_init_target (nuklear_stbrp_context *context, int width, int height, nuklear_stbrp_node *nodes, int num_nodes);
 /*  Initialize a rectangle packer to: */
 /*     pack a rectangle that is 'width' by 'height' in dimensions */
 /*     using temporary storage provided by the array 'nodes', which is 'num_nodes' long */
@@ -10744,22 +10744,22 @@ STBRP_DEF void nuklear_stbrp_init_target (nuklear_stbrp_context *context, int wi
 /*  If you do #2, then the non-quantized algorithm will be used, but the algorithm */
 /*  may run out of temporary storage and be unable to pack some rectangles. */
 
-STBRP_DEF void nuklear_stbrp_setup_allow_out_of_mem (nuklear_stbrp_context *context, int allow_out_of_mem);
+nuklear_stbrp_DEF void nuklear_stbrp_setup_allow_out_of_mem (nuklear_stbrp_context *context, int allow_out_of_mem);
 /*  Optionally call this function after init but before doing any packing to */
 /*  change the handling of the out-of-temp-memory scenario, described above. */
 /*  If you call init again, this will be reset to the default (false). */
 
 
-STBRP_DEF void nuklear_stbrp_setup_heuristic (nuklear_stbrp_context *context, int heuristic);
+nuklear_stbrp_DEF void nuklear_stbrp_setup_heuristic (nuklear_stbrp_context *context, int heuristic);
 /*  Optionally select which packing heuristic the library should use. Different */
 /*  heuristics will produce better/worse results for different data sets. */
 /*  If you call init again, this will be reset to the default. */
 
 enum
 {
-   STBRP_HEURISTIC_Skyline_default=0,
-   STBRP_HEURISTIC_Skyline_BL_sortHeight = STBRP_HEURISTIC_Skyline_default,
-   STBRP_HEURISTIC_Skyline_BF_sortHeight
+   nuklear_stbrp_HEURISTIC_Skyline_default=0,
+   nuklear_stbrp_HEURISTIC_Skyline_BL_sortHeight = nuklear_stbrp_HEURISTIC_Skyline_default,
+   nuklear_stbrp_HEURISTIC_Skyline_BF_sortHeight
 };
 
 
@@ -10799,40 +10799,40 @@ struct nuklear_stbrp_context
 /*  */
 
 #ifdef STB_RECT_PACK_IMPLEMENTATION
-#ifndef STBRP_SORT
+#ifndef nuklear_stbrp_SORT
 #include <stdlib.h>
-#define STBRP_SORT qsort
+#define nuklear_stbrp_SORT qsort
 #endif
 
-#ifndef STBRP_ASSERT
+#ifndef nuklear_stbrp_ASSERT
 #include <assert.h>
-#define STBRP_ASSERT assert
+#define nuklear_stbrp_ASSERT assert
 #endif
 
 #ifdef _MSC_VER
-#define STBRP__NOTUSED(v)  (void)(v)
+#define nuklear_stbrp__NOTUSED(v)  (void)(v)
 #else
-#define STBRP__NOTUSED(v)  (void)sizeof(v)
+#define nuklear_stbrp__NOTUSED(v)  (void)sizeof(v)
 #endif
 
 enum
 {
-   STBRP__INIT_skyline = 1
+   nuklear_stbrp__INIT_skyline = 1
 };
 
-STBRP_DEF void nuklear_stbrp_setup_heuristic(nuklear_stbrp_context *context, int heuristic)
+nuklear_stbrp_DEF void nuklear_stbrp_setup_heuristic(nuklear_stbrp_context *context, int heuristic)
 {
    switch (context->init_mode) {
-      case STBRP__INIT_skyline:
-         STBRP_ASSERT(heuristic == STBRP_HEURISTIC_Skyline_BL_sortHeight || heuristic == STBRP_HEURISTIC_Skyline_BF_sortHeight);
+      case nuklear_stbrp__INIT_skyline:
+         nuklear_stbrp_ASSERT(heuristic == nuklear_stbrp_HEURISTIC_Skyline_BL_sortHeight || heuristic == nuklear_stbrp_HEURISTIC_Skyline_BF_sortHeight);
          context->heuristic = heuristic;
          break;
       default:
-         STBRP_ASSERT(0);
+         nuklear_stbrp_ASSERT(0);
    }
 }
 
-STBRP_DEF void nuklear_stbrp_setup_allow_out_of_mem(nuklear_stbrp_context *context, int allow_out_of_mem)
+nuklear_stbrp_DEF void nuklear_stbrp_setup_allow_out_of_mem(nuklear_stbrp_context *context, int allow_out_of_mem)
 {
    if (allow_out_of_mem)
       /*  if it's ok to run out of memory, then don't bother aligning them; */
@@ -10852,18 +10852,18 @@ STBRP_DEF void nuklear_stbrp_setup_allow_out_of_mem(nuklear_stbrp_context *conte
    }
 }
 
-STBRP_DEF void nuklear_stbrp_init_target(nuklear_stbrp_context *context, int width, int height, nuklear_stbrp_node *nodes, int num_nodes)
+nuklear_stbrp_DEF void nuklear_stbrp_init_target(nuklear_stbrp_context *context, int width, int height, nuklear_stbrp_node *nodes, int num_nodes)
 {
    int i;
-#ifndef STBRP_LARGE_RECTS
-   STBRP_ASSERT(width <= 0xffff && height <= 0xffff);
+#ifndef nuklear_stbrp_LARGE_RECTS
+   nuklear_stbrp_ASSERT(width <= 0xffff && height <= 0xffff);
 #endif
 
    for (i=0; i < num_nodes-1; ++i)
       nodes[i].next = &nodes[i+1];
    nodes[i].next = NULL;
-   context->init_mode = STBRP__INIT_skyline;
-   context->heuristic = STBRP_HEURISTIC_Skyline_default;
+   context->init_mode = nuklear_stbrp__INIT_skyline;
+   context->heuristic = nuklear_stbrp_HEURISTIC_Skyline_default;
    context->free_head = &nodes[0];
    context->active_head = &context->extra[0];
    context->width = width;
@@ -10876,7 +10876,7 @@ STBRP_DEF void nuklear_stbrp_init_target(nuklear_stbrp_context *context, int wid
    context->extra[0].y = 0;
    context->extra[0].next = &context->extra[1];
    context->extra[1].x = (nuklear_stbrp_coord) width;
-#ifdef STBRP_LARGE_RECTS
+#ifdef nuklear_stbrp_LARGE_RECTS
    context->extra[1].y = (1<<30);
 #else
    context->extra[1].y = 65535;
@@ -10891,19 +10891,19 @@ static int nuklear_stbrp__skyline_find_min_y(nuklear_stbrp_context *c, nuklear_s
    int x1 = x0 + width;
    int min_y, visited_width, waste_area;
 
-   STBRP__NOTUSED(c);
+   nuklear_stbrp__NOTUSED(c);
 
-   STBRP_ASSERT(first->x <= x0);
+   nuklear_stbrp_ASSERT(first->x <= x0);
 
    #if 0
    /*  skip in case we're past the node */
    while (node->next->x <= x0)
       ++node;
    #else
-   STBRP_ASSERT(node->next->x > x0); /*  we ended up handling this in the caller for efficiency */
+   nuklear_stbrp_ASSERT(node->next->x > x0); /*  we ended up handling this in the caller for efficiency */
    #endif
 
-   STBRP_ASSERT(node->x <= x0);
+   nuklear_stbrp_ASSERT(node->x <= x0);
 
    min_y = 0;
    waste_area = 0;
@@ -10950,7 +10950,7 @@ static nuklear_stbrp__findresult nuklear_stbrp__skyline_find_best_pos(nuklear_st
    /*  align to multiple of c->align */
    width = (width + c->align - 1);
    width -= width % c->align;
-   STBRP_ASSERT(width % c->align == 0);
+   nuklear_stbrp_ASSERT(width % c->align == 0);
 
    /*  if it can't possibly fit, bail immediately */
    if (width > c->width || height > c->height) {
@@ -10964,7 +10964,7 @@ static nuklear_stbrp__findresult nuklear_stbrp__skyline_find_best_pos(nuklear_st
    while (node->x + width <= c->width) {
       int y,waste;
       y = nuklear_stbrp__skyline_find_min_y(c, node, node->x, width, &waste);
-      if (c->heuristic == STBRP_HEURISTIC_Skyline_BL_sortHeight) { /*  actually just want to test BL */
+      if (c->heuristic == nuklear_stbrp_HEURISTIC_Skyline_BL_sortHeight) { /*  actually just want to test BL */
          /*  bottom left */
          if (y < best_y) {
             best_y = y;
@@ -11004,7 +11004,7 @@ static nuklear_stbrp__findresult nuklear_stbrp__skyline_find_best_pos(nuklear_st
    /*  */
    /*  This makes BF take about 2x the time */
 
-   if (c->heuristic == STBRP_HEURISTIC_Skyline_BF_sortHeight) {
+   if (c->heuristic == nuklear_stbrp_HEURISTIC_Skyline_BF_sortHeight) {
       tail = c->active_head;
       node = c->active_head;
       prev = &c->active_head;
@@ -11014,19 +11014,19 @@ static nuklear_stbrp__findresult nuklear_stbrp__skyline_find_best_pos(nuklear_st
       while (tail) {
          int xpos = tail->x - width;
          int y,waste;
-         STBRP_ASSERT(xpos >= 0);
+         nuklear_stbrp_ASSERT(xpos >= 0);
          /*  find the left position that matches this */
          while (node->next->x <= xpos) {
             prev = &node->next;
             node = node->next;
          }
-         STBRP_ASSERT(node->next->x > xpos && node->x <= xpos);
+         nuklear_stbrp_ASSERT(node->next->x > xpos && node->x <= xpos);
          y = nuklear_stbrp__skyline_find_min_y(c, node, xpos, width, &waste);
          if (y + height <= c->height) {
             if (y <= best_y) {
                if (y < best_y || waste < best_waste || (waste==best_waste && xpos < best_x)) {
                   best_x = xpos;
-                  STBRP_ASSERT(y <= best_y);
+                  nuklear_stbrp_ASSERT(y <= best_y);
                   best_y = y;
                   best_waste = waste;
                   best = prev;
@@ -11098,10 +11098,10 @@ static nuklear_stbrp__findresult nuklear_stbrp__skyline_pack_rectangle(nuklear_s
 #ifdef _DEBUG
    cur = context->active_head;
    while (cur->x < context->width) {
-      STBRP_ASSERT(cur->x < cur->next->x);
+      nuklear_stbrp_ASSERT(cur->x < cur->next->x);
       cur = cur->next;
    }
-   STBRP_ASSERT(cur->next == NULL);
+   nuklear_stbrp_ASSERT(cur->next == NULL);
 
    {
       int count=0;
@@ -11115,7 +11115,7 @@ static nuklear_stbrp__findresult nuklear_stbrp__skyline_pack_rectangle(nuklear_s
          cur = cur->next;
          ++count;
       }
-      STBRP_ASSERT(count == context->num_nodes+2);
+      nuklear_stbrp_ASSERT(count == context->num_nodes+2);
    }
 #endif
 
@@ -11140,13 +11140,13 @@ static int rect_original_order(const void *a, const void *b)
    return (p->was_packed < q->was_packed) ? -1 : (p->was_packed > q->was_packed);
 }
 
-#ifdef STBRP_LARGE_RECTS
-#define STBRP__MAXVAL  0xffffffff
+#ifdef nuklear_stbrp_LARGE_RECTS
+#define nuklear_stbrp__MAXVAL  0xffffffff
 #else
-#define STBRP__MAXVAL  0xffff
+#define nuklear_stbrp__MAXVAL  0xffff
 #endif
 
-STBRP_DEF int nuklear_stbrp_pack_rects(nuklear_stbrp_context *context, nuklear_stbrp_rect *rects, int num_rects)
+nuklear_stbrp_DEF int nuklear_stbrp_pack_rects(nuklear_stbrp_context *context, nuklear_stbrp_rect *rects, int num_rects)
 {
    int i, all_rects_packed = 1;
 
@@ -11156,7 +11156,7 @@ STBRP_DEF int nuklear_stbrp_pack_rects(nuklear_stbrp_context *context, nuklear_s
    }
 
    /*  sort according to heuristic */
-   STBRP_SORT(rects, num_rects, sizeof(rects[0]), rect_height_compare);
+   nuklear_stbrp_SORT(rects, num_rects, sizeof(rects[0]), rect_height_compare);
 
    for (i=0; i < num_rects; ++i) {
       if (rects[i].w == 0 || rects[i].h == 0) {
@@ -11167,17 +11167,17 @@ STBRP_DEF int nuklear_stbrp_pack_rects(nuklear_stbrp_context *context, nuklear_s
             rects[i].x = (nuklear_stbrp_coord) fr.x;
             rects[i].y = (nuklear_stbrp_coord) fr.y;
          } else {
-            rects[i].x = rects[i].y = STBRP__MAXVAL;
+            rects[i].x = rects[i].y = nuklear_stbrp__MAXVAL;
          }
       }
    }
 
    /*  unsort */
-   STBRP_SORT(rects, num_rects, sizeof(rects[0]), rect_original_order);
+   nuklear_stbrp_SORT(rects, num_rects, sizeof(rects[0]), rect_original_order);
 
    /*  set was_packed flags and all_rects_packed status */
    for (i=0; i < num_rects; ++i) {
-      rects[i].was_packed = !(rects[i].x == STBRP__MAXVAL && rects[i].y == STBRP__MAXVAL);
+      rects[i].was_packed = !(rects[i].x == nuklear_stbrp__MAXVAL && rects[i].y == nuklear_stbrp__MAXVAL);
       if (!rects[i].was_packed)
          all_rects_packed = 0;
    }

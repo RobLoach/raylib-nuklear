@@ -2,7 +2,7 @@
 
 Use the [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear) immediate mode cross-platform GUI library in [raylib](https://www.raylib.com/).
 
-![raylib-nuklear example screenshot](examples/raylib-nuklear-example.png)
+![raylib-nuklear-example screenshot](examples/raylib-nuklear-example.png)
 
 ## Example
 
@@ -51,6 +51,7 @@ mkdir build
 cd build
 cmake ..
 make
+./example/raylib-nuklear-example
 ```
 
 ### Nuklear Source

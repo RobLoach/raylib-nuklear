@@ -1,6 +1,6 @@
 /**********************************************************************************************
 *
-*   nuklear_raylib_example - Example of using Nuklear with Raylib.
+*   raylib-nuklear-example - Example of using Nuklear with Raylib.
 *
 *   LICENSE: zlib/libpng
 *

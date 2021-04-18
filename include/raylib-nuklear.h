@@ -1,6 +1,6 @@
 /**********************************************************************************************
 *
-*   nuklear_raylib - Nuklear for Raylib.
+*   raylib-nuklear - Nuklear for Raylib.
 *
 *   FEATURES:
 *       - Use the nuklear immediate-mode graphical user interface in raylib.
@@ -11,7 +11,7 @@
 *
 *   LICENSE: zlib/libpng
 *
-*   nuklear_raylib is licensed under an unmodified zlib/libpng license, which is an OSI-certified,
+*   raylib-nuklear is licensed under an unmodified zlib/libpng license, which is an OSI-certified,
 *   BSD-like license that allows static linking with closed source software:
 *
 *   Copyright (c) 2020 Rob Loach (@RobLoach)
@@ -36,6 +36,10 @@
 #ifndef RAYLIB_NUKLEAR_H
 #define RAYLIB_NUKLEAR_H
 
+#ifndef NK_INCLUDE_STANDARD_VARARGS
+#define NK_INCLUDE_STANDARD_VARARGS
+#endif
+
 #include "./raylib-nuklear-nuklear.h"
 #include "raylib.h"
 
@@ -48,24 +52,28 @@ NK_API struct nk_color ColorToNuklear(Color color);
 NK_API struct nk_colorf ColorToNuklearF(Color color);
 NK_API struct Color ColorFromNuklear(struct nk_color color);
 NK_API struct Color ColorFromNuklearF(struct nk_colorf color);
+NK_API struct Rectangle RectangleFromNuklear(struct nk_rect rect);
+NK_API struct nk_rect RectangleToNuklear(Rectangle rect);
 
-#endif
+#endif  // RAYLIB_NUKLEAR_H
 
 #ifdef RAYLIB_NUKLEAR_IMPLEMENTATION
 #ifndef RAYLIB_NUKLEAR_IMPLEMENTATION_ONCE
 #define RAYLIB_NUKLEAR_IMPLEMENTATION_ONCE
 
+#ifndef NK_ASSERT
 #define NK_ASSERT(condition) if (!(condition)) { TraceLog(LOG_WARNING, "NUKLEAR: Failed assert \"%s\" (%s:%i)", #condition, "nuklear_raylib_nuklear.h", __LINE__); }
+#endif  // NK_ASSERT
 
 // TODO: Replace NK_INCLUDE_DEFAULT_ALLOCATOR with MemAlloc() and MemFree()
 #ifndef NK_INCLUDE_DEFAULT_ALLOCATOR
 #define NK_INCLUDE_DEFAULT_ALLOCATOR
-#endif
+#endif  // NK_INCLUDE_DEFAULT_ALLOCATOR
 
 #ifndef NK_BOOL
 #define NK_INCLUDE_STANDARD_BOOL
 #define NK_BOOL bool
-#endif
+#endif  // NK_BOOL
 
 #define NK_IMPLEMENTATION
 #include "./raylib-nuklear-nuklear.h"
@@ -77,12 +85,16 @@ nk_raylib_font_get_text_width(nk_handle handle, float height, const char *text, 
         return 0;
     }
 
-    struct nk_user_font* userFont = (struct nk_user_font*)handle.ptr;
-    if (userFont == (void*)0) {
-        return 0;
-    }
-
     return MeasureText(text, 10);
+
+    // TODO: Support local user fonts.
+    // struct nk_user_font* userFont = (struct nk_user_font*)handle.ptr;
+    // Font* font = (Font*)userFont->userdata;
+    // if (userFont == (void*)0) {
+    //     return MeasureText(text, 10);
+    // }
+
+    // return MeasureTextEx(font, text, 10, 1.0f);
 }
 
 NK_API void
@@ -331,6 +343,9 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_TEXT: {
                 const struct nk_command_text *text = (const struct nk_command_text*)cmd;
                 Color color = ColorFromNuklear(text->foreground);
+                // Font* font = (Font*)text->font->userdata.ptr;
+
+                Vector2 position = {text->x, text->y};
                 DrawText((const char*)text->string, text->x, text->y, 10, color);
             } break;
 
@@ -491,23 +506,23 @@ NK_API void
 UpdateNuklear(struct nk_context * ctx)
 {
     nk_input_begin(ctx);
+    {
+        // Mouse
+        for (int button = MOUSE_LEFT_BUTTON; button <= MOUSE_MIDDLE_BUTTON; button++) {
+        nk_input_button(ctx, nk_raylib_translate_mouse_button(button), GetMouseX(), GetMouseY(), IsMouseButtonDown(button));
+        }
+        nk_input_motion(ctx, GetMouseX(), GetMouseY());
 
-    // Mouse
-    for (int button = MOUSE_LEFT_BUTTON; button <= MOUSE_MIDDLE_BUTTON; button++) {
-       nk_input_button(ctx, nk_raylib_translate_mouse_button(button), GetMouseX(), GetMouseY(), IsMouseButtonDown(button));
+        // Mouse Wheel
+        int mouseWheel = GetMouseWheelMove();
+        if (mouseWheel != 0) {
+            struct nk_vec2 mouseWheelMove = (struct nk_vec2){0, mouseWheel};
+            nk_input_scroll(ctx, mouseWheelMove);
+        }
+
+        // Keyboard
+        nk_raylib_input_keyboard(ctx);
     }
-    nk_input_motion(ctx, GetMouseX(), GetMouseY());
-
-    // Mouse Wheel
-    int mouseWheel = GetMouseWheelMove();
-    if (mouseWheel != 0) {
-        struct nk_vec2 mouseWheelMove = (struct nk_vec2){0, mouseWheel};
-        nk_input_scroll(ctx, mouseWheelMove);
-    }
-
-    // Keyboard
-    nk_raylib_input_keyboard(ctx);
-
     nk_input_end(ctx);
 }
 
@@ -516,7 +531,7 @@ UnloadNuklear(struct nk_context * ctx)
 {
     // Unload the given font.
     struct Font* font = (struct Font*)ctx->style.font->userdata.ptr;
-    if (font != NULL) {
+    if (font != (void*)0) {
         UnloadFont(*font);
     }
 
@@ -524,5 +539,22 @@ UnloadNuklear(struct nk_context * ctx)
     nk_free(ctx);
 }
 
-#endif // RAYLIB_NUKLEAR_IMPLEMENTATION_ONCE
-#endif // RAYLIB_NUKLEAR_IMPLEMENTATION
+NK_API struct
+Rectangle RectangleFromNuklear(struct nk_rect rect)
+{
+    Rectangle output;
+    output.x = rect.x;
+    output.y = rect.y;
+    output.width = rect.w;
+    output.height = rect.h;
+    return output;
+}
+
+NK_API struct
+nk_rect RectangleToNuklear(Rectangle rect)
+{
+    return nk_rect(rect.x, rect.y, rect.width, rect.height);
+}
+
+#endif  // RAYLIB_NUKLEAR_IMPLEMENTATION_ONCE
+#endif  // RAYLIB_NUKLEAR_IMPLEMENTATION
