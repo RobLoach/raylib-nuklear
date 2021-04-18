@@ -1,6 +1,6 @@
 /**********************************************************************************************
 *
-*   nuklear_raylib_example - Example of using Nuklear with Raylib.
+*   raylib-nuklear-example - Example of using Nuklear with Raylib.
 *
 *   LICENSE: zlib/libpng
 *
@@ -28,35 +28,29 @@
 
 #include "raylib.h"
 
-#define WINDOW_WIDTH 1200
-#define WINDOW_HEIGHT 800
-
-#define NK_INCLUDE_DEFAULT_ALLOCATOR
-#define NK_IMPLEMENTATION
-#define NK_RAYLIB_IMPLEMENTATION
-#include "nuklear_raylib.h"
+#define RAYLIB_NUKLEAR_IMPLEMENTATION
+#include "raylib-nuklear.h"
 
 int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
-    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "raylib [nuklear] example");
+    const int screenWidth = 800;
+    const int screenHeight = 450;
+    InitWindow(screenWidth, screenHeight, "[raylib-nuklear] example");
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
     /* GUI */
-    struct nk_context *ctx;
-    struct nk_colorf bg;
-    ctx = nk_raylib_init();
+    struct nk_colorf bg = ColorToNuklearF(SKYBLUE);
+    struct nk_context *ctx = InitNuklear();
 
     // Main game loop
-    bg.r = 0.10f, bg.g = 0.18f, bg.b = 0.24f, bg.a = 1.0f;
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
         // Update
-        nk_raylib_input(ctx);
+        UpdateNuklear(ctx);
 
         /* GUI */
         if (nk_begin(ctx, "Demo", nk_rect(50, 50, 230, 250),
@@ -97,9 +91,9 @@ int main(void)
         //----------------------------------------------------------------------------------
         BeginDrawing();
 
-            ClearBackground(nk_colorf_to_raylib_color(bg));
+            ClearBackground(ColorFromNuklearF(bg));
 
-            nk_raylib_render(ctx);
+            DrawNuklear(ctx);
 
         EndDrawing();
         //----------------------------------------------------------------------------------
@@ -107,7 +101,7 @@ int main(void)
 
     // De-Initialization
     //--------------------------------------------------------------------------------------
-    nk_raylib_free(ctx);
+    UnloadNuklear(ctx);
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
 

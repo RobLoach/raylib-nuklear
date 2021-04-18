@@ -15,13 +15,12 @@
 //#define NK_INCLUDE_FIXED_TYPES
 //#define NK_INCLUDE_STANDARD_IO
 #define NK_INCLUDE_STANDARD_VARARGS
-#define NK_INCLUDE_DEFAULT_ALLOCATOR
+//#define NK_INCLUDE_DEFAULT_ALLOCATOR
 //#define NK_INCLUDE_VERTEX_BUFFER_OUTPUT
 //#define NK_INCLUDE_FONT_BAKING
 //#define NK_INCLUDE_DEFAULT_FONT
-#define NK_IMPLEMENTATION
-#define NK_RAYLIB_IMPLEMENTATION
-#include "nuklear_raylib.h"
+#define RAYLIB_NUKLEAR_IMPLEMENTATION
+#include "raylib-nuklear.h"
 
 #define WINDOW_WIDTH 1200
 #define WINDOW_HEIGHT 800
@@ -67,14 +66,14 @@
 int main(void)
 {
     /* Platform */
-    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "raylib [nuklear] demo");
+    InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "[raylib-nuklear] demo");
     SetTargetFPS(60);
 
     /* GUI */
     struct nk_context *ctx;
     struct nk_colorf bg;
 
-    ctx = nk_raylib_init();
+    ctx = InitNuklear();
 
     /* style.c */
     #ifdef INCLUDE_STYLE
@@ -88,7 +87,7 @@ int main(void)
     while (!WindowShouldClose())
     {
         /* Input */
-        nk_raylib_input(ctx);
+        UpdateNuklear(ctx);
 
         /* GUI */
         if (nk_begin(ctx, "Demo", nk_rect(50, 50, 230, 250),
@@ -138,12 +137,12 @@ int main(void)
 
         /* Draw */
         BeginDrawing();
-            ClearBackground(nk_colorf_to_raylib_color(bg));
-            nk_raylib_render(ctx);
+            ClearBackground(ColorFromNuklearF(bg));
+            DrawNuklear(ctx);
         EndDrawing();
     }
 
-    nk_raylib_free(ctx);
+    UnloadNuklear(ctx);
     CloseWindow();
     return 0;
 }
