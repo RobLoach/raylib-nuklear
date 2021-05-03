@@ -36,12 +36,13 @@
 #ifndef RAYLIB_NUKLEAR_H
 #define RAYLIB_NUKLEAR_H
 
+#include "raylib.h"
+
 #ifndef NK_INCLUDE_STANDARD_VARARGS
 #define NK_INCLUDE_STANDARD_VARARGS
 #endif
 
-#include "./raylib-nuklear-nuklear.h"
-#include "raylib.h"
+#include "nuklear.h"
 
 NK_API struct nk_context* InitNuklear();
 NK_API void UpdateNuklear(struct nk_context * ctx);
@@ -76,7 +77,7 @@ NK_API struct nk_rect RectangleToNuklear(Rectangle rect);
 #endif  // NK_BOOL
 
 #define NK_IMPLEMENTATION
-#include "./raylib-nuklear-nuklear.h"
+#include "nuklear.h"
 
 #ifndef RAYLIB_NUKLEAR_FONTSIZE
 #define RAYLIB_NUKLEAR_FONTSIZE 10

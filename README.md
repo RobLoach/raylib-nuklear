@@ -70,9 +70,6 @@ make
 ./example/raylib-nuklear-example
 ```
 
-### Nuklear Source
+## License
 
-The copy of [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear) at [`include/raylib-nuklear-nuklear.h`](include/raylib-nuklear-nuklear.h) has been modified to avoid naming conflicts with raylib. To update it...
-
-1. Grab the latest from https://github.com/Immediate-Mode-UI/Nuklear/blob/master/nuklear.h
-2. Replace instances of `stbrp_` with `nuklear_stbrp_`
+raylib-nuklear is licensed under an unmodified zlib/libpng license, which is an OSI-certified, BSD-like license that allows static linking with closed source software. Check [LICENSE](LICENSE) for further details.
