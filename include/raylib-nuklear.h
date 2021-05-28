@@ -7,7 +7,7 @@
 *
 *   DEPENDENCIES:
 *       - raylib https://www.raylib.com/
-*       - nuklear modified version at vendor/nuklear/nuklear.h
+*       - nuklear https://github.com/Immediate-Mode-UI/Nuklear
 *
 *   LICENSE: zlib/libpng
 *
@@ -83,6 +83,11 @@ NK_API struct nk_rect RectangleToNuklear(Rectangle rect);
 #define RAYLIB_NUKLEAR_FONTSIZE 10
 #endif  // RAYLIB_NUKLEAR_FONTSIZE
 
+/**
+ * Nuklear callback; Get the width of the given text.
+ *
+ * @internal
+ */
 NK_API float
 nk_raylib_font_get_text_width(nk_handle handle, float height, const char *text, int len)
 {
@@ -102,6 +107,11 @@ nk_raylib_font_get_text_width(nk_handle handle, float height, const char *text, 
     // return MeasureTextEx(font, text, 10, 1.0f);
 }
 
+/**
+ * Nuklear callback; Paste the current clipboard.
+ *
+ * @internal
+ */
 NK_API void
 nk_raylib_clipboard_paste(nk_handle usr, struct nk_text_edit *edit)
 {
@@ -112,11 +122,19 @@ nk_raylib_clipboard_paste(nk_handle usr, struct nk_text_edit *edit)
     }
 }
 
+/**
+ * Nuklear callback; Copy the given text.
+ *
+ * @internal
+ */
 NK_API void
 nk_raylib_clipboard_copy(nk_handle usr, const char *text, int len) {
     SetClipboardText(text);
 }
 
+/**
+ * Initialize the Nuklear context for use with Raylib.
+ */
 NK_API struct nk_context*
 InitNuklear()
 {
@@ -143,6 +161,9 @@ InitNuklear()
     return ctx;
 }
 
+/**
+ * Convert the given Nuklear color to a raylib color.
+ */
 NK_API Color
 ColorFromNuklear(struct nk_color color)
 {
@@ -154,6 +175,9 @@ ColorFromNuklear(struct nk_color color)
     return rc;
 }
 
+/**
+ * Convert the given raylib color to a Nuklear color.
+ */
 NK_API struct nk_color
 ColorToNuklear(Color color)
 {
@@ -165,18 +189,27 @@ ColorToNuklear(Color color)
     return rc;
 }
 
+/**
+ * Convert the given Nuklear float color to a raylib color.
+ */
 NK_API Color
 ColorFromNuklearF(struct nk_colorf color)
 {
     return ColorFromNuklear(nk_rgba_cf(color));
 }
 
+/**
+ * Convert the given raylib color to a raylib float color.
+ */
 NK_API struct nk_colorf
 ColorToNuklearF(Color color)
 {
     return nk_color_cf(ColorToNuklear(color));
 }
 
+/**
+ * Draw the given Nuklear context in raylib.
+ */
 NK_API void
 DrawNuklear(struct nk_context * ctx)
 {
@@ -394,6 +427,11 @@ DrawNuklear(struct nk_context * ctx)
     nk_clear(ctx);
 }
 
+/**
+ * Convert the given raylib mouse button to a Nuklear mouse button.
+ *
+ * @internal
+ */
 NK_API int
 nk_raylib_translate_mouse_button(int button)
 {
@@ -410,6 +448,8 @@ nk_raylib_translate_mouse_button(int button)
 
 /**
  * Returns 1 when pressed, 0 when released, or -1 when no change.
+ *
+ * @internal
  */
 NK_API int nk_raylib_input_changed(int key) {
     if (IsKeyPressed(key)) {
@@ -421,6 +461,11 @@ NK_API int nk_raylib_input_changed(int key) {
     return -1;
 }
 
+/**
+ * Update the Nuklear context for the keyboard input from raylib.
+ *
+ * @internal
+ */
 NK_API void nk_raylib_input_keyboard(struct nk_context * ctx)
 {
     int down;
@@ -506,6 +551,9 @@ NK_API void nk_raylib_input_keyboard(struct nk_context * ctx)
     }
 }
 
+/**
+ * Update the Nuklear context for raylib's state.
+ */
 NK_API void
 UpdateNuklear(struct nk_context * ctx)
 {
@@ -530,6 +578,9 @@ UpdateNuklear(struct nk_context * ctx)
     nk_input_end(ctx);
 }
 
+/**
+ * Unload the given Nuklear context, along with all internal raylib textures.
+ */
 NK_API void
 UnloadNuklear(struct nk_context * ctx)
 {
@@ -544,6 +595,9 @@ UnloadNuklear(struct nk_context * ctx)
     nk_free(ctx);
 }
 
+/**
+ * Convert the given Nuklear rectangle to a raylib Rectangle.
+ */
 NK_API struct
 Rectangle RectangleFromNuklear(struct nk_rect rect)
 {
@@ -555,6 +609,9 @@ Rectangle RectangleFromNuklear(struct nk_rect rect)
     return output;
 }
 
+/**
+ * Convert the given raylib Rectangle to a Nuklear rectangle.
+ */
 NK_API struct
 nk_rect RectangleToNuklear(Rectangle rect)
 {

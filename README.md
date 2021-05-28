@@ -2,7 +2,7 @@
 
 Use the [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear) immediate mode cross-platform GUI library in [raylib](https://www.raylib.com/).
 
-![raylib-nuklear-example screenshot](examples/raylib-nuklear-example.png)
+[![raylib-nuklear-example Screenshot](examples/raylib-nuklear-example.png)](examples)
 
 ## Example
 
@@ -20,10 +20,15 @@ int main() {
         // Update the Nuklear context, along with input
         UpdateNuklear(ctx);
 
-        // Add your own Nuklear GUI
-        // See the Nuklear Wiki for examples:
+        // Nuklear GUI Code
         // https://github.com/Immediate-Mode-UI/Nuklear/wiki/Window
-        // ...
+        if (nk_begin(ctx, "Nuklear", nk_rect(100, 100, 220, 220),
+                     NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_CLOSABLE)) {
+            if (nk_button_label(ctx, "Button")) {
+                /* event handling */
+            }
+        }
+        nk_end(ctx);
 
         // Render
         BeginDrawing();
@@ -72,4 +77,4 @@ make
 
 ## License
 
-raylib-nuklear is licensed under an unmodified zlib/libpng license, which is an OSI-certified, BSD-like license that allows static linking with closed source software. Check [LICENSE](LICENSE) for further details.
+*raylib-nuklear* is licensed under an unmodified zlib/libpng license, which is an OSI-certified, BSD-like license that allows static linking with closed source software. Check [LICENSE](LICENSE) for further details.

@@ -35,8 +35,8 @@ int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
-    const int screenWidth = 800;
-    const int screenHeight = 450;
+    const int screenWidth = 700;
+    const int screenHeight = 394;
     InitWindow(screenWidth, screenHeight, "[raylib-nuklear] example");
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
@@ -53,7 +53,7 @@ int main(void)
         // Update
         UpdateNuklear(ctx);
 
-        /* GUI */
+        // GUI
         if (nk_begin(ctx, "Demo", nk_rect(50, 50, 230, 250),
             NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
             NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE))
