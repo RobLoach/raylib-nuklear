@@ -45,7 +45,8 @@
 #include "nuklear.h"
 
 NK_API struct nk_context* InitNuklear();
-NK_API struct nk_context* InitNuklearEx(Font* uiFont, float fontSize);
+NK_API struct nk_context* InitNuklearWithSize(int fontSize);
+NK_API struct nk_context* InitNuklearWithFont(Font font, float fontSize);
 NK_API void UpdateNuklear(struct nk_context * ctx);
 NK_API void DrawNuklear(struct nk_context * ctx);
 NK_API void UnloadNuklear(struct nk_context * ctx);
@@ -81,6 +82,9 @@ NK_API struct nk_rect RectangleToNuklear(Rectangle rect);
 #include "nuklear.h"
 
 #ifndef RAYLIB_NUKLEAR_FONTSIZE
+/**
+ * The default font size for text used in the nuklear GUI.
+ */
 #define RAYLIB_NUKLEAR_FONTSIZE 10
 #endif  // RAYLIB_NUKLEAR_FONTSIZE
 
@@ -145,7 +149,16 @@ nk_raylib_clipboard_copy(nk_handle usr, const char *text, int len) {
 NK_API struct nk_context*
 InitNuklear()
 {
-  return InitNuklearEx(0, (float)RAYLIB_NUKLEAR_FONTSIZE);
+  return InitNuklearWithSize(RAYLIB_NUKLEAR_FONTSIZE);
+}
+
+/**
+ * Initialize the Nuklear context for use with Raylib.
+ */
+NK_API struct nk_context*
+InitNuklearWithSize(int fontSize)
+{
+  return InitNuklearWithFont(GetFontDefault(), (float)fontSize);
 }
 
 /**
@@ -154,27 +167,27 @@ InitNuklear()
  * fontSize must be supplied
  */
 NK_API struct nk_context*
-InitNuklearEx(Font* uiFont, float fontSize)
+InitNuklearWithFont(Font uiFont, float fontSize)
 {
     struct nk_context* ctx = (struct nk_context*)MemAlloc(sizeof(struct nk_context));
-
-    // Initialize the given font info (can be null in which case an internal font object gets used)
-    struct Font* font = ( (uiFont != 0) ? uiFont : (struct Font*)MemAlloc(sizeof(struct Font)) );
-    struct nk_user_font* userFont = (struct nk_user_font*)MemAlloc(sizeof(struct nk_user_font));
-    userFont->userdata = nk_handle_ptr(font);
-    userFont->height = fontSize;
-    userFont->width = ( (uiFont != 0) ? nk_raylib_font_get_text_width_user_font : nk_raylib_font_get_text_width);
-
-    // Create the nuklear environment.
-    if (nk_init_default(ctx, userFont) == 0) {
-        TraceLog(LOG_ERROR, "NUKLEAR: Failed to initialize nuklear.");
-        return (void*)0;
-    }
 
     // Clipboard
     ctx->clip.copy = nk_raylib_clipboard_copy;
     ctx->clip.paste = nk_raylib_clipboard_paste;
-    ctx->clip.userdata = nk_handle_ptr(0);
+    //ctx->clip.userdata = nk_handle_ptr(0);
+
+    // Initialize the given font info (can be null in which case an internal font object gets used)
+    struct Font* font = (uiFont != NULL) ? uiFont : (struct Font*)MemAlloc(sizeof(struct Font));
+    struct nk_user_font* userFont = (struct nk_user_font*)MemAlloc(sizeof(struct nk_user_font));
+    userFont->userdata = nk_handle_ptr(font);
+    userFont->height = fontSize;
+    userFont->width = (uiFont != NULL) ? nk_raylib_font_get_text_width_user_font : nk_raylib_font_get_text_width;
+
+    // Create the nuklear environment.
+    if (nk_init_default(ctx, userFont) == 0) {
+        TraceLog(LOG_ERROR, "NUKLEAR: Failed to initialize nuklear.");
+        return NULL;
+    }
 
     return ctx;
 }
@@ -400,13 +413,15 @@ DrawNuklear(struct nk_context * ctx)
                 const struct nk_command_text *text = (const struct nk_command_text*)cmd;
                 Color color = ColorFromNuklear(text->foreground);
                 Color background = ColorFromNuklear(text->background);
-                Font* font = (Font*)text->font->userdata.ptr;
                 float fsize = text->font->height;
+                Font* font = (Font*)text->font->userdata.ptr;
                 DrawRectangle(text->x, text->y, text->w, text->h, background);
-                if (text->font->width == nk_raylib_font_get_text_width_user_font)
-                  DrawTextEx(*font, (const char*)text->string, (Vector2){ (float)text->x, (float)text->y }, fsize, 0.0f, color);
-                else
-                  DrawText((const char*)text->string, text->x, text->y, fsize, color);
+                if (font != NULL) {
+                    DrawTextEx(*font, (const char*)text->string, (Vector2){ (float)text->x, (float)text->y }, fsize, 0.0f, color);
+                }
+                else {
+                    DrawText((const char*)text->string, text->x, text->y, fsize, color);
+                }
             } break;
 
             case NK_COMMAND_IMAGE: {
@@ -606,17 +621,24 @@ UpdateNuklear(struct nk_context * ctx)
 NK_API void
 UnloadNuklear(struct nk_context * ctx)
 {
-    // unload and free the font memory only if the internal default font was initialized in InitNuklear
-    if(ctx->style.font->width == nk_raylib_font_get_text_width)
-    {
-		    struct Font* font = (struct Font*)ctx->style.font->userdata.ptr;
-		    if (font != (void*)0) {
-		        UnloadFont(*font);
-		        MemFree(font);
-		    }
-	  }
+    // Skip unloading if it's not set.
+    if (ctx == NULL) {
+        return;
+    }
 
-	  MemFree((void*)ctx->style.font);
+    // Unload the font.
+    struct nk_user_font* userFont = (struct nk_user_font*)ctx->style.font;
+    if (userFont != NULL) {
+        void* fontPtr = userFont->userdata.ptr;
+        if (fontPtr != NULL) {
+            MemFree(fontPtr);
+            userFont->userdata.ptr = NULL;
+            userFont->userdata.id = 0;
+        }
+
+        MemFree(userFont);
+        ctx->style.font = NULL;
+    }
 
     // Unload the nuklear context.
     nk_free(ctx);
