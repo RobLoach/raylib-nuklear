@@ -15,3 +15,15 @@ target_link_libraries(raylib-nuklear-demo PUBLIC
     raylib
     raylib-nuklear
 )
+
+# raylib-nuklear-font
+add_executable(raylib-nuklear-font
+    raylib-nuklear-font.c
+)
+target_link_libraries(raylib-nuklear-font PUBLIC
+    raylib
+    raylib-nuklear
+)
+
+# Resources
+configure_file(resources/anonymous_pro_bold.ttf resources/anonymous_pro_bold.ttf COPYONLY)
