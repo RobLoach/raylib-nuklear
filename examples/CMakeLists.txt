@@ -25,4 +25,5 @@ target_link_libraries(raylib-nuklear-font PUBLIC
     raylib-nuklear
 )
 
+# Resources
 configure_file(resources/anonymous_pro_bold.ttf resources/anonymous_pro_bold.ttf COPYONLY)
