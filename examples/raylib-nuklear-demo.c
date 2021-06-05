@@ -73,7 +73,7 @@ int main(void)
     struct nk_context *ctx;
     struct nk_colorf bg;
 
-    ctx = InitNuklear();
+    ctx = InitNuklear(0);
 
     /* style.c */
     #ifdef INCLUDE_STYLE
@@ -142,7 +142,7 @@ int main(void)
         EndDrawing();
     }
 
-    UnloadNuklear(ctx);
+    UnloadNuklear(ctx);     // Unload the Nuklear GUI
     CloseWindow();
     return 0;
 }

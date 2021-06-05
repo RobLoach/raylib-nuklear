@@ -14,7 +14,7 @@ int main() {
     InitWindow(640, 480, "raylib-nuklear example");
 
     // Create the Nuklear Context
-    struct nk_context *ctx = InitNuklear();
+    struct nk_context *ctx = InitNuklear(10);
 
     while (!WindowShouldClose()) {
         // Update the Nuklear context, along with input
@@ -51,17 +51,18 @@ int main() {
 ## API
 
 ``` c
-NK_API struct nk_context* InitNuklear();
-NK_API void UpdateNuklear(struct nk_context * ctx);
-NK_API void DrawNuklear(struct nk_context * ctx);
-NK_API void UnloadNuklear(struct nk_context * ctx);
-NK_API Color ColorFromNuklear(struct nk_color color);
-NK_API struct nk_color ColorToNuklear(Color color);
-NK_API struct nk_colorf ColorToNuklearF(Color color);
-NK_API struct Color ColorFromNuklear(struct nk_color color);
-NK_API struct Color ColorFromNuklearF(struct nk_colorf color);
-NK_API struct Rectangle RectangleFromNuklear(struct nk_rect rect);
-NK_API struct nk_rect RectangleToNuklear(Rectangle rect);
+struct nk_context* InitNuklear(int fontSize);  // Set a fontSize of 0 to use the default of 10.
+struct nk_context* InitNuklearEx(Font font, float fontSize);
+void UpdateNuklear(struct nk_context * ctx);
+void DrawNuklear(struct nk_context * ctx);
+void UnloadNuklear(struct nk_context * ctx);
+Color ColorFromNuklear(struct nk_color color);
+struct nk_color ColorToNuklear(Color color);
+struct nk_colorf ColorToNuklearF(Color color);
+struct Color ColorFromNuklear(struct nk_color color);
+struct Color ColorFromNuklearF(struct nk_colorf color);
+struct Rectangle RectangleFromNuklear(struct nk_rect rect);
+struct nk_rect RectangleToNuklear(Rectangle rect);
 ```
 
 ## Development

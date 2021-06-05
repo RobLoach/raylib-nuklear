@@ -1,10 +1,10 @@
 /**********************************************************************************************
 *
-*   raylib-nuklear-example - Example of using Nuklear with Raylib.
+*   raylib-nuklear-font - Example of using Nuklear with a custom Raylib font.
 *
 *   LICENSE: zlib/libpng
 *
-*   nuklear_raylib is licensed under an unmodified zlib/libpng license, which is an OSI-certified,
+*   raylib-nuklear is licensed under an unmodified zlib/libpng license, which is an OSI-certified,
 *   BSD-like license that allows static linking with closed source software:
 *
 *   Copyright (c) 2020 Rob Loach (@RobLoach)
@@ -35,16 +35,17 @@ int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
-    const int screenWidth = 700;
-    const int screenHeight = 394;
+    const int screenWidth = 800;
+    const int screenHeight = 450;
     InitWindow(screenWidth, screenHeight, "[raylib-nuklear] example");
+    Font font = LoadFont("resources/anonymous_pro_bold.ttf");
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
     /* GUI */
     struct nk_colorf bg = ColorToNuklearF(SKYBLUE);
-    struct nk_context *ctx = InitNuklear(0);
+    struct nk_context *ctx = InitNuklearEx(font, 20);
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
@@ -103,6 +104,7 @@ int main(void)
     // De-Initialization
     //--------------------------------------------------------------------------------------
     UnloadNuklear(ctx);     // Unload the Nuklear GUI
+    UnloadFont(font);
     CloseWindow();
     //--------------------------------------------------------------------------------------
 
