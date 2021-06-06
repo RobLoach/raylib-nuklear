@@ -49,7 +49,6 @@ NK_API struct nk_context* InitNuklearEx(Font font, float fontSize);
 NK_API void UpdateNuklear(struct nk_context * ctx);
 NK_API void DrawNuklear(struct nk_context * ctx);
 NK_API void UnloadNuklear(struct nk_context * ctx);
-NK_API Color ColorFromNuklear(struct nk_color color);
 NK_API struct nk_color ColorToNuklear(Color color);
 NK_API struct nk_colorf ColorToNuklearF(Color color);
 NK_API struct Color ColorFromNuklear(struct nk_color color);
@@ -85,14 +84,23 @@ NK_API struct nk_rect RectangleToNuklear(Rectangle rect);
  * The default font size that is used when a font size is not provided.
  */
 #define RAYLIB_NUKLEAR_DEFAULT_FONTSIZE 10
-#endif
+#endif  // RAYLIB_NUKLEAR_DEFAULT_FONTSIZE
 
 #ifndef RAYLIB_NUKLEAR_DEFAULT_SPACING
 /**
  * The default text spacing to use for text.
  */
 #define RAYLIB_NUKLEAR_DEFAULT_SPACING 0.0f
-#endif
+#endif  // RAYLIB_NUKLEAR_DEFAULT_SPACING
+
+#ifndef RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS
+/**
+ * The amount of segments used when drawing an arc.
+ *
+ * @see NK_COMMAND_ARC_FILLED
+ */
+#define RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS 20
+#endif  // RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS
 
 /**
  * Nuklear callback; Get the width of the given text.
@@ -107,7 +115,7 @@ nk_raylib_font_get_text_width(nk_handle handle, float height, const char *text, 
         return 0;
     }
 
-    return MeasureText(text, height);
+    return (float)MeasureText(text, (int)height);
 }
 
 /**
@@ -136,7 +144,7 @@ nk_raylib_clipboard_paste(nk_handle usr, struct nk_text_edit *edit)
     const char *text = GetClipboardText();
     NK_UNUSED(usr);
     if (text != (void*)0) {
-        nk_textedit_paste(edit, text, TextLength(text));
+        nk_textedit_paste(edit, text, (int)TextLength(text));
     }
 }
 
@@ -205,8 +213,8 @@ InitNuklear(int fontSize)
 /**
  * Initialize the Nuklear context for use with Raylib, with a supplied custom font.
  *
- * @param font The raylib font to use with Nuklear.
- * @param fontSize The desired size of the font. If <= 0, will use the default font size.
+ * @param font The custom raylib font to use with Nuklear.
+ * @param fontSize The desired size of the font. Use <= 0 to set the default size of 10.
  *
  * @return The nuklear context, or NULL on error.
  */
@@ -290,7 +298,7 @@ NK_API void
 DrawNuklear(struct nk_context * ctx)
 {
     const struct nk_command *cmd;
-    bool scissor_mode = false;
+    // bool scissor_mode = false;
 
     nk_foreach(cmd, ctx) {
         switch (cmd->type) {
@@ -302,7 +310,7 @@ DrawNuklear(struct nk_context * ctx)
                 // TODO(RobLoach): Verify if NK_COMMAND_SCISSOR works.
                 const struct nk_command_scissor *s =(const struct nk_command_scissor*)cmd;
                 BeginScissorMode(s->x, s->y, s->w, s->h);
-                scissor_mode = true;
+                // scissor_mode = true;
             } break;
 
             case NK_COMMAND_LINE: {
@@ -387,10 +395,9 @@ DrawNuklear(struct nk_context * ctx)
                 // TODO: Fix NK_COMMAND_ARC
                 Vector2 center = {a->cx, a->cy};
                 float radius = a->r;
-                int startAngle = a->a[0];
-                int endAngle = a->a[1];
-                int segments = 20; // TODO(RobLoach): How many segments do we need?
-                DrawCircleSectorLines(center, radius, startAngle, endAngle, segments, color);
+                float startAngle = a->a[0];
+                float endAngle = a->a[1];
+                DrawCircleSectorLines(center, radius, startAngle, endAngle, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
             } break;
 
             case NK_COMMAND_ARC_FILLED: {
@@ -401,10 +408,9 @@ DrawNuklear(struct nk_context * ctx)
 
                 Vector2 center = {a->cx, a->cy};
                 float radius = a->r;
-                int startAngle = a->a[0];
-                int endAngle = a->a[1];
-                int segments = 20; // TODO(RobLoach): How many segments do we need?
-                DrawCircleSector(center, radius, startAngle, endAngle, segments, color);
+                float startAngle = a->a[0];
+                float endAngle = a->a[1];
+                DrawCircleSector(center, radius, startAngle, endAngle, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
             } break;
 
             case NK_COMMAND_TRIANGLE: {
@@ -447,9 +453,8 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_POLYLINE: {
                 const struct nk_command_polyline *p = (const struct nk_command_polyline *)cmd;
                 Color color = ColorFromNuklear(p->color);
-                int i;
                 Vector2 points[p->point_count];
-                for (i = 0; i < p->point_count; i++) {
+                for (int i = 0; i < p->point_count; i++) {
                     points[i] = (Vector2){p->points[i].x, p->points[i].y};
                 }
                 // TODO(RobLoach): See if Polyline is correct.
@@ -460,14 +465,14 @@ DrawNuklear(struct nk_context * ctx)
                 const struct nk_command_text *text = (const struct nk_command_text*)cmd;
                 Color color = ColorFromNuklear(text->foreground);
                 Color background = ColorFromNuklear(text->background);
-                float fsize = text->font->height;
+                float fontSize = text->font->height;
                 Font* font = (Font*)text->font->userdata.ptr;
                 DrawRectangle(text->x, text->y, text->w, text->h, background);
                 if (font != NULL) {
-                    DrawTextEx(*font, (const char*)text->string, (Vector2){ (float)text->x, (float)text->y }, fsize, RAYLIB_NUKLEAR_DEFAULT_SPACING, color);
+                    DrawTextEx(*font, (const char*)text->string, (Vector2){ (float)text->x, (float)text->y }, fontSize, RAYLIB_NUKLEAR_DEFAULT_SPACING, color);
                 }
                 else {
-                    DrawText((const char*)text->string, text->x, text->y, fsize, color);
+                    DrawText((const char*)text->string, text->x, text->y, (int)fontSize, color);
                 }
             } break;
 
@@ -483,7 +488,7 @@ DrawNuklear(struct nk_context * ctx)
                 image.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
 
                 Texture texture = LoadTextureFromImage(image);
-                Rectangle source = {0, 0, image.width, image.height};
+                Rectangle source = {0, 0, (float)image.width, (float)image.height};
                 Rectangle dest = {i->x, i->y, i->w, i->h};
                 Vector2 origin = {0, 0};
                 float rotation = 0;
@@ -504,9 +509,10 @@ DrawNuklear(struct nk_context * ctx)
     }
 
     // Finish the scissor mode if it was in use.
-    if (scissor_mode) {
-        EndScissorMode();
-    }
+    // TODO: Is this needed?
+    // if (scissor_mode) {
+    //  EndScissorMode();
+    // }
 
     nk_clear(ctx);
 }
@@ -630,13 +636,15 @@ NK_API void nk_raylib_input_keyboard(struct nk_context * ctx)
     // TODO: Verify that this unicode keyboard input works.
     for (int i = 32; i < 126; i++) {
         if (IsKeyPressed(i)) {
-            nk_input_unicode(ctx, i);
+            nk_input_unicode(ctx, (nk_rune)i);
         }
     }
 }
 
 /**
  * Update the Nuklear context for raylib's state.
+ *
+ * @param ctx The nuklear context to act upon.
  */
 NK_API void
 UpdateNuklear(struct nk_context * ctx)
@@ -650,9 +658,9 @@ UpdateNuklear(struct nk_context * ctx)
         nk_input_motion(ctx, GetMouseX(), GetMouseY());
 
         // Mouse Wheel
-        int mouseWheel = GetMouseWheelMove();
-        if (mouseWheel != 0) {
-            struct nk_vec2 mouseWheelMove = (struct nk_vec2){0, mouseWheel};
+        float mouseWheel = GetMouseWheelMove();
+        if (mouseWheel != 0.0f) {
+            struct nk_vec2 mouseWheelMove = (struct nk_vec2){0.0f, mouseWheel};
             nk_input_scroll(ctx, mouseWheelMove);
         }
 

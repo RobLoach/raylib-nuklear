@@ -51,18 +51,17 @@ int main() {
 ## API
 
 ``` c
-struct nk_context* InitNuklear(int fontSize);  // Set a fontSize of 0 to use the default of 10.
-struct nk_context* InitNuklearEx(Font font, float fontSize);
-void UpdateNuklear(struct nk_context * ctx);
-void DrawNuklear(struct nk_context * ctx);
-void UnloadNuklear(struct nk_context * ctx);
+nk_context* InitNuklear(int fontSize);                 // Set a fontSize of 0 for the default of 10
+nk_context* InitNuklearEx(Font font, float fontSize);  // Initialize the Nuklear context with a custom font
+void UpdateNuklear(nk_context * ctx);                  // Update the input state and internal components
+void DrawNuklear(nk_context * ctx);                    // Render the Nuklear GUI on the screen
+void UnloadNuklear(nk_context * ctx);                  // Unload the GUI
+nk_color ColorToNuklear(Color color);
+nk_colorf ColorToNuklearF(Color color);
 Color ColorFromNuklear(struct nk_color color);
-struct nk_color ColorToNuklear(Color color);
-struct nk_colorf ColorToNuklearF(Color color);
-struct Color ColorFromNuklear(struct nk_color color);
-struct Color ColorFromNuklearF(struct nk_colorf color);
-struct Rectangle RectangleFromNuklear(struct nk_rect rect);
-struct nk_rect RectangleToNuklear(Rectangle rect);
+Color ColorFromNuklearF(struct nk_colorf color);
+Rectangle RectangleFromNuklear(struct nk_rect rect);
+nk_rect RectangleToNuklear(Rectangle rect);
 ```
 
 ## Development

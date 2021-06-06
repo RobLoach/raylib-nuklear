@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.11)
 project(raylib-nuklear
     DESCRIPTION "raylib-nuklear: Nuklear immediate mode GUI for raylib."
     HOMEPAGE_URL "https://github.com/robloach/raylib-nuklear"
-    VERSION 1.2.1
+    VERSION 2.0.0
     LANGUAGES C
 )
 
@@ -21,4 +21,14 @@ endif()
 option(BUILD_RAYLIB_NUKLEAR_EXAMPLES "Build Examples" ON)
 if (BUILD_RAYLIB_NUKLEAR_EXAMPLES)
     add_subdirectory(examples)
+endif()
+
+# Testing
+include(CTest)
+enable_testing()
+if(BUILD_TESTING AND BUILD_RAYLIB_NUKLEAR_EXAMPLES)
+    set(CTEST_CUSTOM_TESTS_IGNORE
+        pkg-config--static
+    )
+    add_subdirectory(test)
 endif()
