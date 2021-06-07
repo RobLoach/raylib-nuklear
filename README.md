@@ -23,9 +23,9 @@ int main() {
         // Nuklear GUI Code
         // https://github.com/Immediate-Mode-UI/Nuklear/wiki/Window
         if (nk_begin(ctx, "Nuklear", nk_rect(100, 100, 220, 220),
-                     NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_CLOSABLE)) {
+                NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_CLOSABLE)) {
             if (nk_button_label(ctx, "Button")) {
-                /* event handling */
+                // Button was clicked!
             }
         }
         nk_end(ctx);
