@@ -56,6 +56,14 @@ int main(int argc, char *argv[]) {
     UnloadNuklear(ctx);
     UnloadFont(font);
 
+    // RectangleFromNuklear()
+    struct nk_rect rect = nk_rect(10, 20, 30, 40);
+    Rectangle rectangle = RectangleFromNuklear(rect);
+    assert(rect.x == rectangle.x);
+    assert(rect.y == rectangle.y);
+    assert(rect.w == rectangle.width);
+    assert(rect.h == rectangle.height);
+
     CloseWindow();
     TraceLog(LOG_INFO, "================================");
     TraceLog(LOG_INFO, "raylib-nuklear tests succesful");

@@ -293,6 +293,8 @@ ColorToNuklearF(Color color)
 
 /**
  * Draw the given Nuklear context in raylib.
+ *
+ * @param ctx The nuklear context.
  */
 NK_API void
 DrawNuklear(struct nk_context * ctx)
@@ -316,8 +318,8 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_LINE: {
                 const struct nk_command_line *l = (const struct nk_command_line *)cmd;
                 Color color = ColorFromNuklear(l->color);
-                Vector2 startPos = (Vector2){l->begin.x, l->begin.y};
-                Vector2 endPos = (Vector2){l->end.x, l->end.y};
+                Vector2 startPos = (Vector2){(float)l->begin.x, (float)l->begin.y};
+                Vector2 endPos = (Vector2){(float)l->end.x, (float)l->end.y};
 
                 DrawLineEx(startPos, endPos, l->line_thickness, color);
             } break;
@@ -325,11 +327,10 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_CURVE: {
                 const struct nk_command_curve *q = (const struct nk_command_curve *)cmd;
                 Color color = ColorFromNuklear(q->color);
-
-                Vector2 start = (Vector2){q->begin.x, q->begin.y};
+                Vector2 start = (Vector2){(float)q->begin.x, (float)q->begin.y};
                 // Vector2 controlPoint1 = (Vector2){q->ctrl[0].x, q->ctrl[0].y};
                 // Vector2 controlPoint2 = (Vector2){q->ctrl[1].x, q->ctrl[1].y};
-                Vector2 end = (Vector2){q->end.x, q->end.y};
+                Vector2 end = (Vector2){(float)q->end.x, (float)q->end.y};
 
                 // DrawLineBezier(start, controlPoint1, (float)q->line_thickness, color);
                 // DrawLineBezier(controlPoint1, controlPoint2, (float)q->line_thickness, color);
@@ -340,7 +341,7 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_RECT: {
                 const struct nk_command_rect *r = (const struct nk_command_rect *)cmd;
                 Color color = ColorFromNuklear(r->color);
-                Rectangle rect = (Rectangle){r->x, r->y, r->w, r->h};
+                Rectangle rect = (Rectangle){(float)r->x, (float)r->y, (float)r->w, (float)r->h};
                 if (r->rounding > 0) {
                     // TODO: Figure our appropriate roundness.
                     float roundness = (float)r->rounding / 20.0f;
@@ -354,7 +355,7 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_RECT_FILLED: {
                 const struct nk_command_rect_filled *r = (const struct nk_command_rect_filled *)cmd;
                 Color color = ColorFromNuklear(r->color);
-                Rectangle rect = (Rectangle){r->x, r->y, r->w, r->h};
+                Rectangle rect = (Rectangle){(float)r->x, (float)r->y, (float)r->w, (float)r->h};
                 if (r->rounding > 0) {
                     // TODO: Figure our appropriate roundness.
                     float roundness = (float)r->rounding / 20.0f;
@@ -367,7 +368,7 @@ DrawNuklear(struct nk_context * ctx)
 
             case NK_COMMAND_RECT_MULTI_COLOR: {
                 const struct nk_command_rect_multi_color* rectangle = (const struct nk_command_rect_multi_color *)cmd;
-                Rectangle position = (Rectangle){rectangle->x, rectangle->y, rectangle->w, rectangle->h};
+                Rectangle position = (Rectangle){(float)rectangle->x, (float)rectangle->y, (float)rectangle->w, (float)rectangle->h};
                 Color left = ColorFromNuklear(rectangle->left);
                 Color top = ColorFromNuklear(rectangle->top);
                 Color bottom = ColorFromNuklear(rectangle->bottom);
@@ -393,11 +394,8 @@ DrawNuklear(struct nk_context * ctx)
                 Color color = ColorFromNuklear(a->color);
 
                 // TODO: Fix NK_COMMAND_ARC
-                Vector2 center = {a->cx, a->cy};
-                float radius = a->r;
-                float startAngle = a->a[0];
-                float endAngle = a->a[1];
-                DrawCircleSectorLines(center, radius, startAngle, endAngle, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
+                Vector2 center = {(float)a->cx, (float)a->cy};
+                DrawCircleSectorLines(center, (float)a->r, a->a[0], a->a[1], RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
             } break;
 
             case NK_COMMAND_ARC_FILLED: {
@@ -405,25 +403,27 @@ DrawNuklear(struct nk_context * ctx)
                 TraceLog(LOG_WARNING, "NUKLEAR: Untested implementation NK_COMMAND_ARC_FILLED");
                 const struct nk_command_arc *a = (const struct nk_command_arc *)cmd;
                 Color color = ColorFromNuklear(a->color);
-
-                Vector2 center = {a->cx, a->cy};
-                float radius = a->r;
-                float startAngle = a->a[0];
-                float endAngle = a->a[1];
-                DrawCircleSector(center, radius, startAngle, endAngle, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
+                Vector2 center = {(float)a->cx, (float)a->cy};
+                DrawCircleSector(center, (float)a->r, a->a[0], a->a[1], RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
             } break;
 
             case NK_COMMAND_TRIANGLE: {
                 const struct nk_command_triangle *t = (const struct nk_command_triangle*)cmd;
                 Color color = ColorFromNuklear(t->color);
-                DrawTriangleLines((Vector2){t->b.x, t->b.y}, (Vector2){t->a.x, t->a.y}, (Vector2){t->c.x, t->c.y}, color);
+                // TODO: Fix needing counter-clockwise order?
+                Vector2 point1 = (Vector2){(float)t->b.x, (float)t->b.y};
+                Vector2 point2 = (Vector2){(float)t->a.x, (float)t->a.y};
+                Vector2 point3 = (Vector2){(float)t->c.x, (float)t->c.y};
+                DrawTriangleLines(point1, point2, point3, color);
             } break;
 
             case NK_COMMAND_TRIANGLE_FILLED: {
                 const struct nk_command_triangle_filled *t = (const struct nk_command_triangle_filled*)cmd;
                 Color color = ColorFromNuklear(t->color);
-                // TODO: Fix needing counter-clockwise order?
-                DrawTriangle((Vector2){t->b.x, t->b.y}, (Vector2){t->a.x, t->a.y}, (Vector2){t->c.x, t->c.y}, color);
+                Vector2 point1 = (Vector2){(float)t->b.x, (float)t->b.y};
+                Vector2 point2 = (Vector2){(float)t->a.x, (float)t->a.y};
+                Vector2 point3 = (Vector2){(float)t->c.x, (float)t->c.y};
+                DrawTriangle(point1, point2, point3, color);
             } break;
 
             case NK_COMMAND_POLYGON: {
@@ -432,7 +432,7 @@ DrawNuklear(struct nk_context * ctx)
                 Vector2 points[p->point_count];
 
                 for (int i = 0; i < p->point_count; i++) {
-                    points[i] = (Vector2){p->points[i].x, p->points[i].y};
+                    points[i] = (Vector2){(float)p->points[i].x, (float)p->points[i].y};
                 }
 
                 DrawTriangleFan(points, p->point_count, color);
@@ -444,7 +444,7 @@ DrawNuklear(struct nk_context * ctx)
                 Vector2 points[p->point_count];
 
                 for (int i = 0; i < p->point_count; i++) {
-                    points[i] = (Vector2){p->points[i].x, p->points[i].y};
+                    points[i] = (Vector2){(float)p->points[i].x, (float)p->points[i].y};
                 }
 
                 DrawTriangleFan(points, p->point_count, color);
@@ -454,8 +454,9 @@ DrawNuklear(struct nk_context * ctx)
                 const struct nk_command_polyline *p = (const struct nk_command_polyline *)cmd;
                 Color color = ColorFromNuklear(p->color);
                 Vector2 points[p->point_count];
+
                 for (int i = 0; i < p->point_count; i++) {
-                    points[i] = (Vector2){p->points[i].x, p->points[i].y};
+                    points[i] = (Vector2){(float)p->points[i].x, (float)p->points[i].y};
                 }
                 // TODO(RobLoach): See if Polyline is correct.
                 DrawTriangleStrip(points, p->point_count, color);
@@ -489,11 +490,10 @@ DrawNuklear(struct nk_context * ctx)
 
                 Texture texture = LoadTextureFromImage(image);
                 Rectangle source = {0, 0, (float)image.width, (float)image.height};
-                Rectangle dest = {i->x, i->y, i->w, i->h};
+                Rectangle dest = {(float)i->x, (float)i->y, (float)i->w, (float)i->h};
                 Vector2 origin = {0, 0};
-                float rotation = 0;
                 Color tint = ColorFromNuklear(i->col);
-                DrawTexturePro(texture, source, dest, origin, rotation, tint);
+                DrawTexturePro(texture, source, dest, origin, 0, tint);
                 UnloadTexture(texture);
             } break;
 
@@ -534,6 +534,8 @@ NK_API int nk_raylib_input_changed(int key) {
 
 /**
  * Update the Nuklear context for the keyboard input from raylib.
+ *
+ * @param ctx The nuklear context.
  *
  * @internal
  */
@@ -653,6 +655,8 @@ UpdateNuklear(struct nk_context * ctx)
 
 /**
  * Unload the given Nuklear context, along with all internal raylib textures.
+ *
+ * @param ctx The nuklear context.
  */
 NK_API void
 UnloadNuklear(struct nk_context * ctx)
