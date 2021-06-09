@@ -652,9 +652,11 @@ UpdateNuklear(struct nk_context * ctx)
     nk_input_begin(ctx);
     {
         // Mouse
-        for (int button = MOUSE_LEFT_BUTTON; button <= MOUSE_MIDDLE_BUTTON; button++) {
-            nk_input_button(ctx, nk_raylib_translate_mouse_button(button), GetMouseX(), GetMouseY(), IsMouseButtonDown(button));
-        }
+        nk_input_button(ctx, NK_BUTTON_LEFT, GetMouseX(), GetMouseY(), IsMouseButtonDown(NK_BUTTON_LEFT));
+        nk_input_button(ctx, NK_BUTTON_RIGHT, GetMouseX(), GetMouseY(), IsMouseButtonDown(NK_BUTTON_RIGHT));
+        nk_input_button(ctx, NK_BUTTON_MIDDLE, GetMouseX(), GetMouseY(), IsMouseButtonDown(NK_BUTTON_MIDDLE));
+        nk_input_button(ctx, NK_BUTTON_MAX, GetMouseX(), GetMouseY(), IsMouseButtonDown(NK_BUTTON_MAX));
+
         nk_input_motion(ctx, GetMouseX(), GetMouseY());
 
         // Mouse Wheel
