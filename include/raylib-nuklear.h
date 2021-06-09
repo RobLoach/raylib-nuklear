@@ -518,25 +518,6 @@ DrawNuklear(struct nk_context * ctx)
 }
 
 /**
- * Convert the given raylib mouse button to a Nuklear mouse button.
- *
- * @internal
- */
-NK_API int
-nk_raylib_translate_mouse_button(int button)
-{
-    switch (button) {
-        case MOUSE_LEFT_BUTTON:
-            return NK_BUTTON_LEFT;
-        case MOUSE_RIGHT_BUTTON:
-            return NK_BUTTON_RIGHT;
-        case MOUSE_MIDDLE_BUTTON:
-            return NK_BUTTON_MIDDLE;
-    }
-    return NK_BUTTON_MAX;
-}
-
-/**
  * Returns 1 when pressed, 0 when released, or -1 when no change.
  *
  * @internal
@@ -652,11 +633,9 @@ UpdateNuklear(struct nk_context * ctx)
     nk_input_begin(ctx);
     {
         // Mouse
-        nk_input_button(ctx, NK_BUTTON_LEFT, GetMouseX(), GetMouseY(), IsMouseButtonDown(NK_BUTTON_LEFT));
-        nk_input_button(ctx, NK_BUTTON_RIGHT, GetMouseX(), GetMouseY(), IsMouseButtonDown(NK_BUTTON_RIGHT));
-        nk_input_button(ctx, NK_BUTTON_MIDDLE, GetMouseX(), GetMouseY(), IsMouseButtonDown(NK_BUTTON_MIDDLE));
-        nk_input_button(ctx, NK_BUTTON_MAX, GetMouseX(), GetMouseY(), IsMouseButtonDown(NK_BUTTON_MAX));
-
+        nk_input_button(ctx, NK_BUTTON_LEFT, GetMouseX(), GetMouseY(), IsMouseButtonDown(MOUSE_LEFT_BUTTON));
+        nk_input_button(ctx, NK_BUTTON_RIGHT, GetMouseX(), GetMouseY(), IsMouseButtonDown(MOUSE_RIGHT_BUTTON));
+        nk_input_button(ctx, NK_BUTTON_MIDDLE, GetMouseX(), GetMouseY(), IsMouseButtonDown(MOUSE_MIDDLE_BUTTON));
         nk_input_motion(ctx, GetMouseX(), GetMouseY());
 
         // Mouse Wheel
