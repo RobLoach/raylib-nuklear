@@ -86,13 +86,14 @@ nk_rect RectangleToNuklear(Rectangle rect);
 
 ## Development
 
-### Examples
 ```
+git submodule update --init
 mkdir build
 cd build
 cmake ..
 make
 ./example/raylib-nuklear-example
+make test
 ```
 
 ## License
