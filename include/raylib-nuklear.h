@@ -6,7 +6,7 @@
 *       - Use the nuklear immediate-mode graphical user interface in raylib.
 *
 *   DEPENDENCIES:
-*       - raylib https://www.raylib.com/
+*       - raylib 3.7 https://www.raylib.com/
 *       - nuklear https://github.com/Immediate-Mode-UI/Nuklear
 *
 *   LICENSE: zlib/libpng
@@ -63,7 +63,7 @@ NK_API struct nk_rect RectangleToNuklear(Rectangle rect);
 #define RAYLIB_NUKLEAR_IMPLEMENTATION_ONCE
 
 #ifndef NK_ASSERT
-#define NK_ASSERT(condition) if (!(condition)) { TraceLog(LOG_WARNING, "NUKLEAR: Failed assert \"%s\" (%s:%i)", #condition, "nuklear_raylib_nuklear.h", __LINE__); }
+#define NK_ASSERT(condition) if (!(condition)) { TraceLog(LOG_WARNING, "NUKLEAR: Failed assert \"%s\" (%s:%i)", #condition, "nuklear.h", __LINE__); }
 #endif  // NK_ASSERT
 
 // TODO: Replace NK_INCLUDE_DEFAULT_ALLOCATOR with MemAlloc() and MemFree()
@@ -85,13 +85,6 @@ NK_API struct nk_rect RectangleToNuklear(Rectangle rect);
  */
 #define RAYLIB_NUKLEAR_DEFAULT_FONTSIZE 10
 #endif  // RAYLIB_NUKLEAR_DEFAULT_FONTSIZE
-
-#ifndef RAYLIB_NUKLEAR_DEFAULT_SPACING
-/**
- * The default text spacing to use for text.
- */
-#define RAYLIB_NUKLEAR_DEFAULT_SPACING 0.0f
-#endif  // RAYLIB_NUKLEAR_DEFAULT_SPACING
 
 #ifndef RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS
 /**
@@ -130,7 +123,8 @@ nk_raylib_font_get_text_width_user_font(nk_handle handle, float height, const ch
         return 0;
     }
 
-    return MeasureTextEx(*(Font*)handle.ptr, text, height, RAYLIB_NUKLEAR_DEFAULT_SPACING).x;
+    // Spacing is determined by the font size divided by 10.
+    return MeasureTextEx(*(Font*)handle.ptr, text, height, height / 10.0f).x;
 }
 
 /**
@@ -154,7 +148,8 @@ nk_raylib_clipboard_paste(nk_handle usr, struct nk_text_edit *edit)
  * @internal
  */
 NK_API void
-nk_raylib_clipboard_copy(nk_handle usr, const char *text, int len) {
+nk_raylib_clipboard_copy(nk_handle usr, const char *text, int len)
+{
     NK_UNUSED(usr);
     NK_UNUSED(len);
     SetClipboardText(text);
@@ -168,7 +163,8 @@ nk_raylib_clipboard_copy(nk_handle usr, const char *text, int len) {
  * @internal
  */
 NK_API struct nk_context*
-InitNuklearContext(struct nk_user_font* userFont) {
+InitNuklearContext(struct nk_user_font* userFont)
+{
     struct nk_context* ctx = (struct nk_context*)MemAlloc(sizeof(struct nk_context));
 
     // Clipboard
@@ -300,7 +296,6 @@ NK_API void
 DrawNuklear(struct nk_context * ctx)
 {
     const struct nk_command *cmd;
-    // bool scissor_mode = false;
 
     nk_foreach(cmd, ctx) {
         switch (cmd->type) {
@@ -312,7 +307,6 @@ DrawNuklear(struct nk_context * ctx)
                 // TODO(RobLoach): Verify if NK_COMMAND_SCISSOR works.
                 const struct nk_command_scissor *s =(const struct nk_command_scissor*)cmd;
                 BeginScissorMode(s->x, s->y, s->w, s->h);
-                // scissor_mode = true;
             } break;
 
             case NK_COMMAND_LINE: {
@@ -320,7 +314,6 @@ DrawNuklear(struct nk_context * ctx)
                 Color color = ColorFromNuklear(l->color);
                 Vector2 startPos = (Vector2){(float)l->begin.x, (float)l->begin.y};
                 Vector2 endPos = (Vector2){(float)l->end.x, (float)l->end.y};
-
                 DrawLineEx(startPos, endPos, l->line_thickness, color);
             } break;
 
@@ -331,7 +324,7 @@ DrawNuklear(struct nk_context * ctx)
                 // Vector2 controlPoint1 = (Vector2){q->ctrl[0].x, q->ctrl[0].y};
                 // Vector2 controlPoint2 = (Vector2){q->ctrl[1].x, q->ctrl[1].y};
                 Vector2 end = (Vector2){(float)q->end.x, (float)q->end.y};
-
+                // TODO: Encorporate segmented control point bezier curve?
                 // DrawLineBezier(start, controlPoint1, (float)q->line_thickness, color);
                 // DrawLineBezier(controlPoint1, controlPoint2, (float)q->line_thickness, color);
                 // DrawLineBezier(controlPoint2, end, (float)q->line_thickness, color);
@@ -392,7 +385,6 @@ DrawNuklear(struct nk_context * ctx)
                 TraceLog(LOG_WARNING, "NUKLEAR: Untested implementation NK_COMMAND_ARC");
                 const struct nk_command_arc *a = (const struct nk_command_arc *)cmd;
                 Color color = ColorFromNuklear(a->color);
-
                 // TODO: Fix NK_COMMAND_ARC
                 Vector2 center = {(float)a->cx, (float)a->cy};
                 DrawCircleSectorLines(center, (float)a->r, a->a[0], a->a[1], RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
@@ -403,7 +395,7 @@ DrawNuklear(struct nk_context * ctx)
                 TraceLog(LOG_WARNING, "NUKLEAR: Untested implementation NK_COMMAND_ARC_FILLED");
                 const struct nk_command_arc *a = (const struct nk_command_arc *)cmd;
                 Color color = ColorFromNuklear(a->color);
-                Vector2 center = {(float)a->cx, (float)a->cy};
+                Vector2 center = (Vector2){(float)a->cx, (float)a->cy};
                 DrawCircleSector(center, (float)a->r, a->a[0], a->a[1], RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
             } break;
 
@@ -430,11 +422,9 @@ DrawNuklear(struct nk_context * ctx)
                 const struct nk_command_polygon *p = (const struct nk_command_polygon*)cmd;
                 Color color = ColorFromNuklear(p->color);
                 Vector2 points[p->point_count];
-
                 for (int i = 0; i < p->point_count; i++) {
                     points[i] = (Vector2){(float)p->points[i].x, (float)p->points[i].y};
                 }
-
                 DrawTriangleFan(points, p->point_count, color);
             } break;
 
@@ -442,11 +432,9 @@ DrawNuklear(struct nk_context * ctx)
                 const struct nk_command_polygon_filled *p = (const struct nk_command_polygon_filled*)cmd;
                 Color color = ColorFromNuklear(p->color);
                 Vector2 points[p->point_count];
-
                 for (int i = 0; i < p->point_count; i++) {
                     points[i] = (Vector2){(float)p->points[i].x, (float)p->points[i].y};
                 }
-
                 DrawTriangleFan(points, p->point_count, color);
             } break;
 
@@ -454,11 +442,9 @@ DrawNuklear(struct nk_context * ctx)
                 const struct nk_command_polyline *p = (const struct nk_command_polyline *)cmd;
                 Color color = ColorFromNuklear(p->color);
                 Vector2 points[p->point_count];
-
                 for (int i = 0; i < p->point_count; i++) {
                     points[i] = (Vector2){(float)p->points[i].x, (float)p->points[i].y};
                 }
-                // TODO(RobLoach): See if Polyline is correct.
                 DrawTriangleStrip(points, p->point_count, color);
             } break;
 
@@ -470,7 +456,8 @@ DrawNuklear(struct nk_context * ctx)
                 Font* font = (Font*)text->font->userdata.ptr;
                 DrawRectangle(text->x, text->y, text->w, text->h, background);
                 if (font != NULL) {
-                    DrawTextEx(*font, (const char*)text->string, (Vector2){ (float)text->x, (float)text->y }, fontSize, RAYLIB_NUKLEAR_DEFAULT_SPACING, color);
+                    Vector2 position = (Vector2){(float)text->x, (float)text->y};
+                    DrawTextEx(*font, (const char*)text->string, position, fontSize, fontSize / 10.0f, color);
                 }
                 else {
                     DrawText((const char*)text->string, text->x, text->y, (int)fontSize, color);
@@ -478,7 +465,7 @@ DrawNuklear(struct nk_context * ctx)
             } break;
 
             case NK_COMMAND_IMAGE: {
-                // TODO: Fix NK_COMMAND_IMAGE
+                // TODO: Verify NK_COMMAND_IMAGE
                 TraceLog(LOG_WARNING, "NUKLEAR: Broken implementation NK_COMMAND_IMAGE");
                 const struct nk_command_image *i = (const struct nk_command_image *)cmd;
                 struct Image image;
@@ -487,11 +474,10 @@ DrawNuklear(struct nk_context * ctx)
                 image.height = i->h;
                 image.mipmaps = 1;
                 image.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
-
                 Texture texture = LoadTextureFromImage(image);
-                Rectangle source = {0, 0, (float)image.width, (float)image.height};
-                Rectangle dest = {(float)i->x, (float)i->y, (float)i->w, (float)i->h};
-                Vector2 origin = {0, 0};
+                Rectangle source = (Rectangle){0, 0, (float)image.width, (float)image.height};
+                Rectangle dest = (Rectangle){(float)i->x, (float)i->y, (float)i->w, (float)i->h};
+                Vector2 origin = (Vector2){0, 0};
                 Color tint = ColorFromNuklear(i->col);
                 DrawTexturePro(texture, source, dest, origin, 0, tint);
                 UnloadTexture(texture);
@@ -508,12 +494,6 @@ DrawNuklear(struct nk_context * ctx)
         }
     }
 
-    // Finish the scissor mode if it was in use.
-    // TODO: Is this needed?
-    // if (scissor_mode) {
-    //  EndScissorMode();
-    // }
-
     nk_clear(ctx);
 }
 
@@ -522,7 +502,8 @@ DrawNuklear(struct nk_context * ctx)
  *
  * @internal
  */
-NK_API int nk_raylib_input_changed(int key) {
+NK_API int nk_raylib_input_changed(int key)
+{
     if (IsKeyPressed(key)) {
         return 1;
     }

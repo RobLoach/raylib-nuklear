@@ -73,7 +73,7 @@ int main(void)
     struct nk_context *ctx;
     struct nk_colorf bg;
 
-    ctx = InitNuklear(0);
+    ctx = InitNuklear(10);
 
     /* style.c */
     #ifdef INCLUDE_STYLE

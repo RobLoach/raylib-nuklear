@@ -45,7 +45,7 @@ int main(void)
 
     /* GUI */
     struct nk_colorf bg = ColorToNuklearF(SKYBLUE);
-    struct nk_context *ctx = InitNuklearEx(font, 20);
+    struct nk_context *ctx = InitNuklearEx(font, 16);
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
