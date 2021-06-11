@@ -4,6 +4,25 @@ Use the [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear) immediate mode c
 
 [![raylib-nuklear-example Screenshot](examples/raylib-nuklear-example.png)](examples)
 
+## Usage
+
+1. Since this is a header-only library, you must first define `RAYLIB_NUKLEAR_IMPLEMENTATION` in one of your `.c` files...
+    ``` c
+    #define RAYLIB_NUKLEAR_IMPLEMENTATION
+    ```
+2. Include the [`raylib-nuklear.h`](include/raylib-nuklear.h) file...
+    ``` c
+    #include "path/to/raylib-nuklear.h"
+    ```
+3. Use `InitNuklear(fontSize)` or `InitNuklearEx(font, fontSize)` to create the nuklear context...
+    ``` c
+    struct nk_context *ctx = InitNuklear(10);
+    ```
+4. Build your Nuklear GUI through the standard [Nuklear API](https://github.com/Immediate-Mode-UI/Nuklear/wiki/Window)
+5. Update the input for the GUI using `UpdateNuklear(ctx)`
+6. Render the context using `DrawNuklear(ctx)`
+7. Destroy the nuklear context with `UnloadNuklear(ctx)`
+
 ## Example
 
 ``` c
@@ -14,7 +33,8 @@ int main() {
     InitWindow(640, 480, "raylib-nuklear example");
 
     // Create the Nuklear Context
-    struct nk_context *ctx = InitNuklear(10);
+    int fontSize = 10;
+    struct nk_context *ctx = InitNuklear(fontSize);
 
     while (!WindowShouldClose()) {
         // Update the Nuklear context, along with input

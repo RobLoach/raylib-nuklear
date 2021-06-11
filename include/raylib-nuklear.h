@@ -44,6 +44,10 @@
 
 #include "nuklear.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 NK_API struct nk_context* InitNuklear(int fontSize);
 NK_API struct nk_context* InitNuklearEx(Font font, float fontSize);
 NK_API void UpdateNuklear(struct nk_context * ctx);
@@ -55,6 +59,10 @@ NK_API struct Color ColorFromNuklear(struct nk_color color);
 NK_API struct Color ColorFromNuklearF(struct nk_colorf color);
 NK_API struct Rectangle RectangleFromNuklear(struct nk_rect rect);
 NK_API struct nk_rect RectangleToNuklear(Rectangle rect);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // RAYLIB_NUKLEAR_H
 
@@ -78,6 +86,10 @@ NK_API struct nk_rect RectangleToNuklear(Rectangle rect);
 
 #define NK_IMPLEMENTATION
 #include "nuklear.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #ifndef RAYLIB_NUKLEAR_DEFAULT_FONTSIZE
 /**
@@ -687,6 +699,10 @@ nk_rect RectangleToNuklear(Rectangle rect)
 {
     return nk_rect(rect.x, rect.y, rect.width, rect.height);
 }
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  // RAYLIB_NUKLEAR_IMPLEMENTATION_ONCE
 #endif  // RAYLIB_NUKLEAR_IMPLEMENTATION
