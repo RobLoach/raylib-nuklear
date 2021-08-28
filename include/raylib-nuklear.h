@@ -433,31 +433,34 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_POLYGON: {
                 const struct nk_command_polygon *p = (const struct nk_command_polygon*)cmd;
                 Color color = ColorFromNuklear(p->color);
-                Vector2 points[p->point_count];
-                for (int i = 0; i < p->point_count; i++) {
+                Vector2* points = MemAlloc(p->point_count * (unsigned short)sizeof(Vector2));
+                for (unsigned short i = 0; i < p->point_count; i++) {
                     points[i] = (Vector2){(float)p->points[i].x, (float)p->points[i].y};
                 }
                 DrawTriangleFan(points, p->point_count, color);
+                MemFree(points);
             } break;
 
             case NK_COMMAND_POLYGON_FILLED: {
                 const struct nk_command_polygon_filled *p = (const struct nk_command_polygon_filled*)cmd;
                 Color color = ColorFromNuklear(p->color);
-                Vector2 points[p->point_count];
-                for (int i = 0; i < p->point_count; i++) {
+                Vector2* points = MemAlloc(p->point_count * (unsigned short)sizeof(Vector2));
+                for (unsigned short i = 0; i < p->point_count; i++) {
                     points[i] = (Vector2){(float)p->points[i].x, (float)p->points[i].y};
                 }
                 DrawTriangleFan(points, p->point_count, color);
+                MemFree(points);
             } break;
 
             case NK_COMMAND_POLYLINE: {
                 const struct nk_command_polyline *p = (const struct nk_command_polyline *)cmd;
                 Color color = ColorFromNuklear(p->color);
-                Vector2 points[p->point_count];
-                for (int i = 0; i < p->point_count; i++) {
+                Vector2* points = MemAlloc(p->point_count * (unsigned short)sizeof(Vector2));
+                for (unsigned short i = 0; i < p->point_count; i++) {
                     points[i] = (Vector2){(float)p->points[i].x, (float)p->points[i].y};
                 }
                 DrawTriangleStrip(points, p->point_count, color);
+                MemFree(points);
             } break;
 
             case NK_COMMAND_TEXT: {
