@@ -116,11 +116,15 @@ NK_API float
 nk_raylib_font_get_text_width(nk_handle handle, float height, const char *text, int len)
 {
     NK_UNUSED(handle);
-    if (len <= 0) {
-        return 0;
+
+    if (len > 0) {
+        // Grab the text with the cropped length so that it only measures the desired string length.
+        const char* subtext = TextSubtext(text, 0, len);
+
+        return (float)MeasureText(subtext, (int)height);
     }
 
-    return (float)MeasureText(text, (int)height);
+    return 0;
 }
 
 /**
@@ -131,12 +135,15 @@ nk_raylib_font_get_text_width(nk_handle handle, float height, const char *text, 
 NK_API float
 nk_raylib_font_get_text_width_user_font(nk_handle handle, float height, const char *text, int len)
 {
-    if (len <= 0) {
-        return 0;
+    if (len > 0) {
+        // Grab the text with the cropped length so that it only measures the desired string length.
+        const char* subtext = TextSubtext(text, 0, len);
+
+        // Spacing is determined by the font size divided by 10.
+        return MeasureTextEx(*(Font*)handle.ptr, subtext, height, height / 10.0f).x;
     }
 
-    // Spacing is determined by the font size divided by 10.
-    return MeasureTextEx(*(Font*)handle.ptr, text, height, height / 10.0f).x;
+    return 0;
 }
 
 /**
@@ -149,7 +156,7 @@ nk_raylib_clipboard_paste(nk_handle usr, struct nk_text_edit *edit)
 {
     const char *text = GetClipboardText();
     NK_UNUSED(usr);
-    if (text != (void*)0) {
+    if (text != NULL) {
         nk_textedit_paste(edit, text, (int)TextLength(text));
     }
 }
