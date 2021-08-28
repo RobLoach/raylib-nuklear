@@ -71,8 +71,8 @@ int main() {
 ## API
 
 ``` c
-struct nk_context* InitNuklear(int fontSize);                 // Set a fontSize of 0 for the default of 10
-struct nk_context* InitNuklearEx(Font font, float fontSize);  // Initialize the Nuklear context with a custom font
+struct nk_context* InitNuklear(int fontSize);                 // Initialize the Nuklear context
+struct nk_context* InitNuklearEx(Font font, float fontSize);  // Initialize the Nuklear context, with a custom font
 void UpdateNuklear(struct nk_context * ctx);                  // Update the input state and internal components
 void DrawNuklear(struct nk_context * ctx);                    // Render the Nuklear GUI on the screen
 void UnloadNuklear(struct nk_context * ctx);                  // Unload the GUI

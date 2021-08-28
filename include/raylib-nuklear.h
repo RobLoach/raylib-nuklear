@@ -48,17 +48,17 @@
 extern "C" {
 #endif
 
-NK_API struct nk_context* InitNuklear(int fontSize);
-NK_API struct nk_context* InitNuklearEx(Font font, float fontSize);
-NK_API void UpdateNuklear(struct nk_context * ctx);
-NK_API void DrawNuklear(struct nk_context * ctx);
-NK_API void UnloadNuklear(struct nk_context * ctx);
-NK_API struct nk_color ColorToNuklear(Color color);
-NK_API struct nk_colorf ColorToNuklearF(Color color);
-NK_API struct Color ColorFromNuklear(struct nk_color color);
-NK_API struct Color ColorFromNuklearF(struct nk_colorf color);
-NK_API struct Rectangle RectangleFromNuklear(struct nk_rect rect);
-NK_API struct nk_rect RectangleToNuklear(Rectangle rect);
+NK_API struct nk_context* InitNuklear(int fontSize);                // Initialize the Nuklear GUI context.
+NK_API struct nk_context* InitNuklearEx(Font font, float fontSize); // Initialize the Nuklear GUI context, with a custom font.
+NK_API void UpdateNuklear(struct nk_context * ctx);                 // Update the input state and internal components for Nuklear.
+NK_API void DrawNuklear(struct nk_context * ctx);                   // Render the Nuklear GUI on the screen.
+NK_API void UnloadNuklear(struct nk_context * ctx);                 // Deinitialize the Nuklear context.
+NK_API struct nk_color ColorToNuklear(Color color);                 // Convert a raylib Color to a Nuklear color object.
+NK_API struct nk_colorf ColorToNuklearF(Color color);               // Convert a raylib Color to a Nuklear floating color.
+NK_API struct Color ColorFromNuklear(struct nk_color color);        // Convert a Nuklear color to a raylib Color.
+NK_API struct Color ColorFromNuklearF(struct nk_colorf color);      // Convert a Nuklear floating color to a raylib Color.
+NK_API struct Rectangle RectangleFromNuklear(struct nk_rect rect);  // Convert a Nuklear rectangle to a raylib Rectangle.
+NK_API struct nk_rect RectangleToNuklear(Rectangle rect);           // Convert a raylib Rectangle to a nuklear Rectangle.
 
 #ifdef __cplusplus
 }
@@ -175,9 +175,9 @@ nk_raylib_clipboard_copy(nk_handle usr, const char *text, int len)
 }
 
 /**
- * Initialize the Nuklear context for use with Raylib.
+ * Initialize the Nuklear context for use with Raylib, with the given Nuklear user font.
  *
- * @param fontSize The size of the font to use for GUI text.
+ * @param userFont The Nuklear user font to initialize the Nuklear context with.
  *
  * @internal
  */
@@ -204,7 +204,7 @@ InitNuklearContext(struct nk_user_font* userFont)
 /**
  * Initialize the Nuklear context for use with Raylib.
  *
- * @param fontSize The size of the font to use for GUI text. Set to 0 to use the default font size.
+ * @param fontSize The size of the font to use for GUI text. Use 0 to use the default font size of 10.
  *
  * @return The nuklear context, or NULL on error.
  */
@@ -230,7 +230,7 @@ InitNuklear(int fontSize)
  * Initialize the Nuklear context for use with Raylib, with a supplied custom font.
  *
  * @param font The custom raylib font to use with Nuklear.
- * @param fontSize The desired size of the font. Use <= 0 to set the default size of 10.
+ * @param fontSize The desired size of the font. Use 0 to set the default size of 10.
  *
  * @return The nuklear context, or NULL on error.
  */
