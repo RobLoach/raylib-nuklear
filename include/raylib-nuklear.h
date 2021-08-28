@@ -189,6 +189,7 @@ InitNuklearContext(struct nk_user_font* userFont)
         TraceLog(LOG_ERROR, "NUKLEAR: Failed to initialize nuklear");
         return NULL;
     }
+    TraceLog(LOG_INFO, "NUKLEAR: Initialized GUI");
 
     return ctx;
 }
@@ -678,6 +679,7 @@ UnloadNuklear(struct nk_context * ctx)
 
     // Unload the nuklear context.
     nk_free(ctx);
+    TraceLog(LOG_INFO, "NUKLEAR: Unloaded GUI");
 }
 
 /**
