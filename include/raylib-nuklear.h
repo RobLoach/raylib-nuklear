@@ -6,7 +6,7 @@
 *       - Use the nuklear immediate-mode graphical user interface in raylib.
 *
 *   DEPENDENCIES:
-*       - raylib 3.7 https://www.raylib.com/
+*       - raylib 4.0 https://www.raylib.com/
 *       - nuklear https://github.com/Immediate-Mode-UI/Nuklear
 *
 *   LICENSE: zlib/libpng
@@ -245,9 +245,9 @@ InitNuklearEx(Font font, float fontSize)
     // Copy the font to a new raylib font pointer.
     struct Font* newFont = (struct Font*)MemAlloc(sizeof(struct Font));
     newFont->baseSize = font.baseSize;
-    newFont->chars = font.chars;
-    newFont->charsCount = font.charsCount;
-    newFont->charsPadding = font.charsPadding;
+    newFont->glyphCount = font.glyphCount;
+    newFont->glyphPadding = font.glyphPadding;
+    newFont->glyphs = font.glyphs;
     newFont->recs = font.recs;
     newFont->texture = font.texture;
 
