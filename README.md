@@ -84,6 +84,8 @@ Rectangle RectangleFromNuklear(struct nk_rect rect);
 nk_rect RectangleToNuklear(Rectangle rect);
 ```
 
+See the [Nuklear API documenation](https://immediate-mode-ui.github.io/Nuklear/doc/nuklear.html) for more how to use Nuklear.
+
 ## Development
 
 ```

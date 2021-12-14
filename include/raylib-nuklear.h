@@ -211,13 +211,14 @@ InitNuklearContext(struct nk_user_font* userFont)
 NK_API struct nk_context*
 InitNuklear(int fontSize)
 {
+    // User font.
+    struct nk_user_font* userFont = (struct nk_user_font*)MemAlloc(sizeof(struct nk_user_font));
+
     // Use the default font size if desired.
     if (fontSize <= 0) {
         fontSize = RAYLIB_NUKLEAR_DEFAULT_FONTSIZE;
     }
 
-    // User font.
-    struct nk_user_font* userFont = (struct nk_user_font*)MemAlloc(sizeof(struct nk_user_font));
     userFont->height = (float)fontSize;
     userFont->width = nk_raylib_font_get_text_width;
     userFont->userdata = nk_handle_ptr(0);
@@ -237,13 +238,13 @@ InitNuklear(int fontSize)
 NK_API struct nk_context*
 InitNuklearEx(Font font, float fontSize)
 {
+    // Copy the font to a new raylib font pointer.
+    struct Font* newFont = (struct Font*)MemAlloc(sizeof(struct Font));
+
     // Use the default font size if desired.
     if (fontSize <= 0.0f) {
         fontSize = (float)RAYLIB_NUKLEAR_DEFAULT_FONTSIZE;
     }
-
-    // Copy the font to a new raylib font pointer.
-    struct Font* newFont = (struct Font*)MemAlloc(sizeof(struct Font));
     newFont->baseSize = font.baseSize;
     newFont->glyphCount = font.glyphCount;
     newFont->glyphPadding = font.glyphPadding;
@@ -665,13 +666,15 @@ UpdateNuklear(struct nk_context * ctx)
 NK_API void
 UnloadNuklear(struct nk_context * ctx)
 {
+    struct nk_user_font* userFont;
+
     // Skip unloading if it's not set.
     if (ctx == NULL) {
         return;
     }
 
     // Unload the font.
-    struct nk_user_font* userFont = (struct nk_user_font*)ctx->style.font;
+    userFont = (struct nk_user_font*)ctx->style.font;
     if (userFont != NULL) {
         // Clear the raylib Font object.
         void* fontPtr = userFont->userdata.ptr;
