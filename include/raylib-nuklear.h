@@ -357,8 +357,7 @@ DrawNuklear(struct nk_context * ctx)
                 Color color = ColorFromNuklear(r->color);
                 Rectangle rect = (Rectangle){(float)r->x, (float)r->y, (float)r->w, (float)r->h};
                 if (r->rounding > 0) {
-                    // TODO: Figure our appropriate roundness.
-                    float roundness = (float)r->rounding / 20.0f;
+                    float roundness = (float)r->rounding * 4.0f / (rect.width + rect.height);
                     DrawRectangleRoundedLines(rect, roundness, 1, r->line_thickness, color);
                 }
                 else {
@@ -371,8 +370,7 @@ DrawNuklear(struct nk_context * ctx)
                 Color color = ColorFromNuklear(r->color);
                 Rectangle rect = (Rectangle){(float)r->x, (float)r->y, (float)r->w, (float)r->h};
                 if (r->rounding > 0) {
-                    // TODO: Figure our appropriate roundness.
-                    float roundness = (float)r->rounding / 20.0f;
+                    float roundness = (float)r->rounding * 4.0f / (rect.width + rect.height);
                     DrawRectangleRounded(rect, roundness, 1, color);
                 }
                 else {
@@ -403,27 +401,22 @@ DrawNuklear(struct nk_context * ctx)
             } break;
 
             case NK_COMMAND_ARC: {
-                TraceLog(LOG_WARNING, "NUKLEAR: Untested implementation NK_COMMAND_ARC");
-                const struct nk_command_arc *a = (const struct nk_command_arc *)cmd;
+                const struct nk_command_arc *a = (const struct nk_command_arc*)cmd;
                 Color color = ColorFromNuklear(a->color);
-                // TODO: Fix NK_COMMAND_ARC
-                Vector2 center = {(float)a->cx, (float)a->cy};
-                DrawCircleSectorLines(center, (float)a->r, a->a[0], a->a[1], RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
+                Vector2 center = (Vector2){(float)a->cx, (float)a->cy};
+                DrawRingLines(center, 0, a->r, a->a[0] * RAD2DEG - 45, a->a[1] * RAD2DEG - 45, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
             } break;
 
             case NK_COMMAND_ARC_FILLED: {
-                // TODO: Fix NK_COMMAND_ARC_FILLED
-                TraceLog(LOG_WARNING, "NUKLEAR: Untested implementation NK_COMMAND_ARC_FILLED");
-                const struct nk_command_arc *a = (const struct nk_command_arc *)cmd;
+                const struct nk_command_arc_filled *a = (const struct nk_command_arc_filled*)cmd;
                 Color color = ColorFromNuklear(a->color);
                 Vector2 center = (Vector2){(float)a->cx, (float)a->cy};
-                DrawCircleSector(center, (float)a->r, a->a[0], a->a[1], RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
+                DrawRing(center, 0, a->r, a->a[0] * RAD2DEG - 45, a->a[1] * RAD2DEG - 45, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
             } break;
 
             case NK_COMMAND_TRIANGLE: {
                 const struct nk_command_triangle *t = (const struct nk_command_triangle*)cmd;
                 Color color = ColorFromNuklear(t->color);
-                // TODO: Fix needing counter-clockwise order?
                 Vector2 point1 = (Vector2){(float)t->b.x, (float)t->b.y};
                 Vector2 point2 = (Vector2){(float)t->a.x, (float)t->a.y};
                 Vector2 point3 = (Vector2){(float)t->c.x, (float)t->c.y};
@@ -440,17 +433,19 @@ DrawNuklear(struct nk_context * ctx)
             } break;
 
             case NK_COMMAND_POLYGON: {
+                // TODO: Confirm Polygon
                 const struct nk_command_polygon *p = (const struct nk_command_polygon*)cmd;
                 Color color = ColorFromNuklear(p->color);
                 Vector2* points = MemAlloc(p->point_count * (unsigned short)sizeof(Vector2));
                 for (unsigned short i = 0; i < p->point_count; i++) {
                     points[i] = (Vector2){(float)p->points[i].x, (float)p->points[i].y};
                 }
-                DrawTriangleFan(points, p->point_count, color);
+                DrawTriangleStrip(points, p->point_count, color);
                 MemFree(points);
             } break;
 
             case NK_COMMAND_POLYGON_FILLED: {
+                // TODO: Polygon filled expects counter clockwise order
                 const struct nk_command_polygon_filled *p = (const struct nk_command_polygon_filled*)cmd;
                 Color color = ColorFromNuklear(p->color);
                 Vector2* points = MemAlloc(p->point_count * (unsigned short)sizeof(Vector2));
@@ -462,6 +457,7 @@ DrawNuklear(struct nk_context * ctx)
             } break;
 
             case NK_COMMAND_POLYLINE: {
+                // TODO: Polygon expects counter clockwise order
                 const struct nk_command_polyline *p = (const struct nk_command_polyline *)cmd;
                 Color color = ColorFromNuklear(p->color);
                 Vector2* points = MemAlloc(p->point_count * (unsigned short)sizeof(Vector2));

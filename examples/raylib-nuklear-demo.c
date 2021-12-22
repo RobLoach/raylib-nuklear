@@ -35,27 +35,32 @@
 #define INCLUDE_ALL
 /*#define INCLUDE_STYLE */
 /*#define INCLUDE_CALCULATOR */
+/*#define INCLUDE_CANVAS */
 /*#define INCLUDE_OVERVIEW */
 /*#define INCLUDE_NODE_EDITOR */
 
 #ifdef INCLUDE_ALL
   #define INCLUDE_STYLE
   #define INCLUDE_CALCULATOR
+  #define INCLUDE_CANVAS
   #define INCLUDE_OVERVIEW
   #define INCLUDE_NODE_EDITOR
 #endif
 
 #ifdef INCLUDE_STYLE
-  #include "demo/style.c"
+  #include "../vendor/nuklear/demo/style.c"
 #endif
 #ifdef INCLUDE_CALCULATOR
-  #include "demo/calculator.c"
+  #include "../vendor/nuklear/demo/calculator.c"
+#endif
+#ifdef INCLUDE_CANVAS
+  #include "../vendor/nuklear/demo/canvas.c"
 #endif
 #ifdef INCLUDE_OVERVIEW
-  #include "demo/overview.c"
+  #include "../vendor/nuklear/demo/overview.c"
 #endif
 #ifdef INCLUDE_NODE_EDITOR
-  #include "demo/node_editor.c"
+  #include "../vendor/nuklear/demo/node_editor.c"
 #endif
 
 /* ===============================================================
@@ -126,6 +131,9 @@ int main(void)
         /* -------------- EXAMPLES ---------------- */
         #ifdef INCLUDE_CALCULATOR
           calculator(ctx);
+        #endif
+        #ifdef INCLUDE_CANVAS
+          canvas(ctx);
         #endif
         #ifdef INCLUDE_OVERVIEW
           overview(ctx);
