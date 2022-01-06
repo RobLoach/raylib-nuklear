@@ -85,6 +85,7 @@ NK_API struct nk_rect RectangleToNuklear(Rectangle rect);           // Convert a
 #endif  // NK_BOOL
 
 #define NK_IMPLEMENTATION
+#define NK_KEYSTATE_BASED_INPUT
 #include "nuklear.h"
 
 #ifdef __cplusplus
@@ -518,22 +519,6 @@ DrawNuklear(struct nk_context * ctx)
 }
 
 /**
- * Returns 1 when pressed, 0 when released, or -1 when no change.
- *
- * @internal
- */
-NK_API int nk_raylib_input_changed(int key)
-{
-    if (IsKeyPressed(key)) {
-        return 1;
-    }
-    else if (IsKeyReleased(key)) {
-        return 0;
-    }
-    return -1;
-}
-
-/**
  * Update the Nuklear context for the keyboard input from raylib.
  *
  * @param ctx The nuklear context.
@@ -542,80 +527,36 @@ NK_API int nk_raylib_input_changed(int key)
  */
 NK_API void nk_raylib_input_keyboard(struct nk_context * ctx)
 {
-    int down;
-    if ((down = nk_raylib_input_changed(KEY_LEFT_SHIFT)) >= 0) {
-        nk_input_key(ctx, NK_KEY_SHIFT, down);
-    }
-    if ((down = nk_raylib_input_changed(KEY_RIGHT_SHIFT)) >= 0) {
-        nk_input_key(ctx, NK_KEY_SHIFT, down);
-    }
-    if ((down = nk_raylib_input_changed(KEY_LEFT_CONTROL)) >= 0) {
-        nk_input_key(ctx, NK_KEY_CTRL, down);
-    }
-    if ((down = nk_raylib_input_changed(KEY_RIGHT_CONTROL)) >= 0) {
-        nk_input_key(ctx, NK_KEY_CTRL, down);
-    }
-    if ((down = nk_raylib_input_changed(KEY_DELETE)) >= 0) {
-        nk_input_key(ctx, NK_KEY_DEL, down);
-    }
-    if ((down = nk_raylib_input_changed(KEY_ENTER)) >= 0) {
-        nk_input_key(ctx, NK_KEY_ENTER, down);
-    }
-    if ((down = nk_raylib_input_changed(KEY_TAB)) >= 0) {
-        nk_input_key(ctx, NK_KEY_TAB, down);
-    }
-    if ((down = nk_raylib_input_changed(KEY_BACKSPACE)) >= 0) {
-        nk_input_key(ctx, NK_KEY_BACKSPACE, down);
-    }
-    if ((down = nk_raylib_input_changed(KEY_C)) >= 0) {
-        nk_input_key(ctx, NK_KEY_COPY, (down == 1) && IsKeyDown(KEY_LEFT_CONTROL));
-    }
-    if ((down = nk_raylib_input_changed(KEY_X)) >= 0) {
-        nk_input_key(ctx, NK_KEY_CUT, (down == 1) && IsKeyDown(KEY_LEFT_CONTROL));
-    }
-    if ((down = nk_raylib_input_changed(KEY_V)) >= 0) {
-        nk_input_key(ctx, NK_KEY_PASTE, (down == 1) && IsKeyDown(KEY_LEFT_CONTROL));
-    }
-    if ((down = nk_raylib_input_changed(KEY_UP)) >= 0) {
-        nk_input_key(ctx, NK_KEY_UP, down);
-    }
-    if ((down = nk_raylib_input_changed(KEY_DOWN)) >= 0) {
-        nk_input_key(ctx, NK_KEY_DOWN, down);
-    }
-    if ((down = nk_raylib_input_changed(KEY_LEFT)) >= 0) {
-        if (IsKeyDown(KEY_LEFT_CONTROL)) {
-            nk_input_key(ctx, NK_KEY_TEXT_WORD_LEFT, down);
-        }
-        else {
-            nk_input_key(ctx, NK_KEY_LEFT, down);
-        }
-    }
-    if ((down = nk_raylib_input_changed(KEY_RIGHT)) >= 0) {
-        if (IsKeyDown(KEY_LEFT_CONTROL)) {
-            nk_input_key(ctx, NK_KEY_TEXT_WORD_RIGHT, down);
-        }
-        else {
-            nk_input_key(ctx, NK_KEY_RIGHT, down);
-        }
-    }
-
-    // TODO: Add remaining keyboard actions.
-    // NK_KEY_TEXT_INSERT_MODE
-    // NK_KEY_TEXT_REPLACE_MODE
-    // NK_KEY_TEXT_RESET_MODE
-    // NK_KEY_TEXT_LINE_START
-    // NK_KEY_TEXT_LINE_END
-    // NK_KEY_TEXT_START
-    // NK_KEY_TEXT_END
-    // NK_KEY_TEXT_UNDO
-    // NK_KEY_TEXT_REDO
-    // NK_KEY_TEXT_SELECT_ALL
-    // NK_KEY_TEXT_WORD_LEFT
-    // NK_KEY_TEXT_WORD_RIGHT
-    // NK_KEY_SCROLL_START
-    // NK_KEY_SCROLL_END
-    // NK_KEY_SCROLL_DOWN
-    // NK_KEY_SCROLL_UP
+    nk_input_key(ctx, KEY_APOSTROPHE, IsKeyPressed(KEY_APOSTROPHE));
+    nk_input_key(ctx, NK_KEY_SHIFT, IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT));
+    nk_input_key(ctx, NK_KEY_CTRL, IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL));
+    nk_input_key(ctx, NK_KEY_DEL, IsKeyDown(KEY_DELETE));
+    nk_input_key(ctx, NK_KEY_ENTER, IsKeyDown(KEY_ENTER) || IsKeyDown(KEY_KP_ENTER));
+    nk_input_key(ctx, NK_KEY_TAB, IsKeyDown(KEY_TAB));
+    nk_input_key(ctx, NK_KEY_BACKSPACE, IsKeyDown(KEY_BACKSPACE));
+    nk_input_key(ctx, NK_KEY_COPY, IsKeyPressed(KEY_C) && (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)));
+    nk_input_key(ctx, NK_KEY_CUT, IsKeyPressed(KEY_X) && (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)));
+    nk_input_key(ctx, NK_KEY_PASTE, IsKeyPressed(KEY_V) && (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)));
+    nk_input_key(ctx, NK_KEY_TEXT_LINE_START, IsKeyPressed(KEY_B) && (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)));
+    nk_input_key(ctx, NK_KEY_TEXT_LINE_END, IsKeyPressed(KEY_E) && (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)));
+    nk_input_key(ctx, NK_KEY_TEXT_UNDO, IsKeyDown(KEY_Z) && (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)));
+    nk_input_key(ctx, NK_KEY_TEXT_REDO, IsKeyDown(KEY_R) && (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)));
+    nk_input_key(ctx, NK_KEY_TEXT_SELECT_ALL, IsKeyDown(KEY_A) && (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)));
+    nk_input_key(ctx, NK_KEY_TEXT_WORD_LEFT, IsKeyDown(KEY_LEFT) && (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)));
+    nk_input_key(ctx, NK_KEY_TEXT_WORD_RIGHT, IsKeyDown(KEY_RIGHT) && (IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)));
+    nk_input_key(ctx, NK_KEY_LEFT, IsKeyDown(KEY_LEFT) && !(IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)));
+    nk_input_key(ctx, NK_KEY_RIGHT, IsKeyDown(KEY_RIGHT) && !(IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL)));
+    //nk_input_key(ctx, NK_KEY_TEXT_INSERT_MODE, IsKeyDown());
+    //nk_input_key(ctx, NK_KEY_TEXT_REPLACE_MODE, IsKeyDown());
+    //nk_input_key(ctx, NK_KEY_TEXT_RESET_MODE, IsKeyDown());
+    nk_input_key(ctx, NK_KEY_UP, IsKeyDown(KEY_UP));
+    nk_input_key(ctx, NK_KEY_DOWN, IsKeyDown(KEY_DOWN));
+    nk_input_key(ctx, NK_KEY_TEXT_START, IsKeyDown(KEY_HOME));
+    nk_input_key(ctx, NK_KEY_TEXT_END, IsKeyDown(KEY_END));
+    nk_input_key(ctx, NK_KEY_SCROLL_START, IsKeyDown(KEY_HOME));
+    nk_input_key(ctx, NK_KEY_SCROLL_END, IsKeyDown(KEY_END));
+    nk_input_key(ctx, NK_KEY_SCROLL_DOWN, IsKeyDown(KEY_PAGE_DOWN));
+    nk_input_key(ctx, NK_KEY_SCROLL_UP, IsKeyDown(KEY_PAGE_UP));
 
     // TODO: Verify that this unicode keyboard input works.
     for (int i = 32; i < 126; i++) {
