@@ -85,6 +85,7 @@ NK_API struct nk_rect RectangleToNuklear(Rectangle rect);           // Convert a
 #endif  // NK_BOOL
 
 #define NK_IMPLEMENTATION
+#define NK_KEYSTATE_BASED_INPUT
 #include "nuklear.h"
 
 #ifdef __cplusplus
@@ -504,8 +505,9 @@ DrawNuklear(struct nk_context * ctx)
             } break;
 
             case NK_COMMAND_CUSTOM: {
-                // TODO: NK_COMMAND_CUSTOM
-                TraceLog(LOG_WARNING, "NUKLEAR: Missing implementation NK_COMMAND_CUSTOM");
+                TraceLog(LOG_WARNING, "NUKLEAR: Unverified custom callback implementation NK_COMMAND_CUSTOM");
+                const struct nk_command_custom *custom = (const struct nk_command_custom *)cmd;
+                custom->callback(NULL, custom->x, custom->y, custom->w, custom->h, custom->callback_data);
             } break;
 
             default: {
@@ -518,22 +520,6 @@ DrawNuklear(struct nk_context * ctx)
 }
 
 /**
- * Returns 1 when pressed, 0 when released, or -1 when no change.
- *
- * @internal
- */
-NK_API int nk_raylib_input_changed(int key)
-{
-    if (IsKeyPressed(key)) {
-        return 1;
-    }
-    else if (IsKeyReleased(key)) {
-        return 0;
-    }
-    return -1;
-}
-
-/**
  * Update the Nuklear context for the keyboard input from raylib.
  *
  * @param ctx The nuklear context.
@@ -542,86 +528,128 @@ NK_API int nk_raylib_input_changed(int key)
  */
 NK_API void nk_raylib_input_keyboard(struct nk_context * ctx)
 {
-    int down;
-    if ((down = nk_raylib_input_changed(KEY_LEFT_SHIFT)) >= 0) {
-        nk_input_key(ctx, NK_KEY_SHIFT, down);
-    }
-    if ((down = nk_raylib_input_changed(KEY_RIGHT_SHIFT)) >= 0) {
-        nk_input_key(ctx, NK_KEY_SHIFT, down);
-    }
-    if ((down = nk_raylib_input_changed(KEY_LEFT_CONTROL)) >= 0) {
-        nk_input_key(ctx, NK_KEY_CTRL, down);
-    }
-    if ((down = nk_raylib_input_changed(KEY_RIGHT_CONTROL)) >= 0) {
-        nk_input_key(ctx, NK_KEY_CTRL, down);
-    }
-    if ((down = nk_raylib_input_changed(KEY_DELETE)) >= 0) {
-        nk_input_key(ctx, NK_KEY_DEL, down);
-    }
-    if ((down = nk_raylib_input_changed(KEY_ENTER)) >= 0) {
-        nk_input_key(ctx, NK_KEY_ENTER, down);
-    }
-    if ((down = nk_raylib_input_changed(KEY_TAB)) >= 0) {
-        nk_input_key(ctx, NK_KEY_TAB, down);
-    }
-    if ((down = nk_raylib_input_changed(KEY_BACKSPACE)) >= 0) {
-        nk_input_key(ctx, NK_KEY_BACKSPACE, down);
-    }
-    if ((down = nk_raylib_input_changed(KEY_C)) >= 0) {
-        nk_input_key(ctx, NK_KEY_COPY, (down == 1) && IsKeyDown(KEY_LEFT_CONTROL));
-    }
-    if ((down = nk_raylib_input_changed(KEY_X)) >= 0) {
-        nk_input_key(ctx, NK_KEY_CUT, (down == 1) && IsKeyDown(KEY_LEFT_CONTROL));
-    }
-    if ((down = nk_raylib_input_changed(KEY_V)) >= 0) {
-        nk_input_key(ctx, NK_KEY_PASTE, (down == 1) && IsKeyDown(KEY_LEFT_CONTROL));
-    }
-    if ((down = nk_raylib_input_changed(KEY_UP)) >= 0) {
-        nk_input_key(ctx, NK_KEY_UP, down);
-    }
-    if ((down = nk_raylib_input_changed(KEY_DOWN)) >= 0) {
-        nk_input_key(ctx, NK_KEY_DOWN, down);
-    }
-    if ((down = nk_raylib_input_changed(KEY_LEFT)) >= 0) {
-        if (IsKeyDown(KEY_LEFT_CONTROL)) {
-            nk_input_key(ctx, NK_KEY_TEXT_WORD_LEFT, down);
-        }
-        else {
-            nk_input_key(ctx, NK_KEY_LEFT, down);
-        }
-    }
-    if ((down = nk_raylib_input_changed(KEY_RIGHT)) >= 0) {
-        if (IsKeyDown(KEY_LEFT_CONTROL)) {
-            nk_input_key(ctx, NK_KEY_TEXT_WORD_RIGHT, down);
-        }
-        else {
-            nk_input_key(ctx, NK_KEY_RIGHT, down);
-        }
-    }
+    bool control = IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL);
+    bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
+    nk_input_key(ctx, NK_KEY_SHIFT, shift);
+    nk_input_key(ctx, NK_KEY_CTRL, control);
+    nk_input_key(ctx, NK_KEY_DEL, IsKeyDown(KEY_DELETE));
+    nk_input_key(ctx, NK_KEY_ENTER, IsKeyDown(KEY_ENTER) || IsKeyDown(KEY_KP_ENTER));
+    nk_input_key(ctx, NK_KEY_TAB, IsKeyDown(KEY_TAB));
+    nk_input_key(ctx, NK_KEY_BACKSPACE, IsKeyDown(KEY_BACKSPACE));
+    nk_input_key(ctx, NK_KEY_COPY, IsKeyPressed(KEY_C) && control);
+    nk_input_key(ctx, NK_KEY_CUT, IsKeyPressed(KEY_X) && control);
+    nk_input_key(ctx, NK_KEY_PASTE, IsKeyPressed(KEY_V) && control);
+    nk_input_key(ctx, NK_KEY_TEXT_LINE_START, IsKeyPressed(KEY_B) && control);
+    nk_input_key(ctx, NK_KEY_TEXT_LINE_END, IsKeyPressed(KEY_E) && control);
+    nk_input_key(ctx, NK_KEY_TEXT_UNDO, IsKeyDown(KEY_Z) && control);
+    nk_input_key(ctx, NK_KEY_TEXT_REDO, IsKeyDown(KEY_R) && control);
+    nk_input_key(ctx, NK_KEY_TEXT_SELECT_ALL, IsKeyDown(KEY_A) && control);
+    nk_input_key(ctx, NK_KEY_TEXT_WORD_LEFT, IsKeyDown(KEY_LEFT) && control);
+    nk_input_key(ctx, NK_KEY_TEXT_WORD_RIGHT, IsKeyDown(KEY_RIGHT) && control);
+    nk_input_key(ctx, NK_KEY_LEFT, IsKeyDown(KEY_LEFT) && !control);
+    nk_input_key(ctx, NK_KEY_RIGHT, IsKeyDown(KEY_RIGHT) && !control);
+    //nk_input_key(ctx, NK_KEY_TEXT_INSERT_MODE, IsKeyDown());
+    //nk_input_key(ctx, NK_KEY_TEXT_REPLACE_MODE, IsKeyDown());
+    //nk_input_key(ctx, NK_KEY_TEXT_RESET_MODE, IsKeyDown());
+    nk_input_key(ctx, NK_KEY_UP, IsKeyDown(KEY_UP));
+    nk_input_key(ctx, NK_KEY_DOWN, IsKeyDown(KEY_DOWN));
+    nk_input_key(ctx, NK_KEY_TEXT_START, IsKeyDown(KEY_HOME));
+    nk_input_key(ctx, NK_KEY_TEXT_END, IsKeyDown(KEY_END));
+    nk_input_key(ctx, NK_KEY_SCROLL_START, IsKeyDown(KEY_HOME) && control);
+    nk_input_key(ctx, NK_KEY_SCROLL_END, IsKeyDown(KEY_END) && control);
+    nk_input_key(ctx, NK_KEY_SCROLL_DOWN, IsKeyDown(KEY_PAGE_DOWN));
+    nk_input_key(ctx, NK_KEY_SCROLL_UP, IsKeyDown(KEY_PAGE_UP));
 
-    // TODO: Add remaining keyboard actions.
-    // NK_KEY_TEXT_INSERT_MODE
-    // NK_KEY_TEXT_REPLACE_MODE
-    // NK_KEY_TEXT_RESET_MODE
-    // NK_KEY_TEXT_LINE_START
-    // NK_KEY_TEXT_LINE_END
-    // NK_KEY_TEXT_START
-    // NK_KEY_TEXT_END
-    // NK_KEY_TEXT_UNDO
-    // NK_KEY_TEXT_REDO
-    // NK_KEY_TEXT_SELECT_ALL
-    // NK_KEY_TEXT_WORD_LEFT
-    // NK_KEY_TEXT_WORD_RIGHT
-    // NK_KEY_SCROLL_START
-    // NK_KEY_SCROLL_END
-    // NK_KEY_SCROLL_DOWN
-    // NK_KEY_SCROLL_UP
+    // Keys
+    if (IsKeyPressed(KEY_APOSTROPHE)) nk_input_unicode(ctx, shift ? 34 : (nk_rune)KEY_APOSTROPHE);
+    if (IsKeyPressed(KEY_COMMA)) nk_input_unicode(ctx, shift ? 60 : (nk_rune)KEY_COMMA);
+    if (IsKeyPressed(KEY_MINUS)) nk_input_unicode(ctx, shift ? 95 : (nk_rune)KEY_MINUS);
+    if (IsKeyPressed(KEY_PERIOD)) nk_input_unicode(ctx, shift ? 62 : (nk_rune)KEY_PERIOD);
+    if (IsKeyPressed(KEY_SLASH)) nk_input_unicode(ctx, shift ? 63 : (nk_rune)KEY_SLASH);
+    if (IsKeyPressed(KEY_ZERO)) nk_input_unicode(ctx, shift ? 41 : (nk_rune)KEY_ZERO);
+    if (IsKeyPressed(KEY_ONE)) nk_input_unicode(ctx, shift ? 33 : (nk_rune)KEY_ONE);
+    if (IsKeyPressed(KEY_TWO)) nk_input_unicode(ctx, shift ? 64 : (nk_rune)KEY_TWO);
+    if (IsKeyPressed(KEY_THREE)) nk_input_unicode(ctx, shift ? 35 : (nk_rune)KEY_THREE);
+    if (IsKeyPressed(KEY_FOUR)) nk_input_unicode(ctx, shift ? 36 : (nk_rune)KEY_FOUR);
+    if (IsKeyPressed(KEY_FIVE)) nk_input_unicode(ctx, shift ? 37 : (nk_rune)KEY_FIVE);
+    if (IsKeyPressed(KEY_SIX)) nk_input_unicode(ctx, shift ? 94 : (nk_rune)KEY_SIX);
+    if (IsKeyPressed(KEY_SEVEN)) nk_input_unicode(ctx, shift ? 38 : (nk_rune)KEY_SEVEN);
+    if (IsKeyPressed(KEY_EIGHT)) nk_input_unicode(ctx, shift ? 42 : (nk_rune)KEY_EIGHT);
+    if (IsKeyPressed(KEY_NINE)) nk_input_unicode(ctx, shift ? 40 : (nk_rune)KEY_NINE);
+    if (IsKeyPressed(KEY_SEMICOLON)) nk_input_unicode(ctx, shift ? 41 : (nk_rune)KEY_SEMICOLON);
+    if (IsKeyPressed(KEY_EQUAL)) nk_input_unicode(ctx, shift ? 43 : (nk_rune)KEY_EQUAL);
+    if (IsKeyPressed(KEY_A)) nk_input_unicode(ctx, shift ? KEY_A : KEY_A + 32);
+    if (IsKeyPressed(KEY_B)) nk_input_unicode(ctx, shift ? KEY_B : KEY_B + 32);
+    if (IsKeyPressed(KEY_C)) nk_input_unicode(ctx, shift ? KEY_C : KEY_C + 32);
+    if (IsKeyPressed(KEY_D)) nk_input_unicode(ctx, shift ? KEY_D : KEY_D + 32);
+    if (IsKeyPressed(KEY_E)) nk_input_unicode(ctx, shift ? KEY_E : KEY_E + 32);
+    if (IsKeyPressed(KEY_F)) nk_input_unicode(ctx, shift ? KEY_F : KEY_F + 32);
+    if (IsKeyPressed(KEY_G)) nk_input_unicode(ctx, shift ? KEY_G : KEY_G + 32);
+    if (IsKeyPressed(KEY_H)) nk_input_unicode(ctx, shift ? KEY_H : KEY_H + 32);
+    if (IsKeyPressed(KEY_I)) nk_input_unicode(ctx, shift ? KEY_I : KEY_I + 32);
+    if (IsKeyPressed(KEY_J)) nk_input_unicode(ctx, shift ? KEY_J : KEY_J + 32);
+    if (IsKeyPressed(KEY_K)) nk_input_unicode(ctx, shift ? KEY_K : KEY_K + 32);
+    if (IsKeyPressed(KEY_L)) nk_input_unicode(ctx, shift ? KEY_L : KEY_L + 32);
+    if (IsKeyPressed(KEY_M)) nk_input_unicode(ctx, shift ? KEY_M : KEY_M + 32);
+    if (IsKeyPressed(KEY_N)) nk_input_unicode(ctx, shift ? KEY_N : KEY_N + 32);
+    if (IsKeyPressed(KEY_O)) nk_input_unicode(ctx, shift ? KEY_O : KEY_O + 32);
+    if (IsKeyPressed(KEY_P)) nk_input_unicode(ctx, shift ? KEY_P : KEY_P + 32);
+    if (IsKeyPressed(KEY_Q)) nk_input_unicode(ctx, shift ? KEY_Q : KEY_Q + 32);
+    if (IsKeyPressed(KEY_R)) nk_input_unicode(ctx, shift ? KEY_R : KEY_R + 32);
+    if (IsKeyPressed(KEY_S)) nk_input_unicode(ctx, shift ? KEY_S : KEY_S + 32);
+    if (IsKeyPressed(KEY_T)) nk_input_unicode(ctx, shift ? KEY_T : KEY_T + 32);
+    if (IsKeyPressed(KEY_U)) nk_input_unicode(ctx, shift ? KEY_U : KEY_U + 32);
+    if (IsKeyPressed(KEY_V)) nk_input_unicode(ctx, shift ? KEY_V : KEY_V + 32);
+    if (IsKeyPressed(KEY_W)) nk_input_unicode(ctx, shift ? KEY_W : KEY_W + 32);
+    if (IsKeyPressed(KEY_X)) nk_input_unicode(ctx, shift ? KEY_X : KEY_X + 32);
+    if (IsKeyPressed(KEY_Y)) nk_input_unicode(ctx, shift ? KEY_Y : KEY_Y + 32);
+    if (IsKeyPressed(KEY_Z)) nk_input_unicode(ctx, shift ? KEY_Z : KEY_Z + 32);
+    if (IsKeyPressed(KEY_LEFT_BRACKET)) nk_input_unicode(ctx, shift ? 123 : (nk_rune)KEY_LEFT_BRACKET);
+    if (IsKeyPressed(KEY_BACKSLASH)) nk_input_unicode(ctx, shift ? 124 : (nk_rune)KEY_BACKSLASH);
+    if (IsKeyPressed(KEY_RIGHT_BRACKET)) nk_input_unicode(ctx, shift ? 125 : (nk_rune)KEY_RIGHT_BRACKET);
+    if (IsKeyPressed(KEY_GRAVE)) nk_input_unicode(ctx, shift ? 126 : (nk_rune)KEY_GRAVE);
 
-    // TODO: Verify that this unicode keyboard input works.
-    for (int i = 32; i < 126; i++) {
-        if (IsKeyPressed(i)) {
-            nk_input_unicode(ctx, (nk_rune)i);
-        }
+    // Functions
+    if (IsKeyPressed(KEY_SPACE)) nk_input_unicode(ctx, KEY_SPACE);
+    if (IsKeyPressed(KEY_TAB)) nk_input_unicode(ctx, 9);
+
+    // Keypad
+    if (IsKeyPressed(KEY_KP_0)) nk_input_unicode(ctx, KEY_ZERO);
+    if (IsKeyPressed(KEY_KP_1)) nk_input_unicode(ctx, KEY_ONE);
+    if (IsKeyPressed(KEY_KP_2)) nk_input_unicode(ctx, KEY_TWO);
+    if (IsKeyPressed(KEY_KP_3)) nk_input_unicode(ctx, KEY_THREE);
+    if (IsKeyPressed(KEY_KP_4)) nk_input_unicode(ctx, KEY_FOUR);
+    if (IsKeyPressed(KEY_KP_5)) nk_input_unicode(ctx, KEY_FIVE);
+    if (IsKeyPressed(KEY_KP_6)) nk_input_unicode(ctx, KEY_SIX);
+    if (IsKeyPressed(KEY_KP_7)) nk_input_unicode(ctx, KEY_SEVEN);
+    if (IsKeyPressed(KEY_KP_8)) nk_input_unicode(ctx, KEY_EIGHT);
+    if (IsKeyPressed(KEY_KP_9)) nk_input_unicode(ctx, KEY_NINE);
+    if (IsKeyPressed(KEY_KP_DECIMAL)) nk_input_unicode(ctx, KEY_PERIOD);
+    if (IsKeyPressed(KEY_KP_DIVIDE)) nk_input_unicode(ctx, KEY_SLASH);
+    if (IsKeyPressed(KEY_KP_MULTIPLY)) nk_input_unicode(ctx, 48);
+    if (IsKeyPressed(KEY_KP_SUBTRACT)) nk_input_unicode(ctx, 45);
+    if (IsKeyPressed(KEY_KP_ADD)) nk_input_unicode(ctx, 43);
+}
+
+/**
+ * Update the Nuklear context for the mouse input from raylib.
+ *
+ * @param ctx The nuklear context.
+ *
+ * @internal
+ */
+NK_API void nk_raylib_input_mouse(struct nk_context * ctx)
+{
+    nk_input_motion(ctx, GetMouseX(), GetMouseY());
+    nk_input_button(ctx, NK_BUTTON_LEFT, GetMouseX(), GetMouseY(), IsMouseButtonDown(MOUSE_LEFT_BUTTON));
+    nk_input_button(ctx, NK_BUTTON_RIGHT, GetMouseX(), GetMouseY(), IsMouseButtonDown(MOUSE_RIGHT_BUTTON));
+    nk_input_button(ctx, NK_BUTTON_MIDDLE, GetMouseX(), GetMouseY(), IsMouseButtonDown(MOUSE_MIDDLE_BUTTON));
+
+    // Mouse Wheel
+    float mouseWheel = GetMouseWheelMove();
+    if (mouseWheel != 0.0f) {
+        struct nk_vec2 mouseWheelMove = (struct nk_vec2){0.0f, mouseWheel};
+        nk_input_scroll(ctx, mouseWheelMove);
     }
 }
 
@@ -635,20 +663,7 @@ UpdateNuklear(struct nk_context * ctx)
 {
     nk_input_begin(ctx);
     {
-        // Mouse
-        nk_input_button(ctx, NK_BUTTON_LEFT, GetMouseX(), GetMouseY(), IsMouseButtonDown(MOUSE_LEFT_BUTTON));
-        nk_input_button(ctx, NK_BUTTON_RIGHT, GetMouseX(), GetMouseY(), IsMouseButtonDown(MOUSE_RIGHT_BUTTON));
-        nk_input_button(ctx, NK_BUTTON_MIDDLE, GetMouseX(), GetMouseY(), IsMouseButtonDown(MOUSE_MIDDLE_BUTTON));
-        nk_input_motion(ctx, GetMouseX(), GetMouseY());
-
-        // Mouse Wheel
-        float mouseWheel = GetMouseWheelMove();
-        if (mouseWheel != 0.0f) {
-            struct nk_vec2 mouseWheelMove = (struct nk_vec2){0.0f, mouseWheel};
-            nk_input_scroll(ctx, mouseWheelMove);
-        }
-
-        // Keyboard
+        nk_raylib_input_mouse(ctx);
         nk_raylib_input_keyboard(ctx);
     }
     nk_input_end(ctx);
