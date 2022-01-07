@@ -145,8 +145,10 @@ int main(void)
 
         /* Draw */
         BeginDrawing();
+        {
             ClearBackground(ColorFromNuklearF(bg));
             DrawNuklear(ctx);
+        }
         EndDrawing();
     }
 
