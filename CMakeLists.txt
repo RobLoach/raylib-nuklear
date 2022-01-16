@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.11)
-project(raylib-nuklear
-    DESCRIPTION "raylib-nuklear: Nuklear immediate mode GUI for raylib."
+project(raylib_nuklear
+    DESCRIPTION "raylib_nuklear: Nuklear immediate mode GUI for raylib."
     HOMEPAGE_URL "https://github.com/robloach/raylib-nuklear"
     VERSION 4.0.1
     LANGUAGES C
@@ -9,27 +9,27 @@ project(raylib-nuklear
 # raylib-nuklear
 add_subdirectory(include)
 
-# Examples
-option(BUILD_RAYLIB_NUKLEAR_EXAMPLES "Build Examples" ON)
-if (BUILD_RAYLIB_NUKLEAR_EXAMPLES)
-    # raylib
-    find_package(raylib QUIET)
-    if (NOT raylib_FOUND)
-        set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-        set(BUILD_GAMES    OFF CACHE BOOL "" FORCE)
-        add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/vendor/raylib)
-    endif()
-    add_subdirectory(examples)
+# Options
+if ("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
+    set(RAYLIB_NUKLEAR_IS_MAIN TRUE)
+else()
+    set(RAYLIB_NUKLEAR_IS_MAIN FALSE)
 endif()
+option(RAYLIB_NUKLEAR_BUILD_EXAMPLES "Examples" ${RAYLIB_NUKLEAR_IS_MAIN})
 
-# Testing
-if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    include(CTest)
-    enable_testing()
-    if(BUILD_TESTING AND BUILD_RAYLIB_NUKLEAR_EXAMPLES)
-        set(CTEST_CUSTOM_TESTS_IGNORE
-            pkg-config--static
-        )
-        add_subdirectory(test)
+# Examples
+if (RAYLIB_NUKLEAR_BUILD_EXAMPLES)
+    add_subdirectory(examples)
+
+    # Testing
+    if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+        include(CTest)
+        enable_testing()
+        if (BUILD_TESTING)
+            # set(CTEST_CUSTOM_TESTS_IGNORE
+            #     pkg-config--static
+            # )
+            add_subdirectory(test)
+        endif()
     endif()
 endif()

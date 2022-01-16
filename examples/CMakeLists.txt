@@ -1,10 +1,29 @@
+# raylib
+find_package(raylib QUIET)
+if (NOT raylib_FOUND)
+    include(FetchContent)
+        FetchContent_Declare(
+        raylib
+        GIT_REPOSITORY https://github.com/raysan5/raylib.git
+        GIT_TAG 4.0.0
+    )
+    FetchContent_GetProperties(raylib)
+    if (NOT raylib_POPULATED) # Have we downloaded raylib yet?
+        set(FETCHCONTENT_QUIET NO)
+        FetchContent_Populate(raylib)
+        set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+        set(BUILD_GAMES    OFF CACHE BOOL "" FORCE)
+        add_subdirectory(${raylib_SOURCE_DIR} ${raylib_BINARY_DIR})
+    endif()
+endif()
+
 # raylib-nuklear-example
 add_executable(raylib-nuklear-example
     raylib-nuklear-example.c
 )
 target_link_libraries(raylib-nuklear-example PUBLIC
     raylib
-    raylib-nuklear
+    raylib_nuklear
 )
 
 # raylib-nuklear-demo
@@ -13,7 +32,7 @@ add_executable(raylib-nuklear-demo
 )
 target_link_libraries(raylib-nuklear-demo PUBLIC
     raylib
-    raylib-nuklear
+    raylib_nuklear
 )
 
 # raylib-nuklear-font
@@ -22,7 +41,7 @@ add_executable(raylib-nuklear-font
 )
 target_link_libraries(raylib-nuklear-font PUBLIC
     raylib
-    raylib-nuklear
+    raylib_nuklear
 )
 
 # Resources
