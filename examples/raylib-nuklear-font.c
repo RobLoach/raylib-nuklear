@@ -37,7 +37,7 @@ int main(void)
     //--------------------------------------------------------------------------------------
     const int screenWidth = 800;
     const int screenHeight = 450;
-    InitWindow(screenWidth, screenHeight, "[raylib-nuklear] example");
+    InitWindow(screenWidth, screenHeight, "[raylib-nuklear] font example");
     Font font = LoadFont("resources/anonymous_pro_bold.ttf");
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
