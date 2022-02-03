@@ -37,15 +37,17 @@ int main(void)
     //--------------------------------------------------------------------------------------
     const int screenWidth = 800;
     const int screenHeight = 450;
+    const int fontSize = 14;
+
     InitWindow(screenWidth, screenHeight, "[raylib-nuklear] font example");
-    Font font = LoadFont("resources/anonymous_pro_bold.ttf");
+    Font font = LoadFontEx("resources/anonymous_pro_bold.ttf", fontSize, NULL, 0);
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
     /* GUI */
     struct nk_colorf bg = ColorToNuklearF(SKYBLUE);
-    struct nk_context *ctx = InitNuklearEx(font, 16);
+    struct nk_context *ctx = InitNuklearEx(font, fontSize);
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
