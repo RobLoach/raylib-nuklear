@@ -84,6 +84,17 @@ NK_API struct nk_rect RectangleToNuklear(Rectangle rect);           // Convert a
 #define NK_BOOL bool
 #endif  // NK_BOOL
 
+// Math
+#ifndef NK_COS
+#define NK_COS cosf
+#endif  // NK_COS
+#ifndef NK_SIN
+#define NK_SIN sinf
+#endif  // NK_COS
+#ifndef NK_INV_SQRT
+#define NK_INV_SQRT(value) (1.0f / sqrtf(value))
+#endif  // NK_INV_SQRT
+
 #define NK_IMPLEMENTATION
 #define NK_KEYSTATE_BASED_INPUT
 #include "nuklear.h"
@@ -334,18 +345,18 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_LINE: {
                 const struct nk_command_line *l = (const struct nk_command_line *)cmd;
                 Color color = ColorFromNuklear(l->color);
-                Vector2 startPos = (Vector2){(float)l->begin.x, (float)l->begin.y};
-                Vector2 endPos = (Vector2){(float)l->end.x, (float)l->end.y};
+                Vector2 startPos = {(float)l->begin.x, (float)l->begin.y};
+                Vector2 endPos = {(float)l->end.x, (float)l->end.y};
                 DrawLineEx(startPos, endPos, l->line_thickness, color);
             } break;
 
             case NK_COMMAND_CURVE: {
                 const struct nk_command_curve *q = (const struct nk_command_curve *)cmd;
                 Color color = ColorFromNuklear(q->color);
-                Vector2 start = (Vector2){(float)q->begin.x, (float)q->begin.y};
+                Vector2 start = {(float)q->begin.x, (float)q->begin.y};
                 // Vector2 controlPoint1 = (Vector2){q->ctrl[0].x, q->ctrl[0].y};
                 // Vector2 controlPoint2 = (Vector2){q->ctrl[1].x, q->ctrl[1].y};
-                Vector2 end = (Vector2){(float)q->end.x, (float)q->end.y};
+                Vector2 end = {(float)q->end.x, (float)q->end.y};
                 // TODO: Encorporate segmented control point bezier curve?
                 // DrawLineBezier(start, controlPoint1, (float)q->line_thickness, color);
                 // DrawLineBezier(controlPoint1, controlPoint2, (float)q->line_thickness, color);
@@ -356,7 +367,7 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_RECT: {
                 const struct nk_command_rect *r = (const struct nk_command_rect *)cmd;
                 Color color = ColorFromNuklear(r->color);
-                Rectangle rect = (Rectangle){(float)r->x, (float)r->y, (float)r->w, (float)r->h};
+                Rectangle rect = {(float)r->x, (float)r->y, (float)r->w, (float)r->h};
                 if (r->rounding > 0) {
                     float roundness = (float)r->rounding * 4.0f / (rect.width + rect.height);
                     DrawRectangleRoundedLines(rect, roundness, 1, r->line_thickness, color);
@@ -369,7 +380,7 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_RECT_FILLED: {
                 const struct nk_command_rect_filled *r = (const struct nk_command_rect_filled *)cmd;
                 Color color = ColorFromNuklear(r->color);
-                Rectangle rect = (Rectangle){(float)r->x, (float)r->y, (float)r->w, (float)r->h};
+                Rectangle rect = {(float)r->x, (float)r->y, (float)r->w, (float)r->h};
                 if (r->rounding > 0) {
                     float roundness = (float)r->rounding * 4.0f / (rect.width + rect.height);
                     DrawRectangleRounded(rect, roundness, 1, color);
@@ -381,7 +392,7 @@ DrawNuklear(struct nk_context * ctx)
 
             case NK_COMMAND_RECT_MULTI_COLOR: {
                 const struct nk_command_rect_multi_color* rectangle = (const struct nk_command_rect_multi_color *)cmd;
-                Rectangle position = (Rectangle){(float)rectangle->x, (float)rectangle->y, (float)rectangle->w, (float)rectangle->h};
+                Rectangle position = {(float)rectangle->x, (float)rectangle->y, (float)rectangle->w, (float)rectangle->h};
                 Color left = ColorFromNuklear(rectangle->left);
                 Color top = ColorFromNuklear(rectangle->top);
                 Color bottom = ColorFromNuklear(rectangle->bottom);
@@ -404,32 +415,32 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_ARC: {
                 const struct nk_command_arc *a = (const struct nk_command_arc*)cmd;
                 Color color = ColorFromNuklear(a->color);
-                Vector2 center = (Vector2){(float)a->cx, (float)a->cy};
+                Vector2 center = {(float)a->cx, (float)a->cy};
                 DrawRingLines(center, 0, a->r, a->a[0] * RAD2DEG - 45, a->a[1] * RAD2DEG - 45, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
             } break;
 
             case NK_COMMAND_ARC_FILLED: {
                 const struct nk_command_arc_filled *a = (const struct nk_command_arc_filled*)cmd;
                 Color color = ColorFromNuklear(a->color);
-                Vector2 center = (Vector2){(float)a->cx, (float)a->cy};
+                Vector2 center = {(float)a->cx, (float)a->cy};
                 DrawRing(center, 0, a->r, a->a[0] * RAD2DEG - 45, a->a[1] * RAD2DEG - 45, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
             } break;
 
             case NK_COMMAND_TRIANGLE: {
                 const struct nk_command_triangle *t = (const struct nk_command_triangle*)cmd;
                 Color color = ColorFromNuklear(t->color);
-                Vector2 point1 = (Vector2){(float)t->b.x, (float)t->b.y};
-                Vector2 point2 = (Vector2){(float)t->a.x, (float)t->a.y};
-                Vector2 point3 = (Vector2){(float)t->c.x, (float)t->c.y};
+                Vector2 point1 = {(float)t->b.x, (float)t->b.y};
+                Vector2 point2 = {(float)t->a.x, (float)t->a.y};
+                Vector2 point3 = {(float)t->c.x, (float)t->c.y};
                 DrawTriangleLines(point1, point2, point3, color);
             } break;
 
             case NK_COMMAND_TRIANGLE_FILLED: {
                 const struct nk_command_triangle_filled *t = (const struct nk_command_triangle_filled*)cmd;
                 Color color = ColorFromNuklear(t->color);
-                Vector2 point1 = (Vector2){(float)t->b.x, (float)t->b.y};
-                Vector2 point2 = (Vector2){(float)t->a.x, (float)t->a.y};
-                Vector2 point3 = (Vector2){(float)t->c.x, (float)t->c.y};
+                Vector2 point1 = {(float)t->b.x, (float)t->b.y};
+                Vector2 point2 = {(float)t->a.x, (float)t->a.y};
+                Vector2 point3 = {(float)t->c.x, (float)t->c.y};
                 DrawTriangle(point1, point2, point3, color);
             } break;
 
@@ -438,8 +449,10 @@ DrawNuklear(struct nk_context * ctx)
                 const struct nk_command_polygon *p = (const struct nk_command_polygon*)cmd;
                 Color color = ColorFromNuklear(p->color);
                 Vector2* points = MemAlloc(p->point_count * (unsigned short)sizeof(Vector2));
-                for (unsigned short i = 0; i < p->point_count; i++) {
-                    points[i] = (Vector2){(float)p->points[i].x, (float)p->points[i].y};
+                unsigned short i;
+                for (i = 0; i < p->point_count; i++) {
+                    points[i].x = p->points[i].x;
+                    points[i].y = p->points[i].y;
                 }
                 DrawTriangleStrip(points, p->point_count, color);
                 MemFree(points);
@@ -450,8 +463,10 @@ DrawNuklear(struct nk_context * ctx)
                 const struct nk_command_polygon_filled *p = (const struct nk_command_polygon_filled*)cmd;
                 Color color = ColorFromNuklear(p->color);
                 Vector2* points = MemAlloc(p->point_count * (unsigned short)sizeof(Vector2));
-                for (unsigned short i = 0; i < p->point_count; i++) {
-                    points[i] = (Vector2){(float)p->points[i].x, (float)p->points[i].y};
+                unsigned short i;
+                for (i = 0; i < p->point_count; i++) {
+                    points[i].x = p->points[i].x;
+                    points[i].y = p->points[i].y;
                 }
                 DrawTriangleFan(points, p->point_count, color);
                 MemFree(points);
@@ -462,8 +477,10 @@ DrawNuklear(struct nk_context * ctx)
                 const struct nk_command_polyline *p = (const struct nk_command_polyline *)cmd;
                 Color color = ColorFromNuklear(p->color);
                 Vector2* points = MemAlloc(p->point_count * (unsigned short)sizeof(Vector2));
-                for (unsigned short i = 0; i < p->point_count; i++) {
-                    points[i] = (Vector2){(float)p->points[i].x, (float)p->points[i].y};
+                unsigned short i;
+                for (i = 0; i < p->point_count; i++) {
+                    points[i].x = p->points[i].x;
+                    points[i].y = p->points[i].y;
                 }
                 DrawTriangleStrip(points, p->point_count, color);
                 MemFree(points);
@@ -477,7 +494,7 @@ DrawNuklear(struct nk_context * ctx)
                 Font* font = (Font*)text->font->userdata.ptr;
                 DrawRectangle(text->x, text->y, text->w, text->h, background);
                 if (font != NULL) {
-                    Vector2 position = (Vector2){(float)text->x, (float)text->y};
+                    Vector2 position = {(float)text->x, (float)text->y};
                     DrawTextEx(*font, (const char*)text->string, position, fontSize, fontSize / 10.0f, color);
                 }
                 else {
@@ -496,9 +513,9 @@ DrawNuklear(struct nk_context * ctx)
                 image.mipmaps = 1;
                 image.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
                 Texture texture = LoadTextureFromImage(image);
-                Rectangle source = (Rectangle){0, 0, (float)image.width, (float)image.height};
-                Rectangle dest = (Rectangle){(float)i->x, (float)i->y, (float)i->w, (float)i->h};
-                Vector2 origin = (Vector2){0, 0};
+                Rectangle source = {0, 0, (float)image.width, (float)image.height};
+                Rectangle dest = {(float)i->x, (float)i->y, (float)i->w, (float)i->h};
+                Vector2 origin = {0, 0};
                 Color tint = ColorFromNuklear(i->col);
                 DrawTexturePro(texture, source, dest, origin, 0, tint);
                 UnloadTexture(texture);
@@ -648,7 +665,9 @@ NK_API void nk_raylib_input_mouse(struct nk_context * ctx)
     // Mouse Wheel
     float mouseWheel = GetMouseWheelMove();
     if (mouseWheel != 0.0f) {
-        struct nk_vec2 mouseWheelMove = (struct nk_vec2){0.0f, mouseWheel};
+        struct nk_vec2 mouseWheelMove;
+        mouseWheelMove.x = 0.0f;
+        mouseWheelMove.y = mouseWheel;
         nk_input_scroll(ctx, mouseWheelMove);
     }
 }

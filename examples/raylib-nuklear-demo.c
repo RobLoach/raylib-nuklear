@@ -40,7 +40,7 @@
 /*#define INCLUDE_NODE_EDITOR */
 
 #ifdef INCLUDE_ALL
-  #define INCLUDE_STYLE
+  //#define INCLUDE_STYLE
   #define INCLUDE_CALCULATOR
   #define INCLUDE_CANVAS
   #define INCLUDE_OVERVIEW
@@ -70,14 +70,14 @@
  * ===============================================================*/
 int main(void)
 {
+    struct nk_context *ctx;
+    struct nk_colorf bg;
+
     /* Platform */
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "[raylib-nuklear] demo");
     SetTargetFPS(60);
 
     /* GUI */
-    struct nk_context *ctx;
-    struct nk_colorf bg;
-
     ctx = InitNuklear(10);
 
     /* style.c */
