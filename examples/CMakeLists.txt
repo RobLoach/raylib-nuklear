@@ -44,21 +44,34 @@ target_link_libraries(raylib-nuklear-font PUBLIC
     raylib_nuklear
 )
 
+# raylib-nuklear-texture
+add_executable(raylib-nuklear-texture
+    raylib-nuklear-texture.c
+)
+target_link_libraries(raylib-nuklear-texture PUBLIC
+    raylib
+    raylib_nuklear
+)
+
 # Target C99
 set_property(TARGET raylib-nuklear-example PROPERTY C_STANDARD 99)
 set_property(TARGET raylib-nuklear-demo PROPERTY C_STANDARD 99)
 set_property(TARGET raylib-nuklear-font PROPERTY C_STANDARD 99)
+set_property(TARGET raylib-nuklear-texture PROPERTY C_STANDARD 99)
 
 # Enable warnings
 if(MSVC)
   target_compile_options(raylib-nuklear-example PRIVATE /W4 /WX)
   target_compile_options(raylib-nuklear-demo PRIVATE /W4 /WX)
   target_compile_options(raylib-nuklear-font PRIVATE /W4 /WX)
+  target_compile_options(raylib-nuklear-texture PRIVATE /W4 /WX)
 else()
   target_compile_options(raylib-nuklear-example PRIVATE -Wall -Wextra -Wpedantic -Werror)
   target_compile_options(raylib-nuklear-demo PRIVATE -Wall -Wextra -Wpedantic -Werror)
   target_compile_options(raylib-nuklear-font PRIVATE -Wall -Wextra -Wpedantic -Werror)
+  target_compile_options(raylib-nuklear-texture PRIVATE -Wall -Wextra -Wpedantic -Werror)
 endif()
 
 # Resources
 configure_file(resources/anonymous_pro_bold.ttf resources/anonymous_pro_bold.ttf COPYONLY)
+configure_file(resources/test-image.png resources/test-image.png COPYONLY)

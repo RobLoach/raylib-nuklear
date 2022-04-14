@@ -24,6 +24,13 @@ int main(int argc, char *argv[]) {
     struct nk_context *ctx = InitNuklear(10);
     assert(ctx);
 
+    // Image
+    struct nk_image image = LoadNuklearImage("resources/test-image.png");
+    assert(image.handle.ptr);
+    Texture texture = TextureFromNuklear(image);
+    assert(texture.width > 0);
+    UnloadNuklearImage(image);
+
     // UpdateNuklear()
     UpdateNuklear(ctx);
 

@@ -48,20 +48,20 @@
 extern "C" {
 #endif
 
-NK_API struct nk_context* InitNuklear(int fontSize);                // Initialize the Nuklear GUI context.
-NK_API struct nk_context* InitNuklearEx(Font font, float fontSize); // Initialize the Nuklear GUI context, with a custom font.
-NK_API void UpdateNuklear(struct nk_context * ctx);                 // Update the input state and internal components for Nuklear.
-NK_API void DrawNuklear(struct nk_context * ctx);                   // Render the Nuklear GUI on the screen.
-NK_API void UnloadNuklear(struct nk_context * ctx);                 // Deinitialize the Nuklear context.
-NK_API struct nk_color ColorToNuklear(Color color);                 // Convert a raylib Color to a Nuklear color object.
-NK_API struct nk_colorf ColorToNuklearF(Color color);               // Convert a raylib Color to a Nuklear floating color.
-NK_API struct Color ColorFromNuklear(struct nk_color color);        // Convert a Nuklear color to a raylib Color.
-NK_API struct Color ColorFromNuklearF(struct nk_colorf color);      // Convert a Nuklear floating color to a raylib Color.
-NK_API struct Rectangle RectangleFromNuklear(struct nk_rect rect);  // Convert a Nuklear rectangle to a raylib Rectangle.
-NK_API struct nk_rect RectangleToNuklear(Rectangle rect);           // Convert a raylib Rectangle to a Nuklear Rectangle.
-NK_API struct nk_image TextureToNuklear(Texture tex);               // Convert a raylib Texture to A Nuklear image.
+NK_API struct nk_context* InitNuklear(int fontSize);                // Initialize the Nuklear GUI context
+NK_API struct nk_context* InitNuklearEx(Font font, float fontSize); // Initialize the Nuklear GUI context, with a custom font
+NK_API void UpdateNuklear(struct nk_context * ctx);                 // Update the input state and internal components for Nuklear
+NK_API void DrawNuklear(struct nk_context * ctx);                   // Render the Nuklear GUI on the screen
+NK_API void UnloadNuklear(struct nk_context * ctx);                 // Deinitialize the Nuklear context
+NK_API struct nk_color ColorToNuklear(Color color);                 // Convert a raylib Color to a Nuklear color object
+NK_API struct nk_colorf ColorToNuklearF(Color color);               // Convert a raylib Color to a Nuklear floating color
+NK_API struct Color ColorFromNuklear(struct nk_color color);        // Convert a Nuklear color to a raylib Color
+NK_API struct Color ColorFromNuklearF(struct nk_colorf color);      // Convert a Nuklear floating color to a raylib Color
+NK_API struct Rectangle RectangleFromNuklear(struct nk_rect rect);  // Convert a Nuklear rectangle to a raylib Rectangle
+NK_API struct nk_rect RectangleToNuklear(Rectangle rect);           // Convert a raylib Rectangle to a Nuklear Rectangle
+NK_API struct nk_image TextureToNuklear(Texture tex);               // Convert a raylib Texture to A Nuklear image
 NK_API struct Texture TextureFromNuklear(struct nk_image img);      // Convert a Nuklear image to a raylib Texture
-NK_API struct nk_image LoadNuklearImage(const char* path);          // Load a Nuklear image.
+NK_API struct nk_image LoadNuklearImage(const char* path);          // Load a Nuklear image
 NK_API void UnloadNuklearImage(struct nk_image img);                // Unload a Nuklear image. And free its data
 NK_API void CleanupNuklearImage(struct nk_image img);               // Frees the data stored by the Nuklear image
 
@@ -750,19 +750,19 @@ NK_API struct nk_image TextureToNuklear(Texture tex)
 	// For the texture
 	struct nk_image img;
 	Texture* stored_tex = malloc(sizeof(Texture));
-	
+
 	// Copy the data from the texture given into the new texture
 	stored_tex->id = tex.id;
 	stored_tex->width = tex.width;
 	stored_tex->height = tex.height;
 	stored_tex->mipmaps = tex.mipmaps;
 	stored_tex->format = tex.format;
-	
+
 	// Initialize the nk_image struct
 	img.handle.ptr = stored_tex;
-	img.w = stored_tex->width;
-	img.h = stored_tex->height;
-	
+	img.w = (nk_ushort)stored_tex->width;
+	img.h = (nk_ushort)stored_tex->height;
+
 	return img;
 }
 
@@ -775,14 +775,14 @@ NK_API struct Texture TextureFromNuklear(struct nk_image img)
 	// And get back the stored texture
 	Texture tex;
 	Texture* stored_tex = (Texture*)img.handle.ptr;
-	
+
 	// Copy the data from the stored texture to the texture
 	tex.id = stored_tex->id;
 	tex.width = stored_tex->width;
 	tex.height = stored_tex->height;
 	tex.mipmaps = stored_tex->mipmaps;
 	tex.format = stored_tex->format;
-	
+
 	return tex;
 }
 
@@ -793,8 +793,7 @@ NK_API struct Texture TextureFromNuklear(struct nk_image img)
  */
 NK_API struct nk_image LoadNuklearImage(const char* path)
 {
-	Texture tex = LoadTexture(path);
-	return TextureToNuklear(tex);
+	return TextureToNuklear(LoadTexture(path));
 }
 
 /**
@@ -806,7 +805,7 @@ NK_API void UnloadNuklearImage(struct nk_image img)
 {
 	Texture tex = TextureFromNuklear(img);
 	UnloadTexture(tex);
-	free(img.handle.ptr);
+	CleanupNuklearImage(img);
 }
 
 /**
