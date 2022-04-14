@@ -22,7 +22,7 @@ int main()
 	// Initialize the context
 	struct nk_context* ctx = InitNuklear(16);
 	// Load the nk_image
-	struct nk_image img = LoadNuklearImage("test-image.png");
+	struct nk_image img = LoadNuklearImage("resources/test-image.png");
 	
 	while(!WindowShouldClose())
 	{
