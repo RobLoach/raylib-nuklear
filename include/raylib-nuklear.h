@@ -58,7 +58,12 @@ NK_API struct nk_colorf ColorToNuklearF(Color color);               // Convert a
 NK_API struct Color ColorFromNuklear(struct nk_color color);        // Convert a Nuklear color to a raylib Color.
 NK_API struct Color ColorFromNuklearF(struct nk_colorf color);      // Convert a Nuklear floating color to a raylib Color.
 NK_API struct Rectangle RectangleFromNuklear(struct nk_rect rect);  // Convert a Nuklear rectangle to a raylib Rectangle.
-NK_API struct nk_rect RectangleToNuklear(Rectangle rect);           // Convert a raylib Rectangle to a nuklear Rectangle.
+NK_API struct nk_rect RectangleToNuklear(Rectangle rect);           // Convert a raylib Rectangle to a Nuklear Rectangle.
+NK_API struct nk_image TextureToNuklear(Texture tex);               // Convert a raylib Texture to A Nuklear image.
+NK_API struct Texture TextureFromNuklear(struct nk_image img);      // Convert a Nuklear image to a raylib Texture
+NK_API struct nk_image LoadNuklearImage(const char* path);          // Load a Nuklear image.
+NK_API void UnloadNuklearImage(struct nk_image img);                // Unload a Nuklear image. And free its data
+NK_API void CleanupNuklearImage(struct nk_image img);               // Frees the data stored by the Nuklear image
 
 #ifdef __cplusplus
 }
@@ -503,22 +508,13 @@ DrawNuklear(struct nk_context * ctx)
             } break;
 
             case NK_COMMAND_IMAGE: {
-                // TODO: Verify NK_COMMAND_IMAGE
-                TraceLog(LOG_WARNING, "NUKLEAR: Broken implementation NK_COMMAND_IMAGE");
                 const struct nk_command_image *i = (const struct nk_command_image *)cmd;
-                struct Image image;
-                image.data = i->img.handle.ptr;
-                image.width = i->w;
-                image.height = i->h;
-                image.mipmaps = 1;
-                image.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8;
-                Texture texture = LoadTextureFromImage(image);
-                Rectangle source = {0, 0, (float)image.width, (float)image.height};
+                Texture texture = *(Texture*)i->img.handle.ptr;
+                Rectangle source = {0, 0, (float)texture.width, (float)texture.height};
                 Rectangle dest = {(float)i->x, (float)i->y, (float)i->w, (float)i->h};
                 Vector2 origin = {0, 0};
                 Color tint = ColorFromNuklear(i->col);
                 DrawTexturePro(texture, source, dest, origin, 0, tint);
-                UnloadTexture(texture);
             } break;
 
             case NK_COMMAND_CUSTOM: {
@@ -743,6 +739,85 @@ NK_API struct
 nk_rect RectangleToNuklear(Rectangle rect)
 {
     return nk_rect(rect.x, rect.y, rect.width, rect.height);
+}
+
+/**
+ * Convert the given raylib texture to a Nuklear image
+ */
+NK_API struct nk_image TextureToNuklear(Texture tex)
+{
+	// Declare the img to store data and allocate memory
+	// For the texture
+	struct nk_image img;
+	Texture* stored_tex = malloc(sizeof(Texture));
+	
+	// Copy the data from the texture given into the new texture
+	stored_tex->id = tex.id;
+	stored_tex->width = tex.width;
+	stored_tex->height = tex.height;
+	stored_tex->mipmaps = tex.mipmaps;
+	stored_tex->format = tex.format;
+	
+	// Initialize the nk_image struct
+	img.handle.ptr = stored_tex;
+	img.w = stored_tex->width;
+	img.h = stored_tex->height;
+	
+	return img;
+}
+
+/**
+ * Convert the given Nuklear image to a raylib Texture
+ */
+NK_API struct Texture TextureFromNuklear(struct nk_image img)
+{
+	// Declare texture for storage
+	// And get back the stored texture
+	Texture tex;
+	Texture* stored_tex = (Texture*)img.handle.ptr;
+	
+	// Copy the data from the stored texture to the texture
+	tex.id = stored_tex->id;
+	tex.width = stored_tex->width;
+	tex.height = stored_tex->height;
+	tex.mipmaps = stored_tex->mipmaps;
+	tex.format = stored_tex->format;
+	
+	return tex;
+}
+
+/**
+ * Load a Nuklear image directly
+ *
+ * @param path The path to the image
+ */
+NK_API struct nk_image LoadNuklearImage(const char* path)
+{
+	Texture tex = LoadTexture(path);
+	return TextureToNuklear(tex);
+}
+
+/**
+ * Unload a loaded Nuklear image
+ *
+ * @param img The Nuklear image to unload
+ */
+NK_API void UnloadNuklearImage(struct nk_image img)
+{
+	Texture tex = TextureFromNuklear(img);
+	UnloadTexture(tex);
+	free(img.handle.ptr);
+}
+
+/**
+ * Cleans up memory used by a Nuklear image
+ * Does not unload the image.
+ *
+ * @param img The Nuklear image to cleanup
+*/
+NK_API void CleanupNuklearImage(struct nk_image img)
+{
+	free(img.handle.ptr);
 }
 
 #ifdef __cplusplus
