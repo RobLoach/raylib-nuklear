@@ -24,16 +24,22 @@ int main(int argc, char *argv[]) {
     struct nk_context *ctx = InitNuklear(10);
     assert(ctx);
 
+    // Image
+    struct nk_image image = LoadNuklearImage("resources/test-image.png");
+    assert(image.handle.ptr);
+    Texture texture = TextureFromNuklear(image);
+    assert(texture.width > 0);
+
     // UpdateNuklear()
     UpdateNuklear(ctx);
 
     // Nuklear GUI Code
     // https://github.com/Immediate-Mode-UI/Nuklear/wiki/Window
-    if (nk_begin(ctx, "Nuklear", nk_rect(100, 100, 220, 220),
+    if (nk_begin(ctx, "Nuklear", nk_rect(50, 50, 400, 400),
                     NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_CLOSABLE)) {
-        if (nk_button_label(ctx, "Button")) {
-            /* event handling */
-        }
+        nk_button_label(ctx, "Button");
+        nk_layout_row_static(ctx, 256, 256, 1);
+        nk_image(ctx, image);
     }
     nk_end(ctx);
 
@@ -45,6 +51,10 @@ int main(int argc, char *argv[]) {
         DrawNuklear(ctx);
 
     EndDrawing();
+    WaitTime(500);
+
+    // UnloadNuklearImage()
+    UnloadNuklearImage(image);
 
     // UnloadNuklear()
     UnloadNuklear(ctx);

@@ -71,27 +71,29 @@ int main() {
 ## API
 
 ``` c
-struct nk_context* InitNuklear(int fontSize);                 // Initialize the Nuklear context
-struct nk_context* InitNuklearEx(Font font, float fontSize);  // Initialize the Nuklear context, with a custom font
-void UpdateNuklear(struct nk_context * ctx);                  // Update the input state and internal components
-void DrawNuklear(struct nk_context * ctx);                    // Render the Nuklear GUI on the screen
-void UnloadNuklear(struct nk_context * ctx);                  // Unload the GUI
-nk_color ColorToNuklear(Color color);                         // Converts raylib Color to nk_color
-nk_colorf ColorToNuklearF(Color color);                       // Converts raylib Color to nk_colorf
-Color ColorFromNuklear(struct nk_color color);                // Converts nk_color to raylib Color
-Color ColorFromNuklearF(struct nk_colorf color);              // Converts nk_colorf to raylib Color
-Rectangle RectangleFromNuklear(struct nk_rect rect);          // Converts nk_rect to raylib Rectangle
-nk_rect RectangleToNuklear(Rectangle rect);                   // Converts raylib Rectangle to nk_rect
-struct nk_image TextureToNuklear(Texture tex);                // Convert a raylib Texture to A Nuklear image.
-Texture TextureFromNuklear(struct nk_image img);              // Convert a Nuklear image to a raylib Texture
-struct nk_image LoadNuklearImage(const char* path);           // Load a Nuklear image.
-void UnloadNuklearImage(struct nk_image img);                 // Unload a Nuklear image. And free its data
-void CleanupNuklearImage(struct nk_image img);                // Frees the data stored by the Nuklear image
+struct nk_context* InitNuklear(int fontSize);                // Initialize the Nuklear GUI context
+struct nk_context* InitNuklearEx(Font font, float fontSize); // Initialize the Nuklear GUI context, with a custom font
+void UpdateNuklear(struct nk_context * ctx);                 // Update the input state and internal components for Nuklear
+void DrawNuklear(struct nk_context * ctx);                   // Render the Nuklear GUI on the screen
+void UnloadNuklear(struct nk_context * ctx);                 // Deinitialize the Nuklear context
+struct nk_color ColorToNuklear(Color color);                 // Convert a raylib Color to a Nuklear color object
+struct nk_colorf ColorToNuklearF(Color color);               // Convert a raylib Color to a Nuklear floating color
+struct Color ColorFromNuklear(struct nk_color color);        // Convert a Nuklear color to a raylib Color
+struct Color ColorFromNuklearF(struct nk_colorf color);      // Convert a Nuklear floating color to a raylib Color
+struct Rectangle RectangleFromNuklear(struct nk_rect rect);  // Convert a Nuklear rectangle to a raylib Rectangle
+struct nk_rect RectangleToNuklear(Rectangle rect);           // Convert a raylib Rectangle to a Nuklear Rectangle
+struct nk_image TextureToNuklear(Texture tex);               // Convert a raylib Texture to A Nuklear image
+struct Texture TextureFromNuklear(struct nk_image img);      // Convert a Nuklear image to a raylib Texture
+struct nk_image LoadNuklearImage(const char* path);          // Load a Nuklear image
+void UnloadNuklearImage(struct nk_image img);                // Unload a Nuklear image. And free its data
+void CleanupNuklearImage(struct nk_image img);               // Frees the data stored by the Nuklear image
 ```
 
 See the [Nuklear API documenation](https://immediate-mode-ui.github.io/Nuklear/doc/nuklear.html) for more how to use Nuklear.
 
 ## Development
+
+While this project uses CMake, CMake is not required in order to use *raylib-nuklear*.
 
 ```
 git submodule update --init
