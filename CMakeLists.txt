@@ -22,14 +22,12 @@ if (RAYLIB_NUKLEAR_BUILD_EXAMPLES)
     add_subdirectory(examples)
 
     # Testing
-    if (CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-        include(CTest)
-        enable_testing()
-        if (BUILD_TESTING)
-            # set(CTEST_CUSTOM_TESTS_IGNORE
-            #     pkg-config--static
-            # )
-            add_subdirectory(test)
-        endif()
+    include(CTest)
+    enable_testing()
+    if (BUILD_TESTING)
+        # set(CTEST_CUSTOM_TESTS_IGNORE
+        #     pkg-config--static
+        # )
+        add_subdirectory(test)
     endif()
 endif()
