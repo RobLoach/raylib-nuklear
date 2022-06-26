@@ -51,16 +51,16 @@
   #include "../vendor/nuklear/demo/style.c"
 #endif
 #ifdef INCLUDE_CALCULATOR
-  #include "../vendor/nuklear/demo/calculator.c"
+  #include "../vendor/nuklear/demo/common/calculator.c"
 #endif
 #ifdef INCLUDE_CANVAS
-  #include "../vendor/nuklear/demo/canvas.c"
+  #include "../vendor/nuklear/demo/common/canvas.c"
 #endif
 #ifdef INCLUDE_OVERVIEW
-  #include "../vendor/nuklear/demo/overview.c"
+  #include "../vendor/nuklear/demo/common/overview.c"
 #endif
 #ifdef INCLUDE_NODE_EDITOR
-  #include "../vendor/nuklear/demo/node_editor.c"
+  #include "../vendor/nuklear/demo/common/node_editor.c"
 #endif
 
 /* ===============================================================
