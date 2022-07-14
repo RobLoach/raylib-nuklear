@@ -749,7 +749,7 @@ NK_API struct nk_image TextureToNuklear(Texture tex)
 	// Declare the img to store data and allocate memory
 	// For the texture
 	struct nk_image img;
-	Texture* stored_tex = malloc(sizeof(Texture));
+	Texture* stored_tex = (Texture*)MemAlloc(sizeof(Texture));
 
 	// Copy the data from the texture given into the new texture
 	stored_tex->id = tex.id;
