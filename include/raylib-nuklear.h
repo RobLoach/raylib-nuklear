@@ -42,6 +42,15 @@
 #define NK_INCLUDE_STANDARD_VARARGS
 #endif
 
+#ifndef NK_INCLUDE_FIXED_TYPES
+#define NK_INCLUDE_FIXED_TYPES
+#endif  // NK_INCLUDE_FIXED_TYPES
+
+#ifndef NK_BOOL
+#define NK_INCLUDE_STANDARD_BOOL
+#define NK_BOOL bool
+#endif  // NK_BOOL
+
 #include "nuklear.h"
 
 #ifdef __cplusplus
@@ -83,11 +92,6 @@ NK_API void CleanupNuklearImage(struct nk_image img);               // Frees the
 #ifndef NK_INCLUDE_DEFAULT_ALLOCATOR
 #define NK_INCLUDE_DEFAULT_ALLOCATOR
 #endif  // NK_INCLUDE_DEFAULT_ALLOCATOR
-
-#ifndef NK_BOOL
-#define NK_INCLUDE_STANDARD_BOOL
-#define NK_BOOL bool
-#endif  // NK_BOOL
 
 // Math
 #ifndef NK_COS
