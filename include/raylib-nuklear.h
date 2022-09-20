@@ -453,7 +453,7 @@ DrawNuklear(struct nk_context * ctx)
                 // TODO: Confirm Polygon
                 const struct nk_command_polygon *p = (const struct nk_command_polygon*)cmd;
                 Color color = ColorFromNuklear(p->color);
-                Vector2* points = MemAlloc(p->point_count * (unsigned short)sizeof(Vector2));
+                struct Vector2* points = (struct Vector2*)MemAlloc(p->point_count * (unsigned short)sizeof(Vector2));
                 unsigned short i;
                 for (i = 0; i < p->point_count; i++) {
                     points[i].x = p->points[i].x;
@@ -467,7 +467,7 @@ DrawNuklear(struct nk_context * ctx)
                 // TODO: Polygon filled expects counter clockwise order
                 const struct nk_command_polygon_filled *p = (const struct nk_command_polygon_filled*)cmd;
                 Color color = ColorFromNuklear(p->color);
-                Vector2* points = MemAlloc(p->point_count * (unsigned short)sizeof(Vector2));
+                struct Vector2* points = (struct Vector2*)MemAlloc(p->point_count * (unsigned short)sizeof(Vector2));
                 unsigned short i;
                 for (i = 0; i < p->point_count; i++) {
                     points[i].x = p->points[i].x;
@@ -481,7 +481,7 @@ DrawNuklear(struct nk_context * ctx)
                 // TODO: Polygon expects counter clockwise order
                 const struct nk_command_polyline *p = (const struct nk_command_polyline *)cmd;
                 Color color = ColorFromNuklear(p->color);
-                Vector2* points = MemAlloc(p->point_count * (unsigned short)sizeof(Vector2));
+                struct Vector2* points = (struct Vector2*)MemAlloc(p->point_count * (unsigned short)sizeof(Vector2));
                 unsigned short i;
                 for (i = 0; i < p->point_count; i++) {
                     points[i].x = p->points[i].x;
@@ -749,7 +749,7 @@ NK_API struct nk_image TextureToNuklear(Texture tex)
 	// Declare the img to store data and allocate memory
 	// For the texture
 	struct nk_image img;
-	Texture* stored_tex = (Texture*)MemAlloc(sizeof(Texture));
+	struct Texture* stored_tex = (struct Texture*)MemAlloc(sizeof(Texture));
 
 	// Copy the data from the texture given into the new texture
 	stored_tex->id = tex.id;
