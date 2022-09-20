@@ -6,7 +6,7 @@
 *       - Use the nuklear immediate-mode graphical user interface in raylib.
 *
 *   DEPENDENCIES:
-*       - raylib 4.0 https://www.raylib.com/
+*       - raylib 4.2 https://www.raylib.com/
 *       - nuklear https://github.com/Immediate-Mode-UI/Nuklear
 *
 *   LICENSE: zlib/libpng
@@ -95,7 +95,7 @@ NK_API void CleanupNuklearImage(struct nk_image img);               // Frees the
 #endif  // NK_COS
 #ifndef NK_SIN
 #define NK_SIN sinf
-#endif  // NK_COS
+#endif  // NK_SIN
 #ifndef NK_INV_SQRT
 #define NK_INV_SQRT(value) (1.0f / sqrtf(value))
 #endif  // NK_INV_SQRT
@@ -816,7 +816,7 @@ NK_API void UnloadNuklearImage(struct nk_image img)
 */
 NK_API void CleanupNuklearImage(struct nk_image img)
 {
-	free(img.handle.ptr);
+    MemFree(img.handle.ptr);
 }
 
 #ifdef __cplusplus
