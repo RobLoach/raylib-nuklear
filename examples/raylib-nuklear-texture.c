@@ -24,16 +24,17 @@ int main()
 	// Load the nk_image
 	struct nk_image img = LoadNuklearImage("resources/test-image.png");
 
-	while(!WindowShouldClose())
+	while (!WindowShouldClose())
 	{
 		// Input
 		UpdateNuklear(ctx);
 
 		// The window called "Image example" is opend
-		if(nk_begin(ctx, "Image example", nk_rect(200, 200, 420, 320), NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_CLOSABLE))
+		if(nk_begin(ctx, "Image example", nk_rect(300, 100, img.w, img.h + 50), NK_WINDOW_MINIMIZABLE|NK_WINDOW_BORDER|NK_WINDOW_NO_SCROLLBAR|NK_WINDOW_MOVABLE|NK_WINDOW_CLOSABLE))
 		{
 			// Setup the layout
-			nk_layout_row_static(ctx, 256, 256, 1);
+			nk_layout_row_static(ctx, img.h, img.w, 1);
+
 			// Draw the image
 			nk_image(ctx, img);
 		}

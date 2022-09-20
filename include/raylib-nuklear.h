@@ -76,7 +76,7 @@ NK_API void CleanupNuklearImage(struct nk_image img);               // Frees the
 #define RAYLIB_NUKLEAR_IMPLEMENTATION_ONCE
 
 #ifndef NK_ASSERT
-#define NK_ASSERT(condition) if (!(condition)) { TraceLog(LOG_WARNING, "NUKLEAR: Failed assert \"%s\" (%s:%i)", #condition, "nuklear.h", __LINE__); }
+#define NK_ASSERT(condition) do { if (!(condition)) { TraceLog(LOG_WARNING, "NUKLEAR: Failed assert \"%s\" (%s:%i)", #condition, "nuklear.h", __LINE__); }} while (0)
 #endif  // NK_ASSERT
 
 // TODO: Replace NK_INCLUDE_DEFAULT_ALLOCATOR with MemAlloc() and MemFree()
