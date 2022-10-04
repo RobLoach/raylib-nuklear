@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.11)
 project(raylib_nuklear
     DESCRIPTION "raylib_nuklear: Nuklear immediate mode GUI for raylib."
     HOMEPAGE_URL "https://github.com/robloach/raylib-nuklear"
-    VERSION 4.2.0
+    VERSION 4.2.1
     LANGUAGES C
 )
 
