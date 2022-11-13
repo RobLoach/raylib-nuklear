@@ -35,8 +35,8 @@ int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
-    const int screenWidth = 700;
-    const int screenHeight = 394;
+    const int screenWidth = 800;
+    const int screenHeight = 450;
     InitWindow(screenWidth, screenHeight, "[raylib-nuklear] example");
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second

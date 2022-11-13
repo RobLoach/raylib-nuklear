@@ -38,9 +38,23 @@
 
 #include "raylib.h"
 
-#ifndef NK_INCLUDE_STANDARD_VARARGS
+// Nuklear defines
+
 #define NK_INCLUDE_STANDARD_VARARGS
-#endif
+#define NK_INCLUDE_COMMAND_USERDATA
+// TODO: Replace NK_INCLUDE_DEFAULT_ALLOCATOR with MemAlloc() and MemFree()
+#define NK_INCLUDE_DEFAULT_ALLOCATOR
+#define NK_INCLUDE_COMMAND_USERDATA
+
+// TODO: Figure out if we can use STANDARD_BOOL here?
+//#define NK_INCLUDE_STANDARD_BOOL
+//#ifndef NK_BOOL
+//#define NK_BOOL bool
+//#endif  // NK_BOOL
+
+#ifndef NK_ASSERT
+#define NK_ASSERT(condition) do { if (!(condition)) { TraceLog(LOG_WARNING, "NUKLEAR: Failed assert \"%s\" (%s:%i)", #condition, "nuklear.h", __LINE__); }} while (0)
+#endif  // NK_ASSERT
 
 #include "nuklear.h"
 
@@ -64,6 +78,7 @@ NK_API struct Texture TextureFromNuklear(struct nk_image img);      // Convert a
 NK_API struct nk_image LoadNuklearImage(const char* path);          // Load a Nuklear image
 NK_API void UnloadNuklearImage(struct nk_image img);                // Unload a Nuklear image. And free its data
 NK_API void CleanupNuklearImage(struct nk_image img);               // Frees the data stored by the Nuklear image
+NK_API void SetNuklearScaling(struct nk_context * ctx, float scaling); // Sets the scaling for the given Nuklear context
 
 #ifdef __cplusplus
 }
@@ -74,20 +89,6 @@ NK_API void CleanupNuklearImage(struct nk_image img);               // Frees the
 #ifdef RAYLIB_NUKLEAR_IMPLEMENTATION
 #ifndef RAYLIB_NUKLEAR_IMPLEMENTATION_ONCE
 #define RAYLIB_NUKLEAR_IMPLEMENTATION_ONCE
-
-#ifndef NK_ASSERT
-#define NK_ASSERT(condition) do { if (!(condition)) { TraceLog(LOG_WARNING, "NUKLEAR: Failed assert \"%s\" (%s:%i)", #condition, "nuklear.h", __LINE__); }} while (0)
-#endif  // NK_ASSERT
-
-// TODO: Replace NK_INCLUDE_DEFAULT_ALLOCATOR with MemAlloc() and MemFree()
-#ifndef NK_INCLUDE_DEFAULT_ALLOCATOR
-#define NK_INCLUDE_DEFAULT_ALLOCATOR
-#endif  // NK_INCLUDE_DEFAULT_ALLOCATOR
-
-#ifndef NK_BOOL
-#define NK_INCLUDE_STANDARD_BOOL
-#define NK_BOOL bool
-#endif  // NK_BOOL
 
 // Math
 #ifndef NK_COS
@@ -123,6 +124,13 @@ extern "C" {
  */
 #define RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS 20
 #endif  // RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS
+
+/**
+ * The user data that's leverages internally through Nuklear.
+ */
+typedef struct NuklearUserData {
+    float scaling;
+} NuklearUserData;
 
 /**
  * Nuklear callback; Get the width of the given text.
@@ -202,6 +210,7 @@ NK_API struct nk_context*
 InitNuklearContext(struct nk_user_font* userFont)
 {
     struct nk_context* ctx = (struct nk_context*)MemAlloc(sizeof(struct nk_context));
+    struct NuklearUserData* userData = (struct NuklearUserData*)MemAlloc(sizeof(struct NuklearUserData));
 
     // Clipboard
     ctx->clip.copy = nk_raylib_clipboard_copy;
@@ -214,9 +223,12 @@ InitNuklearContext(struct nk_user_font* userFont)
         return NULL;
     }
 
-    // Rendering
-    ctx->backend_render_scale = 1;
-    TraceLog(LOG_INFO, "NUKLEAR: Using backend render scale %d", ctx->backend_render_scale);
+    // Set the internal user data.
+    userData->scaling = 1.0f;
+    nk_handle userDataHandle;
+    userDataHandle.id = 1;
+    userDataHandle.ptr = (void*)userData;
+    nk_set_user_data(ctx, userDataHandle);
 
     TraceLog(LOG_INFO, "NUKLEAR: Initialized GUI");
 
@@ -339,8 +351,8 @@ NK_API void
 DrawNuklear(struct nk_context * ctx)
 {
     const struct nk_command *cmd;
-    const int scale = ctx->backend_render_scale;
-    NK_ASSERT(scale > 0);
+    const struct NuklearUserData* userData = (const struct NuklearUserData*)ctx->userdata.ptr;
+    const float scale = userData->scaling;
 
     nk_foreach(cmd, ctx) {
         switch (cmd->type) {
@@ -352,7 +364,7 @@ DrawNuklear(struct nk_context * ctx)
                 // TODO(RobLoach): Verify if NK_COMMAND_SCISSOR works.
                 const struct nk_command_scissor *s =(const struct nk_command_scissor*)cmd;
                 // BeginScissorMode(s->x, s->y, s->w, s->h);
-                BeginScissorMode(s->x * scale, s->y * scale, s->w * scale, s->h * scale);
+                BeginScissorMode((int)(s->x * scale), (int)(s->y * scale), (int)(s->w * scale), (int)(s->h * scale));
             } break;
 
             case NK_COMMAND_LINE: {
@@ -428,14 +440,14 @@ DrawNuklear(struct nk_context * ctx)
                 const struct nk_command_circle *c = (const struct nk_command_circle *)cmd;
                 Color color = ColorFromNuklear(c->color);
                 // DrawEllipseLines(c->x + c->w / 2, c->y + c->h / 2, c->w / 2, c->h / 2, color);
-                DrawEllipseLines(c->x * scale + c->w * scale / 2, c->y * scale + c->h * scale / 2, c->w * scale / 2, c->h * scale / 2, color);
+                DrawEllipseLines((int)(c->x * scale + c->w * scale / 2), (int)(c->y * scale + c->h * scale / 2), (int)(c->w * scale / 2), (int)(c->h * scale / 2), color);
             } break;
 
             case NK_COMMAND_CIRCLE_FILLED: {
                 const struct nk_command_circle_filled *c = (const struct nk_command_circle_filled *)cmd;
                 Color color = ColorFromNuklear(c->color);
                 // DrawEllipse(c->x + c->w / 2, c->y + c->h / 2, c->w / 2, c->h / 2, color);
-                DrawEllipse(c->x * scale + c->w * scale / 2, c->y * scale + c->h * scale / 2, c->w * scale / 2, c->h * scale / 2, color);
+                DrawEllipse((int)(c->x * scale + c->w * scale / 2), (int)(c->y * scale + c->h * scale / 2), (int)(c->w * scale / 2), (int)(c->h * scale / 2), color);
             } break;
 
             case NK_COMMAND_ARC: {
@@ -558,7 +570,7 @@ DrawNuklear(struct nk_context * ctx)
                 TraceLog(LOG_WARNING, "NUKLEAR: Unverified custom callback implementation NK_COMMAND_CUSTOM");
                 const struct nk_command_custom *custom = (const struct nk_command_custom *)cmd;
                 // custom->callback(NULL, custom->x, custom->y, custom->w, custom->h, custom->callback_data);
-                custom->callback(NULL, custom->x * scale, custom->y * scale, custom->w * scale, custom->h * scale, custom->callback_data);
+                custom->callback(NULL, (short)(custom->x * scale), (short)(custom->y * scale), (unsigned short)(custom->w * scale), (unsigned short)(custom->h * scale), custom->callback_data);
             } break;
 
             default: {
@@ -691,8 +703,8 @@ NK_API void nk_raylib_input_keyboard(struct nk_context * ctx)
  */
 NK_API void nk_raylib_input_mouse(struct nk_context * ctx)
 {
-    const int scale = ctx->backend_render_scale;
-    NK_ASSERT(scale > 0);
+    const struct NuklearUserData* userData = (const struct NuklearUserData*)ctx->userdata.ptr;
+    const float scale = userData->scaling;
 
     // nk_input_motion(ctx, GetMouseX(), GetMouseY());
     // nk_input_button(ctx, NK_BUTTON_LEFT, GetMouseX(), GetMouseY(), IsMouseButtonDown(MOUSE_LEFT_BUTTON));
@@ -757,6 +769,11 @@ UnloadNuklear(struct nk_context * ctx)
         // Clear the user font.
         MemFree(userFont);
         ctx->style.font = NULL;
+    }
+
+    // Unload the custom user data.
+    if (ctx->userdata.ptr != NULL) {
+        MemFree(ctx->userdata.ptr);
     }
 
     // Unload the nuklear context.
@@ -863,6 +880,20 @@ NK_API void UnloadNuklearImage(struct nk_image img)
 NK_API void CleanupNuklearImage(struct nk_image img)
 {
     MemFree(img.handle.ptr);
+}
+
+/**
+ * Sets the scaling of the given Nuklear context.
+ */
+void SetNuklearScaling(struct nk_context * ctx, float scaling) {
+    if (ctx == NULL) {
+        return;
+    }
+
+    struct NuklearUserData* userData = (struct NuklearUserData*)ctx->userdata.ptr;
+    if (userData != NULL) {
+        userData->scaling = scaling;
+    }
 }
 
 #ifdef __cplusplus
