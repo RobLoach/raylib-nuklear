@@ -890,6 +890,11 @@ void SetNuklearScaling(struct nk_context * ctx, float scaling) {
         return;
     }
 
+    if (scaling <= 0.0f) {
+        TraceLog(LOG_WARNING, "NUKLEAR: Cannot set scaling to be less than 0");
+        return;
+    }
+
     struct NuklearUserData* userData = (struct NuklearUserData*)ctx->userdata.ptr;
     if (userData != NULL) {
         userData->scaling = scaling;
