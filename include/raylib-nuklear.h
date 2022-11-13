@@ -494,7 +494,6 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_TEXT: {
                 const struct nk_command_text *text = (const struct nk_command_text*)cmd;
                 Color color = ColorFromNuklear(text->foreground);
-                Color background = ColorFromNuklear(text->background);
                 float fontSize = text->font->height;
                 Font* font = (Font*)text->font->userdata.ptr;
                 // DrawRectangle(text->x, text->y, text->w, text->h, background);
