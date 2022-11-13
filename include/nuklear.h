@@ -5634,6 +5634,8 @@ struct nk_context {
     struct nk_configuration_stacks stacks;
     float delta_time_seconds;
 
+    unsigned int backend_render_scale;
+
 /* private:
     should only be accessed if you
     know what you are doing */
