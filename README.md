@@ -23,6 +23,33 @@ Use the [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear) immediate mode c
 6. Render the context using `DrawNuklear(ctx)`
 7. Destroy the nuklear context with `UnloadNuklear(ctx)`
 
+## Nuklear vs Raygui
+
+Nuklear is a fully fledged immediate mode GUI library, providing a full set of controls and widgets.
+
+Raygui is a companion library for Raylib, and is a tiny, lightweight immediate mode GUI. 
+
+use nuklear if you want:
++ portability 
++ automatic layouts
++ lots of controls
++ [documentation](https://immediate-mode-ui.github.io/Nuklear/doc/index.html)
++ stable api
+
+nuklear cons:
+- larger code size (compiles slower)
+- slightly more complex api
+
+use raygui if you want:
++ portability
++ tiny code size
++ minimal api
++ manual layout
+
+raygui cons:
+- no automatic layouts
+- no documentation
+
 ## Example
 
 ``` c
