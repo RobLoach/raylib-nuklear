@@ -23,33 +23,6 @@ Use the [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear) immediate mode c
 6. Render the context using `DrawNuklear(ctx)`
 7. Destroy the nuklear context with `UnloadNuklear(ctx)`
 
-## Nuklear vs Raygui
-
-Nuklear is a fully fledged immediate mode GUI library, providing a full set of controls and widgets.
-
-Raygui is a companion library for Raylib, and is a tiny, lightweight immediate mode GUI. 
-
-use nuklear if you want:
-+ portability 
-+ automatic layouts
-+ lots of controls
-+ [documentation](https://immediate-mode-ui.github.io/Nuklear/doc/index.html)
-+ stable api
-
-nuklear cons:
-- larger code size (compiles slower)
-- slightly more complex api
-
-use raygui if you want:
-+ portability
-+ tiny code size
-+ minimal api
-+ manual layout
-
-raygui cons:
-- no automatic layouts
-- no documentation
-
 ## Example
 
 ``` c
@@ -118,6 +91,57 @@ void SetNuklearScaling(struct nk_context * ctx, float scaling); // Scale the gra
 ```
 
 See the [Nuklear API documenation](https://immediate-mode-ui.github.io/Nuklear/doc/nuklear.html) for more how to use Nuklear.
+
+## Comparision
+
+There are a few other graphical user interface solutions out there for use with raylib. This aims to each of them.
+
+### Nuklear
+
+[Nuklear](https://github.com/Immediate-Mode-UI/Nuklear) is a fully fledged immediate mode GUI library, providing a full set of controls and widgets.
+
+#### Pros
+
+- Portability, as it's written in C99 
+- Automatic layouts
+- Lots of controls
+- [Documentation](https://immediate-mode-ui.github.io/Nuklear/doc/index.html)
+- Stable API
+
+#### Cons
+
+- Larger code size, which can result in slower compile time
+- Slightly more complex API than raygui
+
+### raygui
+
+[raygui](https://github.com/raysan5/raygui) is a companion library for raylib, and is a tiny, lightweight immediate mode GUI. 
+
+#### Pros
+
+- Targets the same platforms as raylib
+- Tiny code size
+- Minimal API
+
+#### Cons
+
+- No automatic layouts
+- No documentation
+- Not many advanced controls
+
+### ImGui
+
+[ImGui](https://github.com/ocornut/imgui), used in raylib with [rlImGui](https://github.com/raylib-extras/rlImGui), is a very powerful graphical user interface for C++.
+
+#### Pros
+
+- Pretty much an industry standard
+- Lots of advanced controls
+- Automatic layouts
+
+#### Cons
+
+- Requires C++
 
 ## Development
 
