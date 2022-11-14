@@ -80,13 +80,14 @@ struct nk_color ColorToNuklear(Color color);                 // Convert a raylib
 struct nk_colorf ColorToNuklearF(Color color);               // Convert a raylib Color to a Nuklear floating color
 struct Color ColorFromNuklear(struct nk_color color);        // Convert a Nuklear color to a raylib Color
 struct Color ColorFromNuklearF(struct nk_colorf color);      // Convert a Nuklear floating color to a raylib Color
-struct Rectangle RectangleFromNuklear(struct nk_rect rect);  // Convert a Nuklear rectangle to a raylib Rectangle
-struct nk_rect RectangleToNuklear(Rectangle rect);           // Convert a raylib Rectangle to a Nuklear Rectangle
+struct Rectangle RectangleFromNuklear(struct nk_context * ctx, struct nk_rect rect); // Convert a Nuklear rectangle to a raylib Rectangle
+struct nk_rect RectangleToNuklear(struct nk_context * ctx, Rectangle rect); // Convert a raylib Rectangle to a Nuklear Rectangle
 struct nk_image TextureToNuklear(Texture tex);               // Convert a raylib Texture to A Nuklear image
 struct Texture TextureFromNuklear(struct nk_image img);      // Convert a Nuklear image to a raylib Texture
 struct nk_image LoadNuklearImage(const char* path);          // Load a Nuklear image
 void UnloadNuklearImage(struct nk_image img);                // Unload a Nuklear image. And free its data
 void CleanupNuklearImage(struct nk_image img);               // Frees the data stored by the Nuklear image
+void SetNuklearScaling(struct nk_context * ctx, float scaling); // Scale the graphical user interface larger or smaller (1 is the default)
 ```
 
 See the [Nuklear API documenation](https://immediate-mode-ui.github.io/Nuklear/doc/nuklear.html) for more how to use Nuklear.

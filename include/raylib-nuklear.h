@@ -867,8 +867,11 @@ NK_API void CleanupNuklearImage(struct nk_image img)
 
 /**
  * Sets the scaling of the given Nuklear context.
+ *
+ * @param ctx The nuklear context.
+ * @param scaling How much scale to apply to the graphical user interface.
  */
-void SetNuklearScaling(struct nk_context * ctx, float scaling) {
+NK_API void SetNuklearScaling(struct nk_context * ctx, float scaling) {
     if (ctx == NULL) {
         return;
     }
