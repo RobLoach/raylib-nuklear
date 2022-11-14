@@ -95,7 +95,7 @@ See the [Nuklear API documenation](https://immediate-mode-ui.github.io/Nuklear/d
 
 ## Comparision
 
-There are a few other graphical user interface solutions out there for use with raylib. This aims to each of them.
+There are a few other graphical user interface solutions out there for use with raylib. While every project's needs differ, this aims to compare and contrast each one. In general, however, if you're unsure which GUI to use, use raygui.
 
 ### Nuklear
 
