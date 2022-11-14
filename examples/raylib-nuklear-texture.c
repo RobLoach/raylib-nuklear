@@ -21,6 +21,10 @@ int main()
 
 	// Initialize the context
 	struct nk_context* ctx = InitNuklear(20);
+
+    // Scale up the Nuklear GUI
+    SetNuklearScaling(ctx, 1.2f);
+
 	// Load the nk_image
 	struct nk_image img = LoadNuklearImage("resources/test-image.png");
 

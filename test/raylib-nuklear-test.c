@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
 
     // RectangleFromNuklear()
     struct nk_rect rect = nk_rect(10, 20, 30, 40);
-    Rectangle rectangle = RectangleFromNuklear(rect);
+    Rectangle rectangle = RectangleFromNuklear(ctx, rect);
     AssertEqual(rect.x, rectangle.x);
     AssertEqual(rect.y, rectangle.y);
     AssertEqual(rect.w, rectangle.width);
