@@ -701,6 +701,10 @@ NK_API void nk_raylib_input_mouse(struct nk_context * ctx)
 NK_API void
 UpdateNuklear(struct nk_context * ctx)
 {
+    // Update the time that has changed since last frame.
+    ctx->delta_time_seconds = GetFrameTime();
+
+    // Update the input state.
     nk_input_begin(ctx);
     {
         nk_raylib_input_mouse(ctx);
