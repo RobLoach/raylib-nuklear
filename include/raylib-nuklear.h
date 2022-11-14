@@ -79,6 +79,7 @@ NK_API struct nk_image LoadNuklearImage(const char* path);          // Load a Nu
 NK_API void UnloadNuklearImage(struct nk_image img);                // Unload a Nuklear image. And free its data
 NK_API void CleanupNuklearImage(struct nk_image img);               // Frees the data stored by the Nuklear image
 NK_API void SetNuklearScaling(struct nk_context * ctx, float scaling); // Sets the scaling for the given Nuklear context
+NK_API float GetNuklearScaling(struct nk_context * ctx);            // Retrieves the scaling of the given Nuklear context
 
 #ifdef __cplusplus
 }
@@ -351,8 +352,7 @@ NK_API void
 DrawNuklear(struct nk_context * ctx)
 {
     const struct nk_command *cmd;
-    const struct NuklearUserData* userData = (const struct NuklearUserData*)ctx->userdata.ptr;
-    const float scale = userData->scaling;
+    const float scale = GetNuklearScaling(ctx);
 
     nk_foreach(cmd, ctx) {
         switch (cmd->type) {
@@ -674,16 +674,10 @@ NK_API void nk_raylib_input_keyboard(struct nk_context * ctx)
  */
 NK_API void nk_raylib_input_mouse(struct nk_context * ctx)
 {
-    const struct NuklearUserData* userData = (const struct NuklearUserData*)ctx->userdata.ptr;
-    const float scale = userData->scaling;
-
-    // nk_input_motion(ctx, GetMouseX(), GetMouseY());
-    // nk_input_button(ctx, NK_BUTTON_LEFT, GetMouseX(), GetMouseY(), IsMouseButtonDown(MOUSE_LEFT_BUTTON));
-    // nk_input_button(ctx, NK_BUTTON_RIGHT, GetMouseX(), GetMouseY(), IsMouseButtonDown(MOUSE_RIGHT_BUTTON));
-    // nk_input_button(ctx, NK_BUTTON_MIDDLE, GetMouseX(), GetMouseY(), IsMouseButtonDown(MOUSE_MIDDLE_BUTTON));
-
+    const float scale = GetNuklearScaling(ctx);
     const int mouseX = (int)((float)GetMouseX() / scale);
     const int mouseY = (int)((float)GetMouseY() / scale);
+
     nk_input_motion(ctx, mouseX, mouseY);
     nk_input_button(ctx, NK_BUTTON_LEFT, mouseX, mouseY, IsMouseButtonDown(MOUSE_LEFT_BUTTON));
     nk_input_button(ctx, NK_BUTTON_RIGHT, mouseX, mouseY, IsMouseButtonDown(MOUSE_RIGHT_BUTTON));
@@ -760,12 +754,8 @@ UnloadNuklear(struct nk_context * ctx)
 NK_API struct
 Rectangle RectangleFromNuklear(struct nk_context* ctx, struct nk_rect rect)
 {
-    struct NuklearUserData* userData = (struct NuklearUserData*)ctx->userdata.ptr;
-    float scaling = 1.0f;
+    float scaling = GetNuklearScaling(ctx);
     Rectangle output;
-    if (userData != NULL) {
-        scaling = userData->scaling;
-    }
     output.x = rect.x * scaling;
     output.y = rect.y * scaling;
     output.width = rect.w * scaling;
@@ -779,11 +769,7 @@ Rectangle RectangleFromNuklear(struct nk_context* ctx, struct nk_rect rect)
 NK_API struct
 nk_rect RectangleToNuklear(struct nk_context* ctx, Rectangle rect)
 {
-    struct NuklearUserData* userData = (struct NuklearUserData*)ctx->userdata.ptr;
-    float scaling = 1.0f;
-    if (userData != NULL) {
-        scaling = userData->scaling;
-    }
+    float scaling = GetNuklearScaling(ctx);
     return nk_rect(rect.x / scaling, rect.y / scaling, rect.width / scaling, rect.height / scaling);
 }
 
@@ -871,7 +857,8 @@ NK_API void CleanupNuklearImage(struct nk_image img)
  * @param ctx The nuklear context.
  * @param scaling How much scale to apply to the graphical user interface.
  */
-NK_API void SetNuklearScaling(struct nk_context * ctx, float scaling) {
+NK_API void SetNuklearScaling(struct nk_context * ctx, float scaling)
+{
     if (ctx == NULL) {
         return;
     }
@@ -885,6 +872,25 @@ NK_API void SetNuklearScaling(struct nk_context * ctx, float scaling) {
     if (userData != NULL) {
         userData->scaling = scaling;
     }
+}
+
+/**
+ * Retrieves the scale value of the given Nuklear context.
+ *
+ * @return The scale value that had been set for the Nuklear context. 1.0f is the default scale value.
+ */
+NK_API float GetNuklearScaling(struct nk_context * ctx)
+{
+    if (ctx == NULL) {
+        return 1.0f;
+    }
+
+    struct NuklearUserData* userData = (struct NuklearUserData*)ctx->userdata.ptr;
+    if (userData != NULL) {
+        return userData->scaling;
+    }
+
+    return 1.0f;
 }
 
 #ifdef __cplusplus

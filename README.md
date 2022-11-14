@@ -88,6 +88,7 @@ struct nk_image LoadNuklearImage(const char* path);          // Load a Nuklear i
 void UnloadNuklearImage(struct nk_image img);                // Unload a Nuklear image. And free its data
 void CleanupNuklearImage(struct nk_image img);               // Frees the data stored by the Nuklear image
 void SetNuklearScaling(struct nk_context * ctx, float scaling); // Scale the graphical user interface larger or smaller (1 is the default)
+float GetNuklearScaling(struct nk_context * ctx);            // Retrieves the scale of the given Nuklear contextgit
 ```
 
 See the [Nuklear API documenation](https://immediate-mode-ui.github.io/Nuklear/doc/nuklear.html) for more how to use Nuklear.
@@ -102,7 +103,7 @@ There are a few other graphical user interface solutions out there for use with 
 
 #### Pros
 
-- Portability, as it's written in C99 
+- Portability, as it's written in C99
 - Automatic layouts
 - Lots of controls
 - [Documentation](https://immediate-mode-ui.github.io/Nuklear/doc/index.html)
@@ -115,13 +116,15 @@ There are a few other graphical user interface solutions out there for use with 
 
 ### raygui
 
-[raygui](https://github.com/raysan5/raygui) is a companion library for raylib, and is a tiny, lightweight immediate mode GUI. 
+[raygui](https://github.com/raysan5/raygui) is a companion library for raylib, and is a tiny, lightweight immediate mode GUI.
 
 #### Pros
 
 - Targets the same platforms as raylib
 - Tiny code size
 - Minimal API
+- Easy to use
+- Matches the coding conventions of raylib
 
 #### Cons
 
