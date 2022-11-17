@@ -683,8 +683,8 @@ NK_API void nk_raylib_input_mouse(struct nk_context * ctx)
 {
     const float scale = GetNuklearScaling(ctx);
     Vector2 position = GetNuklearPosition(ctx);
-    const int mouseX = (int)((float)GetMouseX() / scale - position.x);
-    const int mouseY = (int)((float)GetMouseY() / scale - position.y);
+    const int mouseX = (int)(((float)GetMouseX() - position.x) / scale);
+    const int mouseY = (int)(((float)GetMouseY() - position.y) / scale);
 
     nk_input_motion(ctx, mouseX, mouseY);
     nk_input_button(ctx, NK_BUTTON_LEFT, mouseX, mouseY, IsMouseButtonDown(MOUSE_LEFT_BUTTON));
