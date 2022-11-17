@@ -24,6 +24,8 @@ int main()
 
     // Scale up the Nuklear GUI
     SetNuklearScaling(ctx, 1.2f);
+    SetNuklearPosition(ctx, (Vector2){300.0f, 100.0f});
+
 
 	// Load the nk_image
 	struct nk_image img = LoadNuklearImage("resources/test-image.png");
@@ -34,7 +36,7 @@ int main()
 		UpdateNuklear(ctx);
 
 		// The window called "Image example" is opend
-		if(nk_begin(ctx, "Image example", nk_rect(300, 100, img.w, img.h + 50), NK_WINDOW_MINIMIZABLE|NK_WINDOW_BORDER|NK_WINDOW_NO_SCROLLBAR|NK_WINDOW_MOVABLE|NK_WINDOW_CLOSABLE))
+		if(nk_begin(ctx, "Image example", nk_rect(0, 0, img.w, img.h + 50), NK_WINDOW_MINIMIZABLE|NK_WINDOW_BORDER|NK_WINDOW_NO_SCROLLBAR|NK_WINDOW_MOVABLE|NK_WINDOW_CLOSABLE))
 		{
 			// Setup the layout
 			nk_layout_row_static(ctx, img.h, img.w, 1);
