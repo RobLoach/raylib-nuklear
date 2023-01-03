@@ -126,6 +126,13 @@ extern "C" {
 #define RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS 20
 #endif  // RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS
 
+#ifndef RAYLIB_NUKLEAR_ROUNDING_SCALE
+/**
+ * The default scaling to apply for rounded borders.
+ */
+#define RAYLIB_NUKLEAR_ROUNDING_SCALE 4.0f
+#endif
+
 /**
  * The user data that's leverages internally through Nuklear.
  */
@@ -395,10 +402,9 @@ DrawNuklear(struct nk_context * ctx)
                 const struct nk_command_rect *r = (const struct nk_command_rect *)cmd;
                 Color color = ColorFromNuklear(r->color);
                 Rectangle rect = {(float)r->x * scale, (float)r->y * scale, (float)r->w * scale, (float)r->h * scale};
-                if (r->rounding > 0) {
-                    float roundness = (float)r->rounding * 4.0f / (rect.width + rect.height);
-                    // TODO: DrawRectangleRoundedLines - Is 1 the correct line segments?
-                    DrawRectangleRoundedLines(rect, roundness, 1, r->line_thickness * scale, color);
+                float roundness = (float)r->rounding * RAYLIB_NUKLEAR_ROUNDING_SCALE / (rect.width + rect.height);
+                if (roundness > 0.0f) {
+                    DrawRectangleRoundedLines(rect, roundness, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, (float)r->line_thickness * scale, color);
                 }
                 else {
                     DrawRectangleLinesEx(rect, r->line_thickness * scale, color);
@@ -409,9 +415,9 @@ DrawNuklear(struct nk_context * ctx)
                 const struct nk_command_rect_filled *r = (const struct nk_command_rect_filled *)cmd;
                 Color color = ColorFromNuklear(r->color);
                 Rectangle rect = {(float)r->x * scale, (float)r->y * scale, (float)r->w * scale, (float)r->h * scale};
-                if (r->rounding > 0) {
-                    float roundness = (float)r->rounding * 4.0f / (rect.width + rect.height);
-                    DrawRectangleRounded(rect, roundness, 1, color);
+                float roundness = (float)r->rounding * RAYLIB_NUKLEAR_ROUNDING_SCALE / (rect.width + rect.height);
+                if (roundness > 0.0f) {
+                    DrawRectangleRounded(rect, roundness, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
                 }
                 else {
                     DrawRectangleRec(rect, color);
