@@ -28,6 +28,8 @@ if (RAYLIB_NUKLEAR_BUILD_EXAMPLES)
         # set(CTEST_CUSTOM_TESTS_IGNORE
         #     pkg-config--static
         # )
+        # Always print verbose output when tests fail if run using `make test`.
+        list(APPEND CMAKE_CTEST_ARGUMENTS "--output-on-failure")
         add_subdirectory(test)
     endif()
 endif()
