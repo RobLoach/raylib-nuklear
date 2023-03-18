@@ -6,7 +6,7 @@
 *       - Use the nuklear immediate-mode graphical user interface in raylib.
 *
 *   DEPENDENCIES:
-*       - raylib 4.2 https://www.raylib.com/
+*       - raylib 4.2+ https://www.raylib.com/
 *       - nuklear https://github.com/Immediate-Mode-UI/Nuklear
 *
 *   LICENSE: zlib/libpng

@@ -2,3 +2,4 @@
 	path = vendor/nuklear
 	url = https://github.com/Immediate-Mode-UI/Nuklear.git
     ignore = dirty
+    branch = master
