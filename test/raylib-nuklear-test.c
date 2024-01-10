@@ -51,6 +51,9 @@ int main(int argc, char *argv[]) {
         DrawNuklear(ctx);
     EndDrawing();
 
+    // Save a screenshot for debugging.
+    TakeScreenshot("raylib-nuklear-test.png");
+
     // UnloadNuklearImage()
     UnloadNuklearImage(image);
 
@@ -58,11 +61,13 @@ int main(int argc, char *argv[]) {
     UnloadNuklear(ctx);
 
     // InitNuklearEx()
-    Font font = LoadFont("resources/anonymous_pro_bold.ttf");
-    ctx = InitNuklearEx(font, 25.0f);
-    Assert(ctx);
-    UnloadNuklear(ctx);
-    UnloadFont(font);
+    {
+        Font font = LoadFont("resources/anonymous_pro_bold.ttf");
+        ctx = InitNuklearEx(font, 25.0f);
+        Assert(ctx);
+        UnloadNuklear(ctx);
+        UnloadFont(font);
+    }
 
     // RectangleFromNuklear()
     {
