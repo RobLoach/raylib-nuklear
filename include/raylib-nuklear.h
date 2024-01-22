@@ -1,12 +1,12 @@
 /**********************************************************************************************
 *
-*   raylib-nuklear v4.5.1 - Nuklear GUI for Raylib.
+*   raylib-nuklear v5.0.0 - Nuklear GUI for Raylib.
 *
 *   FEATURES:
 *       - Use the Nuklear immediate-mode graphical user interface in raylib.
 *
 *   DEPENDENCIES:
-*       - raylib 4.2+ https://www.raylib.com/
+*       - raylib 4.5+ https://www.raylib.com/
 *       - Nuklear https://github.com/Immediate-Mode-UI/Nuklear
 *
 *   LICENSE: zlib/libpng
