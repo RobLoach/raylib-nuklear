@@ -763,7 +763,7 @@ UnloadNuklear(struct nk_context * ctx)
 
     // Unload the nuklear context.
     nk_free(ctx);
-	 MemFree(ctx);
+    MemFree(ctx);
     TraceLog(LOG_INFO, "NUKLEAR: Unloaded GUI");
 }
 
