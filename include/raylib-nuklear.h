@@ -45,12 +45,11 @@
 // TODO: Replace NK_INCLUDE_DEFAULT_ALLOCATOR with MemAlloc() and MemFree()
 #define NK_INCLUDE_DEFAULT_ALLOCATOR
 #define NK_INCLUDE_COMMAND_USERDATA
+#define NK_INCLUDE_STANDARD_BOOL
 
-// TODO: Figure out if we can use STANDARD_BOOL here?
-//#define NK_INCLUDE_STANDARD_BOOL
-//#ifndef NK_BOOL
-//#define NK_BOOL bool
-//#endif  // NK_BOOL
+#ifndef NK_INCLUDE_FIXED_TYPES
+#define NK_INCLUDE_FIXED_TYPES
+#endif  // NK_INCLUDE_FIXED_TYPES
 
 #ifndef NK_ASSERT
 #define NK_ASSERT(condition) do { if (!(condition)) { TraceLog(LOG_WARNING, "NUKLEAR: Failed assert \"%s\" (%s:%i)", #condition, "nuklear.h", __LINE__); }} while (0)
