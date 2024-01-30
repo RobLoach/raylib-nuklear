@@ -545,7 +545,7 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_IMAGE: {
                 const struct nk_command_image *i = (const struct nk_command_image *)cmd;
                 Texture texture = *(Texture*)i->img.handle.ptr;
-                Rectangle source = {0, 0, (float)texture.width, (float)texture.height};
+                Rectangle source = {i->img.region[0], i->img.region[1], (float)i->img.region[2], (float)i->img.region[3]};
                 Rectangle dest = {(float)i->x * scale, (float)i->y * scale, (float)i->w * scale, (float)i->h * scale};
                 Vector2 origin = {0, 0};
                 Color tint = ColorFromNuklear(i->col);
@@ -813,6 +813,12 @@ NK_API struct nk_image TextureToNuklear(Texture tex)
 	img.handle.ptr = stored_tex;
 	img.w = (nk_ushort)stored_tex->width;
 	img.h = (nk_ushort)stored_tex->height;
+
+    // Set the region so we can sub-select the image later.
+    img.region[0] = (nk_ushort)0;
+    img.region[1] = (nk_ushort)0;
+    img.region[2] = img.w;
+    img.region[3] = img.h;
 
 	return img;
 }
