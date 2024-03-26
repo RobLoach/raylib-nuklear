@@ -114,7 +114,7 @@ extern "C" {
 /**
  * The default font size that is used when a font size is not provided.
  */
-#define RAYLIB_NUKLEAR_DEFAULT_FONTSIZE 10
+#define RAYLIB_NUKLEAR_DEFAULT_FONTSIZE 13
 #endif  // RAYLIB_NUKLEAR_DEFAULT_FONTSIZE
 
 #ifndef RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS
@@ -126,7 +126,7 @@ extern "C" {
 #define RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS 20
 #endif  // RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS
 
-#ifdef RAYLIB_NUKLEAR_DEFAULT_FONT
+#ifdef RAYLIB_NUKLEAR_INCLUDE_DEFAULT_FONT
     #include "raylib-nuklear-font.h"
 #endif
 
@@ -305,10 +305,22 @@ InitNuklearEx(Font font, float fontSize)
     return InitNuklearContext(userFont);
 }
 
+/**
+ * Load the default Nuklear font. Requires `RAYLIB_NUKLEAR_INCLUDE_DEFAULT_FONT` to be defined.
+ *
+ * @param size The size of the font to load (optional). Provide 0 if you'd like to use the default size from Nuklear.
+ *
+ * @return The loaded font, or an empty font on error.
+ *
+ * @code
+ * #define RAYLIB_NUKLEAR_INCLUDE_DEFAULT_FONT
+ * #include "raylib-nuklear.h"
+ * Font font = LoadFontFromNuklear(0);
+ */
 NK_API Font LoadFontFromNuklear(int size) {
-    #ifndef RAYLIB_NUKLEAR_DEFAULT_FONT
+    #ifndef RAYLIB_NUKLEAR_INCLUDE_DEFAULT_FONT
     (void)size;
-    TraceLog(LOG_ERROR, "NUKLEAR: RAYLIB_NUKLEAR_DEFAULT_FONT must be defined to use LoadFontFromNuklear()");
+    TraceLog(LOG_ERROR, "NUKLEAR: RAYLIB_NUKLEAR_INCLUDE_DEFAULT_FONT must be defined to use LoadFontFromNuklear()");
     return CLITERAL(Font) {0};
     #else
     if (size <= 0) {

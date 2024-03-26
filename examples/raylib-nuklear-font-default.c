@@ -29,7 +29,7 @@
 #include "raylib.h"
 
 #define RAYLIB_NUKLEAR_IMPLEMENTATION
-#define RAYLIB_NUKLEAR_DEFAULT_FONT
+#define RAYLIB_NUKLEAR_INCLUDE_DEFAULT_FONT
 #include "raylib-nuklear.h"
 
 int main(void)
@@ -41,14 +41,14 @@ int main(void)
     const int fontSize = 14;
 
     InitWindow(screenWidth, screenHeight, "[raylib-nuklear] font example");
-    Font font = LoadFontFromNuklear(10);
+    Font font = LoadFontFromNuklear(0);
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
     /* GUI */
     struct nk_colorf bg = ColorToNuklearF(SKYBLUE);
-    struct nk_context *ctx = InitNuklearEx(font, 10);
+    struct nk_context *ctx = InitNuklearEx(font, 0);
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
