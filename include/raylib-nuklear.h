@@ -61,8 +61,9 @@
 extern "C" {
 #endif
 
-NK_API struct nk_context* InitNuklear(int fontSize);                // Initialize the Nuklear GUI context
+NK_API struct nk_context* InitNuklear(int fontSize);                // Initialize the Nuklear GUI context using raylib's font
 NK_API struct nk_context* InitNuklearEx(Font font, float fontSize); // Initialize the Nuklear GUI context, with a custom font
+NK_API Font LoadFontFromNuklear(int fontSize);                      // Loads the default Nuklear font
 NK_API void UpdateNuklear(struct nk_context * ctx);                 // Update the input state and internal components for Nuklear
 NK_API void DrawNuklear(struct nk_context * ctx);                   // Render the Nuklear GUI on the screen
 NK_API void UnloadNuklear(struct nk_context * ctx);                 // Deinitialize the Nuklear context
@@ -124,6 +125,10 @@ extern "C" {
  */
 #define RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS 20
 #endif  // RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS
+
+#ifdef RAYLIB_NUKLEAR_DEFAULT_FONT
+    #include "raylib-nuklear-font.h"
+#endif
 
 /**
  * The user data that's leverages internally through Nuklear.
@@ -298,6 +303,19 @@ InitNuklearEx(Font font, float fontSize)
 
     // Nuklear context.
     return InitNuklearContext(userFont);
+}
+
+NK_API Font LoadFontFromNuklear(int size) {
+    #ifndef RAYLIB_NUKLEAR_DEFAULT_FONT
+    (void)size;
+    TraceLog(LOG_ERROR, "NUKLEAR: RAYLIB_NUKLEAR_DEFAULT_FONT must be defined to use LoadFontFromNuklear()");
+    return CLITERAL(Font) {0};
+    #else
+    if (size <= 0) {
+        size = RAYLIB_NUKLEAR_DEFAULT_FONTSIZE;
+    }
+    return LoadFontFromMemory(".ttf", RAYLIB_NUKLEAR_DEFAULT_FONT, RAYLIB_NUKLEAR_DEFAULT_FONT_SIZE, size, NULL, 95);
+    #endif
 }
 
 /**
