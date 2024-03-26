@@ -37,7 +37,7 @@ int main(void)
     //--------------------------------------------------------------------------------------
     const int screenWidth = 800;
     const int screenHeight = 450;
-    const int fontSize = 14;
+    const int fontSize = 18;
 
     InitWindow(screenWidth, screenHeight, "[raylib-nuklear] font example");
     Font font = LoadFontEx("resources/anonymous_pro_bold.ttf", fontSize, NULL, 0);

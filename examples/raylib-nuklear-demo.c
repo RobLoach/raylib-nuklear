@@ -78,7 +78,7 @@ int main(void)
     SetTargetFPS(60);
 
     /* GUI */
-    ctx = InitNuklear(10);
+    ctx = InitNuklear(0);
 
     /* style.c */
     #ifdef INCLUDE_STYLE

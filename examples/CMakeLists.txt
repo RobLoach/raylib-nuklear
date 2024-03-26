@@ -45,6 +45,15 @@ target_link_libraries(raylib-nuklear-font PUBLIC
     raylib_nuklear
 )
 
+# raylib-nuklear-font
+add_executable(raylib-nuklear-font-default
+    raylib-nuklear-font-default.c
+)
+target_link_libraries(raylib-nuklear-font-default PUBLIC
+    raylib
+    raylib_nuklear
+)
+
 # raylib-nuklear-texture
 add_executable(raylib-nuklear-texture
     raylib-nuklear-texture.c
