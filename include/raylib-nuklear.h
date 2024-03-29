@@ -569,7 +569,7 @@ DrawNuklear(struct nk_context * ctx)
 struct nk_raylib_input_keyboard_check {
     int key;
     int input_key;
-    bool other;
+    bool modifier;
 };
 
 /**
@@ -584,7 +584,8 @@ NK_API void nk_raylib_input_keyboard(struct nk_context * ctx)
     bool control = IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL);
     bool command = IsKeyDown(KEY_LEFT_SUPER);
     bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
-    struct nk_raylib_input_keyboard_check checks[17] = {
+    #define NK_RAYLIB_INPUT_KEYBOARD_CHECK_NUM 16
+    struct nk_raylib_input_keyboard_check checks[NK_RAYLIB_INPUT_KEYBOARD_CHECK_NUM] = {
         (struct nk_raylib_input_keyboard_check) {KEY_DELETE, NK_KEY_DEL, true},
         (struct nk_raylib_input_keyboard_check) {KEY_ENTER, NK_KEY_ENTER, true},
         (struct nk_raylib_input_keyboard_check) {KEY_BACKSPACE, NK_KEY_BACKSPACE, true},
@@ -603,16 +604,16 @@ NK_API void nk_raylib_input_keyboard(struct nk_context * ctx)
         (struct nk_raylib_input_keyboard_check) {KEY_DOWN, NK_KEY_DOWN, true}
     };
     bool checked = false;
-    for (int i=0; i<12; i++) {
+    for (int i = 0; i < NK_RAYLIB_INPUT_KEYBOARD_CHECK_NUM; i++) {
         struct nk_raylib_input_keyboard_check check = checks[i];
-        if (IsKeyDown(check.key) && check.other) {
-            // printf("key pressed %d\n", i);
+        if (IsKeyDown(check.key) && check.modifier) {
             nk_input_key(ctx, check.input_key, true);
             checked = true;
         } else {
             nk_input_key(ctx, check.input_key, false);
         }
     }
+    #undef NK_RAYLIB_INPUT_KEYBOARD_CHECK_NUM
 
     nk_input_key(ctx, NK_KEY_SHIFT, shift);
 
