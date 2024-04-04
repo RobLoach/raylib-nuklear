@@ -327,7 +327,15 @@ NK_API Font LoadFontFromNuklear(int size) {
     if (size <= 0) {
         size = RAYLIB_NUKLEAR_DEFAULT_FONTSIZE;
     }
-    return LoadFontFromMemory(".ttf", RAYLIB_NUKLEAR_DEFAULT_FONT, RAYLIB_NUKLEAR_DEFAULT_FONT_SIZE, size, NULL, 95);
+
+    #ifndef RAYLIB_NUKLEAR_DEFAULT_FONT_GLYPHS
+    /**
+     * The amount of glyphs to load for the default font.
+     */
+    #define RAYLIB_NUKLEAR_DEFAULT_FONT_GLYPHS 95
+    #endif
+
+    return LoadFontFromMemory(".ttf", RAYLIB_NUKLEAR_DEFAULT_FONT_NAME, RAYLIB_NUKLEAR_DEFAULT_FONT_SIZE, size, NULL, RAYLIB_NUKLEAR_DEFAULT_FONT_GLYPHS);
 #endif
 }
 

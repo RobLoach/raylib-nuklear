@@ -88,7 +88,8 @@ struct nk_image LoadNuklearImage(const char* path);          // Load a Nuklear i
 void UnloadNuklearImage(struct nk_image img);                // Unload a Nuklear image. And free its data
 void CleanupNuklearImage(struct nk_image img);               // Frees the data stored by the Nuklear image
 void SetNuklearScaling(struct nk_context * ctx, float scaling); // Scale the graphical user interface larger or smaller (1 is the default)
-float GetNuklearScaling(struct nk_context * ctx);            // Retrieves the scale of the given Nuklear contextgit
+float GetNuklearScaling(struct nk_context * ctx);            // Retrieves the scale of the given Nuklear context
+Font LoadFontFromNuklear(int size);                          // Loads the default font from Nuklear. Requires RAYLIB_NUKLEAR_INCLUDE_DEFAULT_FONT
 ```
 
 See the [Nuklear API documenation](https://immediate-mode-ui.github.io/Nuklear/doc/nuklear.html) for more how to use Nuklear.
