@@ -316,18 +316,19 @@ InitNuklearEx(Font font, float fontSize)
  * #define RAYLIB_NUKLEAR_INCLUDE_DEFAULT_FONT
  * #include "raylib-nuklear.h"
  * Font font = LoadFontFromNuklear(0);
+ * @endcode
  */
 NK_API Font LoadFontFromNuklear(int size) {
-    #ifndef RAYLIB_NUKLEAR_INCLUDE_DEFAULT_FONT
+#ifndef RAYLIB_NUKLEAR_INCLUDE_DEFAULT_FONT
     (void)size;
     TraceLog(LOG_ERROR, "NUKLEAR: RAYLIB_NUKLEAR_INCLUDE_DEFAULT_FONT must be defined to use LoadFontFromNuklear()");
     return CLITERAL(Font) {0};
-    #else
+#else
     if (size <= 0) {
         size = RAYLIB_NUKLEAR_DEFAULT_FONTSIZE;
     }
     return LoadFontFromMemory(".ttf", RAYLIB_NUKLEAR_DEFAULT_FONT, RAYLIB_NUKLEAR_DEFAULT_FONT_SIZE, size, NULL, 95);
-    #endif
+#endif
 }
 
 /**
