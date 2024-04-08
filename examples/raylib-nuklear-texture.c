@@ -15,7 +15,7 @@
 #define RAYLIB_NUKLEAR_IMPLEMENTATION
 #include "raylib-nuklear.h"
 
-int main()
+int main(void)
 {
 	InitWindow(1280, 720, "[raylib-nuklear] - Texture/Image");
 
