@@ -87,7 +87,8 @@ int main(void) {
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "[raylib-nuklear] demo");
     SetTargetFPS(60);
 
-    ctx = InitNuklear(10);
+    /* GUI */
+    ctx = InitNuklear(0);
     bg.r = 0.10f, bg.g = 0.18f, bg.b = 0.24f, bg.a = 1.0f;
 
     /* style.c */

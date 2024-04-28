@@ -1,10 +1,10 @@
 /**********************************************************************************************
 *
-*   raylib-nuklear-example - Example of using Nuklear with Raylib.
+*   raylib-nuklear-font - Example of using Nuklear with a custom Raylib font.
 *
 *   LICENSE: zlib/libpng
 *
-*   nuklear_raylib is licensed under an unmodified zlib/libpng license, which is an OSI-certified,
+*   raylib-nuklear is licensed under an unmodified zlib/libpng license, which is an OSI-certified,
 *   BSD-like license that allows static linking with closed source software:
 *
 *   Copyright (c) 2020 Rob Loach (@RobLoach)
@@ -29,22 +29,26 @@
 #include "raylib.h"
 
 #define RAYLIB_NUKLEAR_IMPLEMENTATION
+#define RAYLIB_NUKLEAR_INCLUDE_DEFAULT_FONT
 #include "raylib-nuklear.h"
 
 int main(void)
 {
     // Initialization
     //--------------------------------------------------------------------------------------
-    const int screenWidth = 700;
-    const int screenHeight = 394;
-    InitWindow(screenWidth, screenHeight, "[raylib-nuklear] example");
+    const int screenWidth = 800;
+    const int screenHeight = 450;
+    const int fontSize = 14;
+
+    InitWindow(screenWidth, screenHeight, "[raylib-nuklear] font example");
+    Font font = LoadFontFromNuklear(0);
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
     /* GUI */
     struct nk_colorf bg = ColorToNuklearF(SKYBLUE);
-    struct nk_context *ctx = InitNuklear(0);
+    struct nk_context *ctx = InitNuklearEx(font, 0);
 
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
@@ -103,6 +107,7 @@ int main(void)
     // De-Initialization
     //--------------------------------------------------------------------------------------
     UnloadNuklear(ctx);     // Unload the Nuklear GUI
+    UnloadFont(font);
     CloseWindow();
     //--------------------------------------------------------------------------------------
 
