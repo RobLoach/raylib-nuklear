@@ -1463,7 +1463,7 @@ NK_API const struct nk_draw_command* nk__draw_next(const struct nk_draw_command*
 /// #### nk_collapse_states
 /// State           | Description
 /// ----------------|-----------------------------------------------------------
-/// __NK_MINIMIZED__| UI section is collased and not visible until maximized
+/// __NK_MINIMIZED__| UI section is collapsed and not visible until maximized
 /// __NK_MAXIMIZED__| UI section is extended and visible until minimized
 /// <br /><br />
 */
@@ -2001,11 +2001,11 @@ NK_API void nk_window_show(struct nk_context*, const char *name, enum nk_show_st
 /// __ctx__     | Must point to an previously initialized `nk_context` struct
 /// __name__    | Identifier of the window to either hide or show
 /// __state__   | state with either visible or hidden to modify the window with
-/// __cond__    | condition that has to be met to actually commit the visbility state change
+/// __cond__    | condition that has to be met to actually commit the visibility state change
 */
 NK_API void nk_window_show_if(struct nk_context*, const char *name, enum nk_show_states, int cond);
 /*/// #### nk_window_show_if
-/// Line for visual seperation. Draws a line with thickness determined by the current row height.
+/// Line for visual separation. Draws a line with thickness determined by the current row height.
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~c
 /// void nk_rule_horizontal(struct nk_context *ctx, struct nk_color color, NK_BOOL rounding)
 /// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -2069,7 +2069,7 @@ NK_API void nk_rule_horizontal(struct nk_context *ctx, struct nk_color color, nk
 ///     the size of each widget dynamically by formula:
 ///
 ///     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~c
-///     widget_width = (window_width - padding - spacing) * (1/colum_count)
+///     widget_width = (window_width - padding - spacing) * (1/column_count)
 ///     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ///
 ///     Just like all other layouting APIs if you define more widget than columns this
@@ -5220,6 +5220,7 @@ struct nk_style_chart {
     struct nk_vec2 padding;
     float color_factor;
     float disabled_factor;
+    nk_bool show_markers;
 };
 
 struct nk_style_combo {
@@ -5410,6 +5411,7 @@ struct nk_chart_slot {
     int count;
     struct nk_vec2 last;
     int index;
+    nk_bool show_markers;
 };
 
 struct nk_chart {
@@ -5798,11 +5800,11 @@ struct nk_context {
 #define NK_ALIGN_PTR_BACK(x, mask)\
     (NK_UINT_TO_PTR((NK_PTR_TO_UINT((nk_byte*)(x)) & ~(mask-1))))
 
-#if (defined(__GNUC__) && __GNUC__ >= 4) || defined(__clang__)
+/*#if (defined(__GNUC__) && __GNUC__ >= 4) || defined(__clang__)
 #define NK_OFFSETOF(st,m) (__builtin_offsetof(st,m))
-#else
+#else*/
 #define NK_OFFSETOF(st,m) ((nk_ptr)&(((st*)0)->m))
-#endif
+/*#endif*/
 
 #ifdef __cplusplus
 }
@@ -7662,9 +7664,9 @@ nk_rgb_factor(struct nk_color col, const float factor)
 {
     if (factor == 1.0f)
         return col;
-    col.r *= factor;
-    col.g *= factor;
-    col.b *= factor;
+    col.r = (nk_byte)(col.r * factor);
+    col.g = (nk_byte)(col.g * factor);
+    col.b = (nk_byte)(col.b * factor);
     return col;
 }
 NK_API struct nk_color
@@ -11142,7 +11144,7 @@ static int stbrp__skyline_find_min_y(stbrp_context *c, stbrp_node *first, int x0
       if (node->y > min_y) {
          /*  raise min_y higher. */
          /*  we've accounted for all waste up to min_y, */
-         /*  but we'll now add more waste for everything we've visted */
+         /*  but we'll now add more waste for everything we've visited */
          waste_area += visited_width * (node->y - min_y);
          min_y = node->y;
          /*  the first time through, visited_width might be reduced */
@@ -11297,7 +11299,7 @@ static stbrp__findresult stbrp__skyline_pack_rectangle(stbrp_context *context, i
 
    /*  insert the new node into the right starting point, and */
    /*  let 'cur' point to the remaining nodes needing to be */
-   /*  stiched back in */
+   /*  stitched back in */
 
    cur = *res.prev_link;
    if (cur->x < res.x) {
@@ -18678,6 +18680,7 @@ nk_style_from_table(struct nk_context *ctx, const struct nk_color *table)
     chart->rounding         = 0;
     chart->color_factor     = 1.0f;
     chart->disabled_factor  = NK_WIDGET_DISABLED_FACTOR;
+    chart->show_markers     = nk_true;
 
     /* combo */
     combo = &style->combo;
@@ -19667,12 +19670,12 @@ nk_panel_get_border_color(const struct nk_style *style, enum nk_panel_type type)
 NK_LIB nk_bool
 nk_panel_is_sub(enum nk_panel_type type)
 {
-    return (type & NK_PANEL_SET_SUB)?1:0;
+    return ((int)type & (int)NK_PANEL_SET_SUB)?1:0;
 }
 NK_LIB nk_bool
 nk_panel_is_nonblock(enum nk_panel_type type)
 {
-    return (type & NK_PANEL_SET_NONBLOCK)?1:0;
+    return ((int)type & (int)NK_PANEL_SET_NONBLOCK)?1:0;
 }
 NK_LIB nk_bool
 nk_panel_begin(struct nk_context *ctx, const char *title, enum nk_panel_type panel_type)
@@ -20922,7 +20925,7 @@ nk_popup_begin(struct nk_context *ctx, enum nk_popup_type type,
 
     win = ctx->current;
     panel = win->layout;
-    NK_ASSERT(!(panel->type & NK_PANEL_SET_POPUP) && "popups are not allowed to have popups");
+    NK_ASSERT(!((int)panel->type & (int)NK_PANEL_SET_POPUP) && "popups are not allowed to have popups");
     (void)panel;
     title_len = (int)nk_strlen(title);
     title_hash = nk_murmur_hash(title, (int)title_len, NK_PANEL_POPUP);
@@ -21016,7 +21019,7 @@ nk_nonblock_begin(struct nk_context *ctx,
     /* popups cannot have popups */
     win = ctx->current;
     panel = win->layout;
-    NK_ASSERT(!(panel->type & NK_PANEL_SET_POPUP));
+    NK_ASSERT(!((int)panel->type & (int)NK_PANEL_SET_POPUP));
     (void)panel;
     popup = win->popup.win;
     if (!popup) {
@@ -21089,7 +21092,7 @@ nk_popup_close(struct nk_context *ctx)
 
     popup = ctx->current;
     NK_ASSERT(popup->parent);
-    NK_ASSERT(popup->layout->type & NK_PANEL_SET_POPUP);
+    NK_ASSERT((int)popup->layout->type & (int)NK_PANEL_SET_POPUP);
     popup->flags |= NK_WINDOW_HIDDEN;
 }
 NK_API void
@@ -21357,7 +21360,7 @@ nk_contextual_end(struct nk_context *ctx)
     popup = ctx->current;
     panel = popup->layout;
     NK_ASSERT(popup->parent);
-    NK_ASSERT(panel->type & NK_PANEL_SET_POPUP);
+    NK_ASSERT((int)panel->type & (int)NK_PANEL_SET_POPUP);
     if (panel->flags & NK_WINDOW_DYNAMIC) {
         /* Close behavior
         This is a bit of a hack solution since we do not know before we end our popup
@@ -28322,7 +28325,7 @@ nk_do_property(nk_flags *ws,
     text_edit->string.buffer.memory.ptr = dst;
     text_edit->string.buffer.size = NK_MAX_NUMBER_BUFFER;
     text_edit->mode = NK_TEXT_EDIT_MODE_INSERT;
-    nk_do_edit(ws, out, edit, NK_EDIT_FIELD|NK_EDIT_AUTO_SELECT,
+    nk_do_edit(ws, out, edit, (int)NK_EDIT_FIELD|(int)NK_EDIT_AUTO_SELECT,
         filters[filter], text_edit, &style->edit, (*state == NK_PROPERTY_EDIT) ? in: 0, font);
 
     *length = text_edit->string.len;
@@ -28629,7 +28632,8 @@ nk_chart_begin_colored(struct nk_context *ctx, enum nk_chart_type type,
     slot->highlight = highlight;
     slot->min = NK_MIN(min_value, max_value);
     slot->max = NK_MAX(min_value, max_value);
-    slot->range = slot->max - slot->min;}
+    slot->range = slot->max - slot->min;
+    slot->show_markers = style->show_markers;}
 
     /* draw chart background */
     background = &style->background;
@@ -28681,7 +28685,8 @@ nk_chart_add_slot_colored(struct nk_context *ctx, const enum nk_chart_type type,
     slot->highlight = highlight;
     slot->min = NK_MIN(min_value, max_value);
     slot->max = NK_MAX(min_value, max_value);
-    slot->range = slot->max - slot->min;}
+    slot->range = slot->max - slot->min;
+    slot->show_markers = style->show_markers;}
 }
 NK_API void
 nk_chart_add_slot(struct nk_context *ctx, const enum nk_chart_type type,
@@ -28728,7 +28733,9 @@ nk_chart_push_line(struct nk_context *ctx, struct nk_window *win,
                 i->mouse.buttons[NK_BUTTON_LEFT].clicked) ? NK_CHART_CLICKED: 0;
             color = g->slots[slot].highlight;
         }
-        nk_fill_rect(out, bounds, 0, color);
+        if (g->slots[slot].show_markers) {
+            nk_fill_rect(out, bounds, 0, color);
+        }
         g->slots[slot].index += 1;
         return ret;
     }
@@ -28752,7 +28759,9 @@ nk_chart_push_line(struct nk_context *ctx, struct nk_window *win,
             color = g->slots[slot].highlight;
         }
     }
-    nk_fill_rect(out, nk_rect(cur.x - 2, cur.y - 2, 4, 4), 0, color);
+    if (g->slots[slot].show_markers) {
+        nk_fill_rect(out, nk_rect(cur.x - 2, cur.y - 2, 4, 4), 0, color);
+    }
 
     /* save current data point position */
     g->slots[slot].last.x = cur.x;
@@ -29982,7 +29991,7 @@ nk_tooltip_begin(struct nk_context *ctx, float width)
     /* make sure that no nonblocking popup is currently active */
     win = ctx->current;
     in = &ctx->input;
-    if (win->popup.win && (win->popup.type & NK_PANEL_SET_NONBLOCK))
+    if (win->popup.win && ((int)win->popup.type & (int)NK_PANEL_SET_NONBLOCK))
         return 0;
 
     w = nk_iceilf(width);
@@ -30123,6 +30132,7 @@ nk_tooltipfv(struct nk_context *ctx, const char *fmt, va_list args)
 ///   - [y]: Minor version with non-breaking API and library changes
 ///   - [z]: Patch version with no direct changes to the API
 ///
+/// - 2024/03/07 (4.12.1) - Fix bitwise operations warnings in C++20
 /// - 2023/11/26 (4.12.0) - Added an alignment option to checkboxes and radio buttons.
 /// - 2023/10/11 (4.11.0) - Added nk_widget_disable_begin() and nk_widget_disable_end()
 /// - 2022/12/23 (4.10.6) - Fix incorrect glyph index in nk_font_bake()
@@ -30269,7 +30279,7 @@ nk_tooltipfv(struct nk_context *ctx, const char *fmt, va_list args)
 ///                        dynamic and static widgets.
 /// - 2016/12/31 (1.30.0) - Extended scrollbar offset from 16-bit to 32-bit.
 /// - 2016/12/31 (1.29.2) - Fixed closing window bug of minimized windows.
-/// - 2016/12/03 (1.29.1) - Fixed wrapped text with no seperator and C89 error.
+/// - 2016/12/03 (1.29.1) - Fixed wrapped text with no separator and C89 error.
 /// - 2016/12/03 (1.29.0) - Changed text wrapping to process words not characters.
 /// - 2016/11/22 (1.28.6) - Fixed window minimized closing bug.
 /// - 2016/11/19 (1.28.5) - Fixed abstract combo box closing behavior.
@@ -30407,7 +30417,7 @@ nk_tooltipfv(struct nk_context *ctx, const char *fmt, va_list args)
 ///                        precision.
 /// - 2016/08/08 (1.07.2) - Fixed compiling error without define `NK_INCLUDE_FIXED_TYPE`.
 /// - 2016/08/08 (1.07.1) - Fixed possible floating point error inside `nk_widget` leading
-///                        to wrong wiget width calculation which results in widgets falsely
+///                        to wrong widget width calculation which results in widgets falsely
 ///                        becoming tagged as not inside window and cannot be accessed.
 /// - 2016/08/08 (1.07.0) - Nuklear now differentiates between hiding a window (NK_WINDOW_HIDDEN) and
 ///                        closing a window (NK_WINDOW_CLOSED). A window can be hidden/shown
