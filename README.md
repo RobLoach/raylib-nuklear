@@ -97,7 +97,7 @@ See the [Nuklear API documenation](https://immediate-mode-ui.github.io/Nuklear/d
 
 ## Comparision
 
-There are a few other graphical user interface solutions out there for use with raylib. While every project's needs differ, this aims to compare and contrast each one. In general, however, if you're unsure which GUI to use, use raygui.
+There are a few other graphical user interface solutions out there for use with raylib. While every project's needs differ, this aims to compare and contrast each one. In general, however, if you're unsure which GUI to use with raylib, use [raygui](https://github.com/raysan5/raygui).
 
 ### Nuklear
 
@@ -114,7 +114,7 @@ There are a few other graphical user interface solutions out there for use with 
 #### Cons
 
 - Larger code size, which can result in slower compile time
-- Slightly more complex API than raygui
+- More complex API than raygui
 
 ### raygui
 
@@ -131,7 +131,7 @@ There are a few other graphical user interface solutions out there for use with 
 #### Cons
 
 - No automatic layouts
-- No documentation
+- Lacks some documentation
 - Not many advanced controls
 
 ### ImGui
@@ -143,6 +143,7 @@ There are a few other graphical user interface solutions out there for use with 
 - Pretty much an industry standard
 - Lots of advanced controls
 - Automatic layouts
+- Large community
 
 #### Cons
 
