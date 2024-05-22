@@ -448,7 +448,7 @@ DrawNuklear(struct nk_context * ctx)
                     rect.y += ((float) r->line_thickness) * scale + 1.0;
                     rect.width = NK_MAX(rect.width - (2 * ((float) r->line_thickness) * scale + 1.0), 0.0);
                     rect.height = NK_MAX(rect.height - (2 * ((float) r->line_thickness) * scale + 1.0), 0.0);
-                    DrawRectangleRoundedLines(rect, roundness, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, (float)r->line_thickness * scale, color);
+                    DrawRectangleRoundedLinesEx(rect, roundness, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, (float)r->line_thickness * scale, color);
                 }
                 else {
                     DrawRectangleLinesEx(rect, r->line_thickness * scale, color);
