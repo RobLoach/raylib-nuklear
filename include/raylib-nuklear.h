@@ -439,15 +439,15 @@ DrawNuklear(struct nk_context * ctx)
                 Rectangle rect = {(float)r->x * scale, (float)r->y * scale, (float)r->w * scale, (float)r->h * scale};
                 float roundness = (rect.width > rect.height) ?
                         ((2 * r->rounding * scale)/rect.height) : ((2 * r->rounding * scale)/rect.width);
-                roundness = NK_CLAMP(0.0, roundness, 1.0);
+                roundness = NK_CLAMP(0.0f, roundness, 1.0f);
                 if (roundness > 0.0f) {
                     // DrawRectangleRoundedLines doesn't work in the same way as DrawRectangleLinesEx and it draws
                     // the outline outside the region defined by the rectangle. To compensate for that, shrink
                     // the rectangle by the thickness plus 1 (due to inconsistencies from DrawRectangleRoundedLines):
-                    rect.x += ((float) r->line_thickness) * scale + 1.0;
-                    rect.y += ((float) r->line_thickness) * scale + 1.0;
-                    rect.width = NK_MAX(rect.width - (2 * ((float) r->line_thickness) * scale + 1.0), 0.0);
-                    rect.height = NK_MAX(rect.height - (2 * ((float) r->line_thickness) * scale + 1.0), 0.0);
+                    rect.x += ((float) r->line_thickness) * scale + 1.0f;
+                    rect.y += ((float) r->line_thickness) * scale + 1.0f;
+                    rect.width = NK_MAX(rect.width - (2 * ((float) r->line_thickness) * scale + 1.0f), 0.0f);
+                    rect.height = NK_MAX(rect.height - (2 * ((float) r->line_thickness) * scale + 1.0f), 0.0f);
 #if RAYLIB_VERSION_MAJOR >= 5 && RAYLIB_VERSION_MINOR == 0
                     DrawRectangleRoundedLines(rect, roundness, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, (float)r->line_thickness * scale, color);
 #else
@@ -465,7 +465,7 @@ DrawNuklear(struct nk_context * ctx)
                 Rectangle rect = {(float)r->x * scale, (float)r->y * scale, (float)r->w * scale, (float)r->h * scale};
                 float roundness = (rect.width > rect.height) ?
                         ((2 * r->rounding * scale)/rect.height) : ((2 * r->rounding * scale)/rect.width);
-                roundness = NK_CLAMP(0.0, roundness, 1.0);
+                roundness = NK_CLAMP(0.0f, roundness, 1.0f);
                 if (roundness > 0.0f) {
                     DrawRectangleRounded(rect, roundness, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
                 }
