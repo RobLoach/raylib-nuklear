@@ -39,20 +39,14 @@
 #include "raylib.h"
 
 // Nuklear defines
-
-#define NK_INCLUDE_STANDARD_VARARGS
-#define NK_INCLUDE_COMMAND_USERDATA
-// TODO: Replace NK_INCLUDE_DEFAULT_ALLOCATOR with MemAlloc() and MemFree()
-#define NK_INCLUDE_DEFAULT_ALLOCATOR
-#define NK_INCLUDE_COMMAND_USERDATA
-#define NK_INCLUDE_STANDARD_BOOL
-
-#ifndef NK_INCLUDE_FIXED_TYPES
 #define NK_INCLUDE_FIXED_TYPES
-#endif  // NK_INCLUDE_FIXED_TYPES
+#define NK_INCLUDE_STANDARD_VARARGS
+#define NK_INCLUDE_STANDARD_BOOL
+#define NK_INCLUDE_COMMAND_USERDATA
+#define NK_KEYSTATE_BASED_INPUT
 
 #ifndef NK_ASSERT
-#define NK_ASSERT(condition) do { if (!(condition)) { TraceLog(LOG_WARNING, "NUKLEAR: Failed assert \"%s\" (%s:%i)", #condition, "nuklear.h", __LINE__); }} while (0)
+#define NK_ASSERT(condition) do { if (!(condition)) { TraceLog(LOG_ERROR, "NUKLEAR: Failed assert \"%s\" (%s:%i)", #condition, "nuklear.h", __LINE__); }} while (0)
 #endif  // NK_ASSERT
 
 #include "nuklear.h"
@@ -81,6 +75,17 @@ NK_API void CleanupNuklearImage(struct nk_image img);               // Frees the
 NK_API void SetNuklearScaling(struct nk_context * ctx, float scaling); // Sets the scaling for the given Nuklear context
 NK_API float GetNuklearScaling(struct nk_context * ctx);            // Retrieves the scaling of the given Nuklear context
 
+// Internal Nuklear functions
+NK_API float nk_raylib_font_get_text_width(nk_handle handle, float height, const char *text, int len);
+NK_API float nk_raylib_font_get_text_width_user_font(nk_handle handle, float height, const char *text, int len);
+NK_API void nk_raylib_clipboard_paste(nk_handle usr, struct nk_text_edit *edit);
+NK_API void nk_raylib_clipboard_copy(nk_handle usr, const char *text, int len);
+NK_LIB void* nk_raylib_malloc(nk_handle unused, void *old, nk_size size);
+NK_LIB void nk_raylib_mfree(nk_handle unused, void *ptr);
+NK_API struct nk_context* InitNuklearContext(struct nk_user_font* userFont);
+NK_API void nk_raylib_input_keyboard(struct nk_context * ctx);
+NK_API void nk_raylib_input_mouse(struct nk_context * ctx);
+
 #ifdef __cplusplus
 }
 #endif
@@ -90,6 +95,8 @@ NK_API float GetNuklearScaling(struct nk_context * ctx);            // Retrieves
 #ifdef RAYLIB_NUKLEAR_IMPLEMENTATION
 #ifndef RAYLIB_NUKLEAR_IMPLEMENTATION_ONCE
 #define RAYLIB_NUKLEAR_IMPLEMENTATION_ONCE
+
+#include <stddef.h> // NULL
 
 // Math
 #ifndef NK_COS
@@ -103,7 +110,6 @@ NK_API float GetNuklearScaling(struct nk_context * ctx);            // Retrieves
 #endif  // NK_INV_SQRT
 
 #define NK_IMPLEMENTATION
-#define NK_KEYSTATE_BASED_INPUT
 #include "nuklear.h"
 
 #ifdef __cplusplus
@@ -134,7 +140,7 @@ extern "C" {
  * The user data that's leverages internally through Nuklear.
  */
 typedef struct NuklearUserData {
-    float scaling;
+    float scaling; // The scaling of the Nuklear user interface.
 } NuklearUserData;
 
 /**
@@ -209,6 +215,29 @@ nk_raylib_clipboard_copy(nk_handle usr, const char *text, int len)
 }
 
 /**
+ * Nuklear callback; Allocate memory for Nuklear.
+ *
+ * @internal
+ */
+NK_LIB void*
+nk_raylib_malloc(nk_handle unused, void *old, nk_size size)
+{
+    NK_UNUSED(unused);
+    NK_UNUSED(old);
+    return MemAlloc((unsigned int)size);
+}
+
+/**
+ * Nuklear callback; Free memory for Nuklear.
+ */
+NK_LIB void
+nk_raylib_mfree(nk_handle unused, void *ptr)
+{
+    NK_UNUSED(unused);
+    MemFree(ptr);
+}
+
+/**
  * Initialize the Nuklear context for use with Raylib, with the given Nuklear user font.
  *
  * @param userFont The Nuklear user font to initialize the Nuklear context with.
@@ -219,16 +248,34 @@ NK_API struct nk_context*
 InitNuklearContext(struct nk_user_font* userFont)
 {
     struct nk_context* ctx = (struct nk_context*)MemAlloc(sizeof(struct nk_context));
+    if (ctx == NULL) {
+        TraceLog(LOG_ERROR, "NUKLEAR: Failed to initialize nuklear memory");
+        return NULL;
+    }
+
     struct NuklearUserData* userData = (struct NuklearUserData*)MemAlloc(sizeof(struct NuklearUserData));
+    if (userData == NULL) {
+        TraceLog(LOG_ERROR, "NUKLEAR: Failed to initialize nuklear user data");
+        MemFree(ctx);
+        return NULL;
+    }
 
     // Clipboard
     ctx->clip.copy = nk_raylib_clipboard_copy;
     ctx->clip.paste = nk_raylib_clipboard_paste;
     ctx->clip.userdata = nk_handle_ptr(0);
 
-    // Create the nuklear environment.
-    if (nk_init_default(ctx, userFont) == 0) {
+    // Allocator
+    struct nk_allocator alloc;
+    alloc.userdata = nk_handle_ptr(0);
+    alloc.alloc = nk_raylib_malloc;
+    alloc.free = nk_raylib_mfree;
+
+    // Initialize the context.
+    if (!nk_init(ctx, &alloc, userFont)) {
         TraceLog(LOG_ERROR, "NUKLEAR: Failed to initialize nuklear");
+        MemFree(ctx);
+        MemFree(userData);
         return NULL;
     }
 
@@ -616,7 +663,8 @@ DrawNuklear(struct nk_context * ctx)
  *
  * @internal
  */
-NK_API void nk_raylib_input_keyboard(struct nk_context * ctx)
+NK_API void
+nk_raylib_input_keyboard(struct nk_context * ctx)
 {
     bool control = IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL);
     bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
@@ -728,7 +776,8 @@ NK_API void nk_raylib_input_keyboard(struct nk_context * ctx)
  *
  * @internal
  */
-NK_API void nk_raylib_input_mouse(struct nk_context * ctx)
+NK_API void
+nk_raylib_input_mouse(struct nk_context * ctx)
 {
     const float scale = GetNuklearScaling(ctx);
     const int mouseX = (int)((float)GetMouseX() / scale);
@@ -837,7 +886,8 @@ nk_rect RectangleToNuklear(struct nk_context* ctx, Rectangle rect)
 /**
  * Convert the given raylib texture to a Nuklear image
  */
-NK_API struct nk_image TextureToNuklear(Texture tex)
+NK_API struct nk_image
+TextureToNuklear(Texture tex)
 {
 	// Declare the img to store data and allocate memory
 	// For the texture
@@ -868,7 +918,8 @@ NK_API struct nk_image TextureToNuklear(Texture tex)
 /**
  * Convert the given Nuklear image to a raylib Texture
  */
-NK_API struct Texture TextureFromNuklear(struct nk_image img)
+NK_API struct Texture
+TextureFromNuklear(struct nk_image img)
 {
 	// Declare texture for storage
 	// And get back the stored texture
@@ -890,7 +941,8 @@ NK_API struct Texture TextureFromNuklear(struct nk_image img)
  *
  * @param path The path to the image
  */
-NK_API struct nk_image LoadNuklearImage(const char* path)
+NK_API struct nk_image
+LoadNuklearImage(const char* path)
 {
 	return TextureToNuklear(LoadTexture(path));
 }
@@ -900,7 +952,8 @@ NK_API struct nk_image LoadNuklearImage(const char* path)
  *
  * @param img The Nuklear image to unload
  */
-NK_API void UnloadNuklearImage(struct nk_image img)
+NK_API void
+UnloadNuklearImage(struct nk_image img)
 {
 	Texture tex = TextureFromNuklear(img);
 	UnloadTexture(tex);
@@ -913,7 +966,8 @@ NK_API void UnloadNuklearImage(struct nk_image img)
  *
  * @param img The Nuklear image to cleanup
 */
-NK_API void CleanupNuklearImage(struct nk_image img)
+NK_API void
+CleanupNuklearImage(struct nk_image img)
 {
     MemFree(img.handle.ptr);
 }
@@ -924,7 +978,8 @@ NK_API void CleanupNuklearImage(struct nk_image img)
  * @param ctx The nuklear context.
  * @param scaling How much scale to apply to the graphical user interface.
  */
-NK_API void SetNuklearScaling(struct nk_context * ctx, float scaling)
+NK_API void
+SetNuklearScaling(struct nk_context * ctx, float scaling)
 {
     if (ctx == NULL) {
         return;
@@ -946,7 +1001,8 @@ NK_API void SetNuklearScaling(struct nk_context * ctx, float scaling)
  *
  * @return The scale value that had been set for the Nuklear context. 1.0f is the default scale value.
  */
-NK_API float GetNuklearScaling(struct nk_context * ctx)
+NK_API float
+GetNuklearScaling(struct nk_context * ctx)
 {
     if (ctx == NULL) {
         return 1.0f;
