@@ -1,11 +1,19 @@
 #ifndef RAYLIB_NUKLEAR_FONT_H
 #define RAYLIB_NUKLEAR_FONT_H
 
+#ifndef RAYLIB_NUKLEAR_DEFAULT_FONT_SIZE
 /**
  * ProggyClean Nuklear Default Font byte size.
 */
 #define RAYLIB_NUKLEAR_DEFAULT_FONT_SIZE 41208
+#endif
+
+#ifndef RAYLIB_NUKLEAR_DEFAULT_FONT_NAME
+/**
+ * The name of the variable to use for the default font.
+ */
 #define RAYLIB_NUKLEAR_DEFAULT_FONT_NAME RaylibNuklearFont
+#endif
 
 #endif
 

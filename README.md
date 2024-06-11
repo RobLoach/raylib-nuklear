@@ -72,8 +72,9 @@ int main() {
 ## API
 
 ``` c
-struct nk_context* InitNuklear(int fontSize);                // Initialize the Nuklear GUI context
+struct nk_context* InitNuklear(int fontSize);                // Initialize the Nuklear GUI context using raylib's font
 struct nk_context* InitNuklearEx(Font font, float fontSize); // Initialize the Nuklear GUI context, with a custom font
+Font LoadFontFromNuklear(int fontSize);                      // Loads the default Nuklear font
 void UpdateNuklear(struct nk_context * ctx);                 // Update the input state and internal components for Nuklear
 void DrawNuklear(struct nk_context * ctx);                   // Render the Nuklear GUI on the screen
 void UnloadNuklear(struct nk_context * ctx);                 // Deinitialize the Nuklear context
@@ -88,9 +89,8 @@ struct Texture TextureFromNuklear(struct nk_image img);      // Convert a Nuklea
 struct nk_image LoadNuklearImage(const char* path);          // Load a Nuklear image
 void UnloadNuklearImage(struct nk_image img);                // Unload a Nuklear image. And free its data
 void CleanupNuklearImage(struct nk_image img);               // Frees the data stored by the Nuklear image
-void SetNuklearScaling(struct nk_context * ctx, float scaling); // Scale the graphical user interface larger or smaller (1 is the default)
-float GetNuklearScaling(struct nk_context * ctx);            // Retrieves the scale of the given Nuklear context
-Font LoadFontFromNuklear(int size);                          // Loads the default font from Nuklear. Requires RAYLIB_NUKLEAR_INCLUDE_DEFAULT_FONT
+void SetNuklearScaling(struct nk_context * ctx, float scaling); // Sets the scaling for the given Nuklear context
+float GetNuklearScaling(struct nk_context * ctx);            // Retrieves the scaling of the given Nuklear context
 ```
 
 See the [Nuklear API documenation](https://immediate-mode-ui.github.io/Nuklear/doc/nuklear.html) for more how to use Nuklear.
