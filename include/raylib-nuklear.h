@@ -52,7 +52,11 @@
 #endif  // NK_INCLUDE_FIXED_TYPES
 
 #ifndef NK_ASSERT
-#define NK_ASSERT(condition) do { if (!(condition)) { TraceLog(LOG_WARNING, "NUKLEAR: Failed assert \"%s\" (%s:%i)", #condition, "nuklear.h", __LINE__); }} while (0)
+#ifdef NDEBUG
+#define NK_ASSERT(condition) ((void)0)
+#else
+#define NK_ASSERT(condition) do { if (!(condition)) { TraceLog(LOG_ERROR, "NUKLEAR: Failed assert \"%s\" (%s:%i)", #condition, "nuklear.h", __LINE__); }} while (0)
+#endif  // NDEBUG
 #endif  // NK_ASSERT
 
 #include "nuklear.h"
