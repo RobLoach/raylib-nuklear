@@ -444,7 +444,8 @@ ColorToNuklearF(Color color)
 NK_API void
 DrawNuklear(struct nk_context * ctx)
 {
-    if (!ctx) {
+    // Protect against drawing when there's nothing to draw.
+    if (ctx == NULL || k__begin(ctx) == 0) {
         return;
     }
 
