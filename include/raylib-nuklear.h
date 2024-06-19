@@ -444,6 +444,11 @@ ColorToNuklearF(Color color)
 NK_API void
 DrawNuklear(struct nk_context * ctx)
 {
+    // Protect against drawing when there's nothing to draw.
+    if (ctx == NULL || nk__begin(ctx) == 0) {
+        return;
+    }
+
     const struct nk_command *cmd;
     const float scale = GetNuklearScaling(ctx);
 
