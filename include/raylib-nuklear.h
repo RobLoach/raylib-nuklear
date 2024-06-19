@@ -445,7 +445,7 @@ NK_API void
 DrawNuklear(struct nk_context * ctx)
 {
     // Protect against drawing when there's nothing to draw.
-    if (ctx == NULL || k__begin(ctx) == 0) {
+    if (ctx == NULL || nk__begin(ctx) == 0) {
         return;
     }
 
