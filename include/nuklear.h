@@ -524,6 +524,10 @@ enum nk_symbol_type {
     NK_SYMBOL_TRIANGLE_RIGHT,
     NK_SYMBOL_PLUS,
     NK_SYMBOL_MINUS,
+    NK_SYMBOL_TRIANGLE_UP_OUTLINE,
+    NK_SYMBOL_TRIANGLE_DOWN_OUTLINE,
+    NK_SYMBOL_TRIANGLE_LEFT_OUTLINE,
+    NK_SYMBOL_TRIANGLE_RIGHT_OUTLINE,
     NK_SYMBOL_MAX
 };
 /* =============================================================================
@@ -16727,7 +16731,7 @@ nk_font_bake_pack(struct nk_font_baker *baker,
         it = config_iter;
         do {
             struct stbtt_fontinfo *font_info = &baker->build[i++].info;
-            font_info->userdata = alloc;
+            font_info->userdata = (void*)alloc;
 
             if (!stbtt_InitFont(font_info, (const unsigned char*)it->ttf_blob, stbtt_GetFontOffsetForIndex((const unsigned char*)it->ttf_blob, 0)))
                 return nk_false;
@@ -16735,7 +16739,7 @@ nk_font_bake_pack(struct nk_font_baker *baker,
     }
     *height = 0;
     *width = (total_glyph_count > 1000) ? 1024 : 512;
-    stbtt_PackBegin(&baker->spc, 0, (int)*width, (int)max_height, 0, 1, alloc);
+    stbtt_PackBegin(&baker->spc, 0, (int)*width, (int)max_height, 0, 1, (void*)alloc);
     {
         int input_i = 0;
         int range_n = 0;
@@ -19903,7 +19907,7 @@ nk_panel_begin(struct nk_context *ctx, const char *title, enum nk_panel_type pan
                 nk_draw_nine_slice(out, body, &style->window.fixed_background.data.slice, nk_white);
                 break;
             case NK_STYLE_ITEM_COLOR:
-                nk_fill_rect(out, body, 0, style->window.fixed_background.data.color);
+                nk_fill_rect(out, body, style->window.rounding, style->window.fixed_background.data.color);
                 break;
         }
     }
@@ -20099,7 +20103,7 @@ nk_panel_end(struct nk_context *ctx)
                 : (window->bounds.y + window->bounds.h));
         struct nk_rect b = window->bounds;
         b.h = padding_y - window->bounds.y;
-        nk_stroke_rect(out, b, 0, layout->border, border_color);
+        nk_stroke_rect(out, b, style->window.rounding, layout->border, border_color);
     }
 
     /* scaler */
@@ -24079,6 +24083,19 @@ nk_draw_symbol(struct nk_command_buffer *out, enum nk_symbol_type type,
         nk_triangle_from_direction(points, content, 0, 0, heading);
         nk_fill_triangle(out, points[0].x, points[0].y, points[1].x, points[1].y,
             points[2].x, points[2].y, foreground);
+    } break;
+    case NK_SYMBOL_TRIANGLE_UP_OUTLINE:
+    case NK_SYMBOL_TRIANGLE_DOWN_OUTLINE:
+    case NK_SYMBOL_TRIANGLE_LEFT_OUTLINE:
+    case NK_SYMBOL_TRIANGLE_RIGHT_OUTLINE: {
+        enum nk_heading heading;
+        struct nk_vec2 points[3];
+        heading = (type == NK_SYMBOL_TRIANGLE_RIGHT_OUTLINE) ? NK_RIGHT :
+            (type == NK_SYMBOL_TRIANGLE_LEFT_OUTLINE) ? NK_LEFT:
+            (type == NK_SYMBOL_TRIANGLE_UP_OUTLINE) ? NK_UP: NK_DOWN;
+        nk_triangle_from_direction(points, content, 0, 0, heading);
+        nk_stroke_triangle(out, points[0].x, points[0].y, points[1].x, points[1].y,
+            points[2].x, points[2].y, border_width, foreground);
     } break;
     default:
     case NK_SYMBOL_NONE:
