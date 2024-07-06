@@ -543,7 +543,9 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_CIRCLE: {
                 const struct nk_command_circle *c = (const struct nk_command_circle *)cmd;
                 Color color = ColorFromNuklear(c->color);
-                DrawEllipseLines((int)(c->x * scale + c->w * scale / 2.0f), (int)(c->y * scale + c->h * scale / 2.0f), (int)(c->w * scale / 2.0f), (int)(c->h * scale / 2.0f), color);
+                for (unsigned short i = 0; i < c->line_thickness; i++) {
+                    DrawEllipseLines((int)(c->x * scale + c->w * scale / 2.0f), (int)(c->y * scale + c->h * scale / 2.0f), c->w * scale / 2.0f - (float)i / 2.0f, c->h * scale / 2.0f - (float)i / 2.0f, color);
+                }
             } break;
 
             case NK_COMMAND_CIRCLE_FILLED: {
@@ -556,14 +558,14 @@ DrawNuklear(struct nk_context * ctx)
                 const struct nk_command_arc *a = (const struct nk_command_arc*)cmd;
                 Color color = ColorFromNuklear(a->color);
                 Vector2 center = {(float)a->cx, (float)a->cy};
-                DrawRingLines(center, 0, a->r * scale, a->a[0] * RAD2DEG - 45, a->a[1] * RAD2DEG - 45, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
+                DrawRingLines(center, 0, a->r * scale, a->a[0] * RAD2DEG, a->a[1] * RAD2DEG, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
             } break;
 
             case NK_COMMAND_ARC_FILLED: {
                 const struct nk_command_arc_filled *a = (const struct nk_command_arc_filled*)cmd;
                 Color color = ColorFromNuklear(a->color);
                 Vector2 center = {(float)a->cx * scale, (float)a->cy * scale};
-                DrawRing(center, 0, a->r * scale, a->a[0] * RAD2DEG - 45, a->a[1] * RAD2DEG - 45, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
+                DrawRing(center, 0, a->r * scale, a->a[0] * RAD2DEG, a->a[1] * RAD2DEG, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
             } break;
 
             case NK_COMMAND_TRIANGLE: {
@@ -572,6 +574,7 @@ DrawNuklear(struct nk_context * ctx)
                 Vector2 point1 = {(float)t->b.x * scale, (float)t->b.y * scale};
                 Vector2 point2 = {(float)t->a.x * scale, (float)t->a.y * scale};
                 Vector2 point3 = {(float)t->c.x * scale, (float)t->c.y * scale};
+                // TODO: Add line thickness to NK_COMMAND_TRIANGLE
                 DrawTriangleLines(point1, point2, point3, color);
             } break;
 
@@ -585,30 +588,31 @@ DrawNuklear(struct nk_context * ctx)
             } break;
 
             case NK_COMMAND_POLYGON: {
-                // TODO: Confirm Polygon
                 const struct nk_command_polygon *p = (const struct nk_command_polygon*)cmd;
                 Color color = ColorFromNuklear(p->color);
-                struct Vector2* points = (struct Vector2*)MemAlloc(p->point_count * (unsigned short)sizeof(Vector2));
+                struct Vector2* points = (struct Vector2*)MemAlloc((p->point_count + 1) * (unsigned short)sizeof(Vector2));
                 unsigned short i;
                 for (i = 0; i < p->point_count; i++) {
                     points[i].x = p->points[i].x * scale;
                     points[i].y = p->points[i].y * scale;
                 }
-                DrawTriangleStrip(points, p->point_count, color);
+                points[p->point_count] = points[0];
+                DrawLineStrip(points, p->point_count + 1, color);
                 MemFree(points);
             } break;
 
             case NK_COMMAND_POLYGON_FILLED: {
-                // TODO: Polygon filled expects counter clockwise order
+                // TODO: Implement NK_COMMAND_POLYGON_FILLED
                 const struct nk_command_polygon_filled *p = (const struct nk_command_polygon_filled*)cmd;
                 Color color = ColorFromNuklear(p->color);
-                struct Vector2* points = (struct Vector2*)MemAlloc(p->point_count * (unsigned short)sizeof(Vector2));
+                struct Vector2* points = (struct Vector2*)MemAlloc((p->point_count + 1) * (unsigned short)sizeof(Vector2));
                 unsigned short i;
                 for (i = 0; i < p->point_count; i++) {
                     points[i].x = p->points[i].x * scale;
                     points[i].y = p->points[i].y * scale;
                 }
-                DrawTriangleFan(points, p->point_count, color);
+                points[p->point_count] = points[0];
+                DrawLineStrip(points, p->point_count + 1, color);
                 MemFree(points);
             } break;
 
