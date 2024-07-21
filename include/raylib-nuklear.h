@@ -84,8 +84,8 @@ NK_API float nk_raylib_font_get_text_width(nk_handle handle, float height, const
 NK_API float nk_raylib_font_get_text_width_user_font(nk_handle handle, float height, const char *text, int len);
 NK_API void nk_raylib_clipboard_paste(nk_handle usr, struct nk_text_edit *edit);
 NK_API void nk_raylib_clipboard_copy(nk_handle usr, const char *text, int len);
-NK_LIB void* nk_raylib_malloc(nk_handle unused, void *old, nk_size size);
-NK_LIB void nk_raylib_mfree(nk_handle unused, void *ptr);
+NK_API void* nk_raylib_malloc(nk_handle unused, void *old, nk_size size);
+NK_API void nk_raylib_mfree(nk_handle unused, void *ptr);
 NK_API struct nk_context* InitNuklearContext(struct nk_user_font* userFont);
 NK_API void nk_raylib_input_keyboard(struct nk_context * ctx);
 NK_API void nk_raylib_input_mouse(struct nk_context * ctx);
@@ -223,7 +223,7 @@ nk_raylib_clipboard_copy(nk_handle usr, const char *text, int len)
  *
  * @internal
  */
-NK_LIB void*
+NK_API void*
 nk_raylib_malloc(nk_handle unused, void *old, nk_size size)
 {
     NK_UNUSED(unused);
@@ -234,7 +234,7 @@ nk_raylib_malloc(nk_handle unused, void *old, nk_size size)
 /**
  * Nuklear callback; Free memory for Nuklear.
  */
-NK_LIB void
+NK_API void
 nk_raylib_mfree(nk_handle unused, void *ptr)
 {
     NK_UNUSED(unused);
