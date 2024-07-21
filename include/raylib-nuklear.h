@@ -590,7 +590,7 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_POLYGON: {
                 const struct nk_command_polygon *p = (const struct nk_command_polygon*)cmd;
                 Color color = ColorFromNuklear(p->color);
-                struct Vector2* points = (struct Vector2*)MemAlloc((p->point_count + 1) * (unsigned short)sizeof(Vector2));
+                struct Vector2* points = (struct Vector2*)MemAlloc((unsigned int)((size_t)(p->point_count + 1) * sizeof(Vector2)));
                 unsigned short i;
                 for (i = 0; i < p->point_count; i++) {
                     points[i].x = p->points[i].x * scale;
@@ -605,7 +605,7 @@ DrawNuklear(struct nk_context * ctx)
                 // TODO: Implement NK_COMMAND_POLYGON_FILLED
                 const struct nk_command_polygon_filled *p = (const struct nk_command_polygon_filled*)cmd;
                 Color color = ColorFromNuklear(p->color);
-                struct Vector2* points = (struct Vector2*)MemAlloc((p->point_count + 1) * (unsigned short)sizeof(Vector2));
+                struct Vector2* points = (struct Vector2*)MemAlloc((unsigned int)((size_t)(p->point_count + 1) * sizeof(Vector2)));
                 unsigned short i;
                 for (i = 0; i < p->point_count; i++) {
                     points[i].x = p->points[i].x * scale;
