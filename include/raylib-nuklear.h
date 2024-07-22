@@ -214,8 +214,13 @@ NK_API void
 nk_raylib_clipboard_copy(nk_handle usr, const char *text, int len)
 {
     NK_UNUSED(usr);
-    NK_UNUSED(len);
-    SetClipboardText(text);
+    char* trimmedText = (char*)MemAlloc(sizeof(char) * (len+1));
+    if(!trimmedText)
+        return;
+    nk_memcopy(trimmedText, text, len);
+    trimmedText[len] = 0;
+    SetClipboardText(trimmedText);
+    MemFree(trimmedText);
 }
 
 /**
@@ -264,11 +269,6 @@ InitNuklearContext(struct nk_user_font* userFont)
         return NULL;
     }
 
-    // Clipboard
-    ctx->clip.copy = nk_raylib_clipboard_copy;
-    ctx->clip.paste = nk_raylib_clipboard_paste;
-    ctx->clip.userdata = nk_handle_ptr(0);
-
     // Allocator
     struct nk_allocator alloc;
     alloc.userdata = nk_handle_ptr(0);
@@ -282,6 +282,11 @@ InitNuklearContext(struct nk_user_font* userFont)
         MemFree(userData);
         return NULL;
     }
+
+    // Clipboard
+    ctx->clip.copy = nk_raylib_clipboard_copy;
+    ctx->clip.paste = nk_raylib_clipboard_paste;
+    ctx->clip.userdata = nk_handle_ptr(0);
 
     // Set the internal user data.
     userData->scaling = 1.0f;
