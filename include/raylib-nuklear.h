@@ -214,10 +214,10 @@ NK_API void
 nk_raylib_clipboard_copy(nk_handle usr, const char *text, int len)
 {
     NK_UNUSED(usr);
-    char* trimmedText = (char*)MemAlloc(sizeof(char) * (len+1));
+    char* trimmedText = (char*)MemAlloc((unsigned int)(sizeof(char) * (size_t)(len + 1)));
     if(!trimmedText)
         return;
-    nk_memcopy(trimmedText, text, len);
+    nk_memcopy(trimmedText, text, (nk_size)len);
     trimmedText[len] = 0;
     SetClipboardText(trimmedText);
     MemFree(trimmedText);
