@@ -48,7 +48,7 @@
   #define INCLUDE_CALCULATOR
   #define INCLUDE_CANVAS
   #define INCLUDE_OVERVIEW
-  #define INCLUDE_NODE_EDITOR
+  //#define INCLUDE_NODE_EDITOR
 #endif
 
 #ifdef INCLUDE_STYLE
@@ -88,7 +88,9 @@ int main(void) {
     SetTargetFPS(60);
 
     /* GUI */
-    ctx = InitNuklear(0);
+    const int fontSize = 13;
+    Font font = LoadFontFromNuklear(fontSize);
+    ctx = InitNuklear(fontSize);
     bg.r = 0.10f, bg.g = 0.18f, bg.b = 0.24f, bg.a = 1.0f;
 
     /* style.c */
