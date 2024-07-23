@@ -106,6 +106,7 @@ There are a few other graphical user interface solutions out there for use with 
 | Automatic Layouts | :white_check_mark: | :x: | :white_check_mark: |
 | Advanced Controls | :white_check_mark: | :x: | :white_check_mark: |
 | Documentation | :white_check_mark: | :x: | :white_check_mark: |
+| Industry Standard | :x: | :x: | :white_check_mark: |
 | Easy to Use | :x: | :white_check_mark: | :x: |
 
 ## Development
