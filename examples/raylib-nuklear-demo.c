@@ -24,6 +24,7 @@
 //#define NK_INCLUDE_FONT_BAKING
 //#define NK_INCLUDE_DEFAULT_FONT
 #define RAYLIB_NUKLEAR_IMPLEMENTATION
+#define RAYLIB_NUKLEAR_INCLUDE_DEFAULT_FONT
 #include "raylib-nuklear.h"
 
 #define WINDOW_WIDTH 1200
@@ -90,7 +91,7 @@ int main(void) {
     /* GUI */
     const int fontSize = 13;
     Font font = LoadFontFromNuklear(fontSize);
-    ctx = InitNuklear(fontSize);
+    ctx = InitNuklearEx(font, fontSize);
     bg.r = 0.10f, bg.g = 0.18f, bg.b = 0.24f, bg.a = 1.0f;
 
     /* style.c */
