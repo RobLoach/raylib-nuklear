@@ -33,6 +33,9 @@ int main(int argc, char *argv[]) {
     // UpdateNuklear()
     UpdateNuklear(ctx);
 
+    // UpdateNuklearEx()
+    UpdateNuklearEx(ctx, 1.0f / 60.0f);
+
     // Nuklear GUI Code
     // https://github.com/Immediate-Mode-UI/Nuklear/wiki/Window
     if (nk_begin(ctx, "Nuklear", nk_rect(50, 50, 400, 400),

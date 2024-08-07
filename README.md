@@ -76,6 +76,7 @@ struct nk_context* InitNuklear(int fontSize);                // Initialize the N
 struct nk_context* InitNuklearEx(Font font, float fontSize); // Initialize the Nuklear GUI context, with a custom font
 Font LoadFontFromNuklear(int fontSize);                      // Loads the default Nuklear font
 void UpdateNuklear(struct nk_context * ctx);                 // Update the input state and internal components for Nuklear
+void UpdateNuklearEx(struct nk_context * ctx, float deltaTime); // Update the input state and internal components for Nuklear, with a custom frame time
 void DrawNuklear(struct nk_context * ctx);                   // Render the Nuklear GUI on the screen
 void UnloadNuklear(struct nk_context * ctx);                 // Deinitialize the Nuklear context
 struct nk_color ColorToNuklear(Color color);                 // Convert a raylib Color to a Nuklear color object

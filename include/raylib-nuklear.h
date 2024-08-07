@@ -63,7 +63,7 @@ NK_API struct nk_context* InitNuklear(int fontSize);                // Initializ
 NK_API struct nk_context* InitNuklearEx(Font font, float fontSize); // Initialize the Nuklear GUI context, with a custom font
 NK_API Font LoadFontFromNuklear(int fontSize);                      // Loads the default Nuklear font
 NK_API void UpdateNuklear(struct nk_context * ctx);                 // Update the input state and internal components for Nuklear
-NK_API void UpdateNuklearCustom(struct nk_context * ctx, float deltaTime); // Update the input state and internal components for Nuklear
+NK_API void UpdateNuklearEx(struct nk_context * ctx, float deltaTime); // Update the input state and internal components for Nuklear, with a custom frame time
 NK_API void DrawNuklear(struct nk_context * ctx);                   // Render the Nuklear GUI on the screen
 NK_API void UnloadNuklear(struct nk_context * ctx);                 // Deinitialize the Nuklear context
 NK_API struct nk_color ColorToNuklear(Color color);                 // Convert a raylib Color to a Nuklear color object
@@ -847,19 +847,10 @@ nk_raylib_input_mouse(struct nk_context * ctx)
  *
  * @param ctx The nuklear context to act upon.
  */
-NK_API void
+NK_API inline void
 UpdateNuklear(struct nk_context * ctx)
 {
-    // Update the time that has changed since last frame.
-    ctx->delta_time_seconds = GetFrameTime();
-
-    // Update the input state.
-    nk_input_begin(ctx);
-    {
-        nk_raylib_input_mouse(ctx);
-        nk_raylib_input_keyboard(ctx);
-    }
-    nk_input_end(ctx);
+    UpdateNuklearEx(ctx, GetFrameTime());
 }
 
 /**
@@ -869,7 +860,7 @@ UpdateNuklear(struct nk_context * ctx)
  * @param deltaTime Time in seconds since last frame.
  */
 NK_API void
-UpdateNuklearCustom(struct nk_context * ctx, float deltaTime)
+UpdateNuklearEx(struct nk_context * ctx, float deltaTime)
 {
     // Update the time that has changed since last frame.
     ctx->delta_time_seconds = deltaTime;
