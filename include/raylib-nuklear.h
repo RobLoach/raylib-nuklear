@@ -102,6 +102,7 @@ NK_API void nk_raylib_input_mouse(struct nk_context * ctx);
 #define RAYLIB_NUKLEAR_IMPLEMENTATION_ONCE
 
 #include <stddef.h> // NULL
+#include <math.h> // cosf, sinf, sqrtf
 
 // Math
 #ifndef NK_COS
