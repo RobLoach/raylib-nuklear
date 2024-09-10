@@ -474,32 +474,25 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_LINE: {
                 const struct nk_command_line *l = (const struct nk_command_line *)cmd;
                 Color color = ColorFromNuklear(l->color);
-                Vector2 startPos = {(float)l->begin.x * scale, (float)l->begin.y * scale};
-                Vector2 endPos = {(float)l->end.x * scale, (float)l->end.y * scale};
+                Vector2 startPos = CLITERAL(Vector2) {(float)l->begin.x * scale, (float)l->begin.y * scale};
+                Vector2 endPos = CLITERAL(Vector2) {(float)l->end.x * scale, (float)l->end.y * scale};
                 DrawLineEx(startPos, endPos, l->line_thickness * scale, color);
             } break;
 
             case NK_COMMAND_CURVE: {
                 const struct nk_command_curve *q = (const struct nk_command_curve *)cmd;
                 Color color = ColorFromNuklear(q->color);
-                // Vector2 start = {(float)q->begin.x, (float)q->begin.y};
-                Vector2 start = {(float)q->begin.x * scale, (float)q->begin.y * scale};
-                // Vector2 controlPoint1 = (Vector2){q->ctrl[0].x, q->ctrl[0].y};
-                // Vector2 controlPoint2 = (Vector2){q->ctrl[1].x, q->ctrl[1].y};
-                // Vector2 end = {(float)q->end.x, (float)q->end.y};
-                Vector2 end = {(float)q->end.x * scale, (float)q->end.y * scale};
-                // TODO: Encorporate segmented control point bezier curve?
-                // DrawLineBezier(start, controlPoint1, (float)q->line_thickness, color);
-                // DrawLineBezier(controlPoint1, controlPoint2, (float)q->line_thickness, color);
-                // DrawLineBezier(controlPoint2, end, (float)q->line_thickness, color);
-                // DrawLineBezier(start, end, (float)q->line_thickness, color);
-                DrawLineBezier(start, end, (float)q->line_thickness * scale, color);
+                Vector2 begin = CLITERAL(Vector2) {(float)q->begin.x * scale, (float)q->begin.y * scale};
+                Vector2 controlPoint1 = CLITERAL(Vector2) {(float)q->ctrl[0].x * scale, (float)q->ctrl[0].y * scale};
+                Vector2 controlPoint2 = CLITERAL(Vector2) {(float)q->ctrl[1].x * scale, (float)q->ctrl[1].y * scale};
+                Vector2 end = CLITERAL(Vector2) {(float)q->end.x * scale, (float)q->end.y * scale};
+                DrawSplineSegmentBezierCubic(begin, controlPoint1, controlPoint2, end, (float)q->line_thickness * scale, color);
             } break;
 
             case NK_COMMAND_RECT: {
                 const struct nk_command_rect *r = (const struct nk_command_rect *)cmd;
                 Color color = ColorFromNuklear(r->color);
-                Rectangle rect = {(float)r->x * scale, (float)r->y * scale, (float)r->w * scale, (float)r->h * scale};
+                Rectangle rect = CLITERAL(Rectangle) {(float)r->x * scale, (float)r->y * scale, (float)r->w * scale, (float)r->h * scale};
                 float roundness = (rect.width > rect.height) ?
                         ((2 * r->rounding * scale)/rect.height) : ((2 * r->rounding * scale)/rect.width);
                 roundness = NK_CLAMP(0.0f, roundness, 1.0f);
@@ -525,7 +518,7 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_RECT_FILLED: {
                 const struct nk_command_rect_filled *r = (const struct nk_command_rect_filled *)cmd;
                 Color color = ColorFromNuklear(r->color);
-                Rectangle rect = {(float)r->x * scale, (float)r->y * scale, (float)r->w * scale, (float)r->h * scale};
+                Rectangle rect = CLITERAL(Rectangle) {(float)r->x * scale, (float)r->y * scale, (float)r->w * scale, (float)r->h * scale};
                 float roundness = (rect.width > rect.height) ?
                         ((2 * r->rounding * scale)/rect.height) : ((2 * r->rounding * scale)/rect.width);
                 roundness = NK_CLAMP(0.0f, roundness, 1.0f);
@@ -564,33 +557,37 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_ARC: {
                 const struct nk_command_arc *a = (const struct nk_command_arc*)cmd;
                 Color color = ColorFromNuklear(a->color);
-                Vector2 center = {(float)a->cx, (float)a->cy};
+                Vector2 center = CLITERAL(Vector2) {(float)a->cx, (float)a->cy};
                 DrawRingLines(center, 0, a->r * scale, a->a[0] * RAD2DEG, a->a[1] * RAD2DEG, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
             } break;
 
             case NK_COMMAND_ARC_FILLED: {
                 const struct nk_command_arc_filled *a = (const struct nk_command_arc_filled*)cmd;
                 Color color = ColorFromNuklear(a->color);
-                Vector2 center = {(float)a->cx * scale, (float)a->cy * scale};
+                Vector2 center = CLITERAL(Vector2) {(float)a->cx * scale, (float)a->cy * scale};
                 DrawRing(center, 0, a->r * scale, a->a[0] * RAD2DEG, a->a[1] * RAD2DEG, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
             } break;
 
             case NK_COMMAND_TRIANGLE: {
                 const struct nk_command_triangle *t = (const struct nk_command_triangle*)cmd;
                 Color color = ColorFromNuklear(t->color);
-                Vector2 point1 = {(float)t->b.x * scale, (float)t->b.y * scale};
-                Vector2 point2 = {(float)t->a.x * scale, (float)t->a.y * scale};
-                Vector2 point3 = {(float)t->c.x * scale, (float)t->c.y * scale};
-                // TODO: Add line thickness to NK_COMMAND_TRIANGLE
+                Vector2 point1 = CLITERAL(Vector2) {(float)t->b.x * scale, (float)t->b.y * scale};
+                Vector2 point2 = CLITERAL(Vector2) {(float)t->a.x * scale, (float)t->a.y * scale};
+                Vector2 point3 = CLITERAL(Vector2) {(float)t->c.x * scale, (float)t->c.y * scale};
+
+                // DrawLineEx(point1, point2, t->line_thickness * scale, color);
+                // DrawLineEx(point2, point3, t->line_thickness * scale, color);
+                // DrawLineEx(point3, point1, t->line_thickness * scale, color);
+                // TODO: Add line thickness to DrawTriangleLines(), maybe via a DrawTriangleLinesEx()?
                 DrawTriangleLines(point1, point2, point3, color);
             } break;
 
             case NK_COMMAND_TRIANGLE_FILLED: {
                 const struct nk_command_triangle_filled *t = (const struct nk_command_triangle_filled*)cmd;
                 Color color = ColorFromNuklear(t->color);
-                Vector2 point1 = {(float)t->b.x * scale, (float)t->b.y * scale};
-                Vector2 point2 = {(float)t->a.x * scale, (float)t->a.y * scale};
-                Vector2 point3 = {(float)t->c.x * scale, (float)t->c.y * scale};
+                Vector2 point1 = CLITERAL(Vector2) {(float)t->b.x * scale, (float)t->b.y * scale};
+                Vector2 point2 = CLITERAL(Vector2) {(float)t->a.x * scale, (float)t->a.y * scale};
+                Vector2 point3 = CLITERAL(Vector2) {(float)t->c.x * scale, (float)t->c.y * scale};
                 DrawTriangle(point1, point2, point3, color);
             } break;
 
@@ -613,8 +610,7 @@ DrawNuklear(struct nk_context * ctx)
                 const struct nk_command_polygon_filled *p = (const struct nk_command_polygon_filled*)cmd;
                 Color color = ColorFromNuklear(p->color);
                 struct Vector2* points = (struct Vector2*)MemAlloc((unsigned int)((size_t)(p->point_count + 1) * sizeof(Vector2)));
-                unsigned short i;
-                for (i = 0; i < p->point_count; i++) {
+                for (unsigned short i = 0; i < p->point_count; i++) {
                     points[i].x = p->points[i].x * scale;
                     points[i].y = p->points[i].y * scale;
                 }
@@ -624,17 +620,13 @@ DrawNuklear(struct nk_context * ctx)
             } break;
 
             case NK_COMMAND_POLYLINE: {
-                // TODO: Polygon expects counter clockwise order
                 const struct nk_command_polyline *p = (const struct nk_command_polyline *)cmd;
                 Color color = ColorFromNuklear(p->color);
-                struct Vector2* points = (struct Vector2*)MemAlloc(p->point_count * (unsigned short)sizeof(Vector2));
-                unsigned short i;
-                for (i = 0; i < p->point_count; i++) {
-                    points[i].x = p->points[i].x * scale;
-                    points[i].y = p->points[i].y * scale;
+                for (unsigned short i = 0; i < p->point_count - 1; i++) {
+                    Vector2 start = {(float)p->points[i].x * scale, (float)p->points[i].y * scale};
+                    Vector2 end = {(float)p->points[i + 1].x * scale, (float)p->points[i + 1].y * scale};
+                    DrawLineEx(start, end, p->line_thickness * scale, color);
                 }
-                DrawTriangleStrip(points, p->point_count, color);
-                MemFree(points);
             } break;
 
             case NK_COMMAND_TEXT: {
@@ -654,9 +646,9 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_IMAGE: {
                 const struct nk_command_image *i = (const struct nk_command_image *)cmd;
                 Texture texture = *(Texture*)i->img.handle.ptr;
-                Rectangle source = {i->img.region[0], i->img.region[1], (float)i->img.region[2], (float)i->img.region[3]};
-                Rectangle dest = {(float)i->x * scale, (float)i->y * scale, (float)i->w * scale, (float)i->h * scale};
-                Vector2 origin = {0, 0};
+                Rectangle source = CLITERAL(Rectangle) {i->img.region[0], i->img.region[1], (float)i->img.region[2], (float)i->img.region[3]};
+                Rectangle dest = CLITERAL(Rectangle) {(float)i->x * scale, (float)i->y * scale, (float)i->w * scale, (float)i->h * scale};
+                Vector2 origin = CLITERAL(Vector2) {0, 0};
                 Color tint = ColorFromNuklear(i->col);
                 DrawTexturePro(texture, source, dest, origin, 0, tint);
             } break;
