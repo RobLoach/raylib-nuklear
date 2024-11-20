@@ -3,12 +3,12 @@
 *   raylib-assert - Assertion library for raylib.
 *   https://github.com/robloach/raylib-assert
 *
-*   Version: v2.0.0
+*   Version: v3.0.0
 *
 *   Copyright 2023 Rob Loach (@RobLoach)
 *
 *   DEPENDENCIES:
-*       raylib 4.5+ https://www.raylib.com
+*       raylib 5.5+ https://www.raylib.com
 *
 *   LICENSE: zlib/libpng
 *
@@ -201,6 +201,19 @@ extern "C" {
  */
 #define AssertVector2Same(...) RAYLIB_ASSERT_VA_SELECT(AssertVector2Same, __VA_ARGS__)
 
+/**
+ * Assert whether two Vector3s are the same.
+ *
+ * @param vector1 The first Vector3 to check.
+ * @param vector2 The second Vector3 to check.
+ * @param message (Optional) The message to provide on failed assertions.
+ * @param p1 (Optional) The first parameter in the message.
+ * @param p2 (Optional) The second parameter in the message.
+ * @param p3 (Optional) The third parameter in the message.
+ * @param p4 (Optional) The fourth parameter in the message.
+ */
+#define AssertVector3Same(...) RAYLIB_ASSERT_VA_SELECT(AssertVector3Same, __VA_ARGS__)
+
 // Assert()
 #ifdef RAYLIB_ASSERT_NDEBUG
 #define Assert_0()
@@ -275,21 +288,21 @@ extern "C" {
 
 // AssertImage()
 #define AssertImage_0() AssertFail_1("No image provided for AssertImage()")
-#define AssertImage_1(image) Assert_3(IsImageReady(image), "AssertImage(%s) - Image not loaded", #image)
-#define AssertImage_2(image, message) Assert_2(IsImageReady(image), message)
-#define AssertImage_3(image, message, p1) Assert_3(IsImageReady(image), message, p1)
-#define AssertImage_4(image, message, p1, p2) Assert_4(IsImageReady(image), message, p1, p2)
-#define AssertImage_5(image, message, p1, p2, p3) Assert_5(IsImageReady(image), message, p1, p2, p3)
-#define AssertImage_6(image, message, p1, p2, p3, p4) Assert_6(IsImageReady(image), message, p1, p2, p3, p4)
+#define AssertImage_1(image) Assert_3(IsImageValid(image), "AssertImage(%s) - Image not loaded", #image)
+#define AssertImage_2(image, message) Assert_2(IsImageValid(image), message)
+#define AssertImage_3(image, message, p1) Assert_3(IsImageValid(image), message, p1)
+#define AssertImage_4(image, message, p1, p2) Assert_4(IsImageValid(image), message, p1, p2)
+#define AssertImage_5(image, message, p1, p2, p3) Assert_5(IsImageValid(image), message, p1, p2, p3)
+#define AssertImage_6(image, message, p1, p2, p3, p4) Assert_6(IsImageValid(image), message, p1, p2, p3, p4)
 
 // AssertTexture()
 #define AssertTexture_0() AssertFail_1("No texture provided for AssertTexture()")
-#define AssertTexture_1(texture) Assert_3(IsTextureReady(texture), "AssertTexture(%s) - Texture not loaded", #texture)
-#define AssertTexture_2(texture, message) Assert_2(IsTextureReady(texture), message)
-#define AssertTexture_3(texture, message, p1) Assert_3(IsTextureReady(texture), message, p1)
-#define AssertTexture_4(texture, message, p1, p2) Assert_4(IsTextureReady(texture), message, p1, p2)
-#define AssertTexture_5(texture, message, p1, p2, p3) Assert_5(IsTextureReady(texture), message, p1, p2, p3)
-#define AssertTexture_6(texture, message, p1, p2, p3, p4) Assert_6(IsTextureReady(texture), message, p1, p2, p3, p4)
+#define AssertTexture_1(texture) Assert_3(IsTextureValid(texture), "AssertTexture(%s) - Texture not loaded", #texture)
+#define AssertTexture_2(texture, message) Assert_2(IsTextureValid(texture), message)
+#define AssertTexture_3(texture, message, p1) Assert_3(IsTextureValid(texture), message, p1)
+#define AssertTexture_4(texture, message, p1, p2) Assert_4(IsTextureValid(texture), message, p1, p2)
+#define AssertTexture_5(texture, message, p1, p2, p3) Assert_5(IsTextureValid(texture), message, p1, p2, p3)
+#define AssertTexture_6(texture, message, p1, p2, p3, p4) Assert_6(IsTextureValid(texture), message, p1, p2, p3, p4)
 
 // AssertImageSame()
 #ifdef RAYLIB_ASSERT_NDEBUG
@@ -381,6 +394,31 @@ extern "C" {
 #define AssertVector2Same_5(vector1, vector2, message, p1, p2) AssertVector2Same_3(vector1, vector2, RAYLIB_ASSERT_TEXTFORMAT(message, p1, p2))
 #define AssertVector2Same_6(vector1, vector2, message, p1, p2, p3) AssertVector2Same_3(vector1, vector2, RAYLIB_ASSERT_TEXTFORMAT(message, p1, p2, p3))
 #define AssertVector2Same_7(vector1, vector2, message, p1, p2, p3, p4) AssertVector2Same_3(vector1, vector2, RAYLIB_ASSERT_TEXTFORMAT(message, p1, p2, p3, p4))
+#endif
+
+// AssertVector3Same()
+#ifdef RAYLIB_ASSERT_NDEBUG
+#define AssertVector3Same_0()
+#define AssertVector3Same_1(vector)
+#define AssertVector3Same_2(vector1, vector2)
+#define AssertVector3Same_3(vector1, vector2, message)
+#define AssertVector3Same_4(vector1, vector2, message, p1)
+#define AssertVector3Same_5(vector1, vector2, message, p1, p2)
+#define AssertVector3Same_6(vector1, vector2, message, p1, p2, p3)
+#define AssertVector3Same_7(vector1, vector2, message, p1, p2, p3, p4)
+#else
+#define AssertVector3Same_0() AssertFail_1("Vectors not provided to AssertVector2Same()")
+#define AssertVector3Same_1(vector) AssertFail_1("Expected two vectors for AssertVector2Same()")
+#define AssertVector3Same_2(vector1, vector2) AssertVector3Same_5(vector1, vector2, "AssertVector2Same(%s, %s) - vectors do not match", #vector1, #vector2)
+#define AssertVector3Same_3(vector1, vector2, message) do { \
+    if (vector1.x != vector2.x || vector1.y != vector2.y || vector1.z != vector2.z) { \
+        AssertFail_1(message); \
+    }\
+} while (0)
+#define AssertVector3Same_4(vector1, vector2, message, p1) AssertVector3Same_3(vector1, vector2, RAYLIB_ASSERT_TEXTFORMAT(message, p1))
+#define AssertVector3Same_5(vector1, vector2, message, p1, p2) AssertVector3Same_3(vector1, vector2, RAYLIB_ASSERT_TEXTFORMAT(message, p1, p2))
+#define AssertVector3Same_6(vector1, vector2, message, p1, p2, p3) AssertVector3Same_3(vector1, vector2, RAYLIB_ASSERT_TEXTFORMAT(message, p1, p2, p3))
+#define AssertVector3Same_7(vector1, vector2, message, p1, p2, p3, p4) AssertVector3Same_3(vector1, vector2, RAYLIB_ASSERT_TEXTFORMAT(message, p1, p2, p3, p4))
 #endif
 
 #ifdef __cplusplus
