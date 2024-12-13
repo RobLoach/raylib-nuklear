@@ -170,6 +170,7 @@ nk_raylib_font_get_text_width(nk_handle handle, float height, const char *text, 
         // Grab the text with the cropped length so that it only measures the desired string length.
         const char* subtext = TextSubtext(text, 0, len);
 
+        // Spacing is determined by the font size multiplied by RAYLIB_NUKLEAR_FONT_SPACING_RATIO.
         // Raylib only counts the spacing between characters, but Nuklear expects one spacing to be
         // counter for every character in the string:
         return (float)MeasureText(subtext, (int)height) + height * RAYLIB_NUKLEAR_FONT_SPACING_RATIO;
@@ -190,7 +191,7 @@ nk_raylib_font_get_text_width_user_font(nk_handle handle, float height, const ch
         // Grab the text with the cropped length so that it only measures the desired string length.
         const char* subtext = TextSubtext(text, 0, len);
 
-        // Spacing is determined by the font size divided by 10.
+        // Spacing is determined by the font size multiplied by RAYLIB_NUKLEAR_FONT_SPACING_RATIO.
         // Raylib only counts the spacing between characters, but Nuklear expects one spacing to be
         // counter for every character in the string:
         return MeasureTextEx(*(Font*)handle.ptr, subtext, height, height * RAYLIB_NUKLEAR_FONT_SPACING_RATIO).x + height * RAYLIB_NUKLEAR_FONT_SPACING_RATIO;
