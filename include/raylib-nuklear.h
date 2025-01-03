@@ -778,7 +778,7 @@ nk_raylib_input_mouse(struct nk_context * ctx)
  *
  * @param ctx The nuklear context to act upon.
  */
-NK_API inline void
+NK_API void
 UpdateNuklear(struct nk_context * ctx)
 {
     UpdateNuklearEx(ctx, GetFrameTime());
