@@ -129,6 +129,13 @@ extern "C" {
 #define RAYLIB_NUKLEAR_DEFAULT_FONTSIZE 13
 #endif  // RAYLIB_NUKLEAR_DEFAULT_FONTSIZE
 
+/*
+ * Spacing is determined by the font size multiplied by RAYLIB_NUKLEAR_FONT_SPACING_RATIO.
+ */
+#ifndef RAYLIB_NUKLEAR_FONT_SPACING_RATIO
+#define RAYLIB_NUKLEAR_FONT_SPACING_RATIO 0.01f
+#endif // RAYLIB_NUKLEAR_FONT_SPACING_RATIO
+
 #ifndef RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS
 /**
  * The amount of segments used when drawing an arc.
@@ -163,9 +170,10 @@ nk_raylib_font_get_text_width(nk_handle handle, float height, const char *text, 
         // Grab the text with the cropped length so that it only measures the desired string length.
         const char* subtext = TextSubtext(text, 0, len);
 
+        // Spacing is determined by the font size multiplied by RAYLIB_NUKLEAR_FONT_SPACING_RATIO.
         // Raylib only counts the spacing between characters, but Nuklear expects one spacing to be
         // counter for every character in the string:
-        return (float)MeasureText(subtext, (int)height) + height / 10.0f;
+        return (float)MeasureText(subtext, (int)height) + height * RAYLIB_NUKLEAR_FONT_SPACING_RATIO;
     }
 
     return 0;
@@ -183,10 +191,10 @@ nk_raylib_font_get_text_width_user_font(nk_handle handle, float height, const ch
         // Grab the text with the cropped length so that it only measures the desired string length.
         const char* subtext = TextSubtext(text, 0, len);
 
-        // Spacing is determined by the font size divided by 10.
+        // Spacing is determined by the font size multiplied by RAYLIB_NUKLEAR_FONT_SPACING_RATIO.
         // Raylib only counts the spacing between characters, but Nuklear expects one spacing to be
         // counter for every character in the string:
-        return MeasureTextEx(*(Font*)handle.ptr, subtext, height, height / 10.0f).x + height / 10.0f;
+        return MeasureTextEx(*(Font*)handle.ptr, subtext, height, height * RAYLIB_NUKLEAR_FONT_SPACING_RATIO).x + height * RAYLIB_NUKLEAR_FONT_SPACING_RATIO;
     }
 
     return 0;
@@ -636,7 +644,7 @@ DrawNuklear(struct nk_context * ctx)
                 Font* font = (Font*)text->font->userdata.ptr;
                 if (font != NULL) {
                     Vector2 position = {(float)text->x * scale, (float)text->y * scale};
-                    DrawTextEx(*font, (const char*)text->string, position, fontSize, fontSize / 10.0f, color);
+                    DrawTextEx(*font, (const char*)text->string, position, fontSize, fontSize * RAYLIB_NUKLEAR_FONT_SPACING_RATIO, color);
                 }
                 else {
                     DrawText((const char*)text->string, (int)(text->x * scale), (int)(text->y * scale), (int)fontSize, color);
