@@ -654,7 +654,7 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_IMAGE: {
                 const struct nk_command_image *i = (const struct nk_command_image *)cmd;
                 Texture texture = *(Texture*)i->img.handle.ptr;
-                Rectangle source = CLITERAL(Rectangle) {i->img.region[0], i->img.region[1], (float)i->img.region[2], (float)i->img.region[3]};
+                Rectangle source = CLITERAL(Rectangle) {(float)i->img.region[0], (float)i->img.region[1], (float)i->img.region[2], (float)i->img.region[3]};
                 Rectangle dest = CLITERAL(Rectangle) {(float)i->x * scale, (float)i->y * scale, (float)i->w * scale, (float)i->h * scale};
                 Vector2 origin = CLITERAL(Vector2) {0, 0};
                 Color tint = ColorFromNuklear(i->col);
@@ -718,10 +718,10 @@ nk_raylib_input_keyboard(struct nk_context * ctx)
     for (int i = 0; i < NK_RAYLIB_INPUT_KEYBOARD_CHECK_NUM; i++) {
         struct nk_raylib_input_keyboard_check check = checks[i];
         if (IsKeyDown(check.key) && check.modifier) {
-            nk_input_key(ctx, check.input_key, true);
+            nk_input_key(ctx, (enum nk_keys)check.input_key, true);
             checked = true;
         } else {
-            nk_input_key(ctx, check.input_key, false);
+            nk_input_key(ctx, (enum nk_keys)check.input_key, false);
         }
     }
     #undef NK_RAYLIB_INPUT_KEYBOARD_CHECK_NUM
@@ -749,7 +749,7 @@ nk_raylib_input_keyboard(struct nk_context * ctx)
     // Unicode
     int code;
     while ((code = GetCharPressed()) != 0)
-        nk_input_unicode(ctx, code);
+        nk_input_unicode(ctx, (nk_rune)code);
 }
 
 /**
