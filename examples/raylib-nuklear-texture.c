@@ -42,7 +42,7 @@ int main(void)
 			// Draw the image
 			nk_image(ctx, img);
 		}
-		nk_end(ctx);
+        nk_end(ctx);
 
 		// Draw the GUI
 		BeginDrawing();
