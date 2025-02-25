@@ -1,1 +1,49 @@
-<!doctypehtml><html><head><meta charset=utf-8><meta content="text/html; charset=utf-8"http-equiv=Content-Type><title>raylib-nuklear</title><style>body,html{margin:0;height:100vh;max-width:100vw}body{display:flex;align-items:center;justify-content:center;flex-direction:column;color:#fff;background:#000}#console{overflow:auto}</style></head><body><canvas id=canvas oncontextmenu=event.preventDefault()></canvas><script>window.Module={canvas:document.getElementById("canvas"),print:(...n)=>{const e=document.getElementById("console"),o=n.join(" ");console.log(o),e&&(e.innerText+=o+"\n",e.scrollTop=e.scrollHeight)}}</script><script async src=index.js></script></body></html>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>raylib-nuklear: Demo</title>
+    <meta name="description" content="Use Nuklear GUI within raylib: https://github.com/RobLoach/raylib-nuklear">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="author" content="Rob Loach">
+    <style>
+        html, body  {
+            margin: 0;
+            height: 100vh;
+            max-width: 100vw;
+        }
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
+            background: black;
+        }
+        #console {
+            overflow: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas" oncontextmenu="event.preventDefault()"></canvas>
+    <!-- <pre id="console"></pre> -->
+    <script type='text/javascript'>
+        window.Module = {
+            canvas: document.getElementById('canvas'),
+            print: (...args) => {
+                const consoleElement = document.getElementById('console')
+                const text = args.join(' ')
+                console.log(text);
+                if (consoleElement) {
+                  consoleElement.innerText += text + "\n"
+                  consoleElement.scrollTop = consoleElement.scrollHeight
+                }
+            }
+        }
+    </script>
+   <script async type="text/javascript" src="index.js"></script>
+</body>
+</html>
