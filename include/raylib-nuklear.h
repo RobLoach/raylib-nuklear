@@ -770,8 +770,10 @@ nk_raylib_input_mouse(struct nk_context * ctx)
     nk_input_button(ctx, NK_BUTTON_LEFT, mouseX, mouseY, IsMouseButtonDown(MOUSE_LEFT_BUTTON));
     nk_input_button(ctx, NK_BUTTON_RIGHT, mouseX, mouseY, IsMouseButtonDown(MOUSE_RIGHT_BUTTON));
     nk_input_button(ctx, NK_BUTTON_MIDDLE, mouseX, mouseY, IsMouseButtonDown(MOUSE_MIDDLE_BUTTON));
-    nk_input_button(ctx, NK_BUTTON_X1, mouseX, mouseY, IsMouseButtonDown(MOUSE_BUTTON_BACK));
-    nk_input_button(ctx, NK_BUTTON_X2, mouseX, mouseY, IsMouseButtonDown(MOUSE_BUTTON_FORWARD));
+
+    // Appears raylib mislabels the BACK/FORWARD mouse enums. X1/X2 are SIDE/EXTRA.
+    nk_input_button(ctx, NK_BUTTON_X1, mouseX, mouseY, IsMouseButtonDown(MOUSE_BUTTON_SIDE));
+    nk_input_button(ctx, NK_BUTTON_X2, mouseX, mouseY, IsMouseButtonDown(MOUSE_BUTTON_EXTRA));
 
     // Mouse Wheel
     float mouseWheel = GetMouseWheelMove();
