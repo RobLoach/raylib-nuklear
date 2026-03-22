@@ -129,10 +129,12 @@ extern "C" {
 #define RAYLIB_NUKLEAR_DEFAULT_FONTSIZE 13
 #endif  // RAYLIB_NUKLEAR_DEFAULT_FONTSIZE
 
-/*
- * Spacing is determined by the font size multiplied by RAYLIB_NUKLEAR_FONT_SPACING_RATIO.
- */
 #ifndef RAYLIB_NUKLEAR_FONT_SPACING_RATIO
+/**
+ * For user fonts, spacing is determined by the font size multiplied by RAYLIB_NUKLEAR_FONT_SPACING_RATIO.
+ *
+ * The default font uses raylib's internal spacing logic (fontSize / 10) instead.
+ */
 #define RAYLIB_NUKLEAR_FONT_SPACING_RATIO 0.01f
 #endif // RAYLIB_NUKLEAR_FONT_SPACING_RATIO
 
