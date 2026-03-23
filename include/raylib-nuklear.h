@@ -551,7 +551,7 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_CIRCLE: {
                 const struct nk_command_circle *c = (const struct nk_command_circle *)cmd;
                 Color color = ColorFromNuklear(c->color);
-                for (unsigned short i = 0; i < c->line_thickness; i++) {
+                for (unsigned short i = 0; i < (unsigned short)(c->line_thickness * scale); i++) {
                     DrawEllipseLines((int)(c->x * scale + c->w * scale / 2.0f), (int)(c->y * scale + c->h * scale / 2.0f), c->w * scale / 2.0f - (float)i / 2.0f, c->h * scale / 2.0f - (float)i / 2.0f, color);
                 }
             } break;
@@ -565,7 +565,7 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_ARC: {
                 const struct nk_command_arc *a = (const struct nk_command_arc*)cmd;
                 Color color = ColorFromNuklear(a->color);
-                Vector2 center = CLITERAL(Vector2) {(float)a->cx, (float)a->cy};
+                Vector2 center = CLITERAL(Vector2) {(float)a->cx * scale, (float)a->cy * scale};
                 DrawRingLines(center, 0, a->r * scale, a->a[0] * RAD2DEG, a->a[1] * RAD2DEG, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
             } break;
 

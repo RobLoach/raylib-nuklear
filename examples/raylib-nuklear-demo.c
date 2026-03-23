@@ -85,6 +85,7 @@ void UpdateDrawFrame(void);     // Update and Draw one frame
 int main(void) {
         // Initialization
     //--------------------------------------------------------------------------------------
+    SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "[raylib-nuklear] demo");
     SetTargetFPS(60);
 
@@ -161,6 +162,9 @@ void UpdateDrawFrame(void) {
             nk_combo_end(ctx);
         }
     }
+
+    Vector2 mouse = GetMousePosition();
+    DrawCircle((int)mouse.x, (int)mouse.y, 20, RED);
     nk_end(ctx);
 
     /* -------------- EXAMPLES ---------------- */
