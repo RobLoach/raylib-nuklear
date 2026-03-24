@@ -163,8 +163,6 @@ void UpdateDrawFrame(void) {
         }
     }
 
-    Vector2 mouse = GetMousePosition();
-    DrawCircle((int)mouse.x, (int)mouse.y, 20, RED);
     nk_end(ctx);
 
     /* -------------- EXAMPLES ---------------- */
