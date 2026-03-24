@@ -687,10 +687,36 @@ DrawNuklear(struct nk_context * ctx)
     nk_clear(ctx);
 }
 
+/**
+ * @see nk_raylib_keyboard_checks
+ */
 struct nk_raylib_input_keyboard_check {
     int key;
     int input_key;
-    bool modifier;
+    bool needs_ctrl_cmd; // true = only active when ctrl or command is held
+};
+
+#define NK_RAYLIB_INPUT_KEYBOARD_CHECK_NUM 16
+/**
+ * A map determining the Nuklear to raylib keys.
+ */
+static const struct nk_raylib_input_keyboard_check nk_raylib_keyboard_checks[NK_RAYLIB_INPUT_KEYBOARD_CHECK_NUM] = {
+    {KEY_DELETE,    NK_KEY_DEL,             false},
+    {KEY_ENTER,     NK_KEY_ENTER,           false},
+    {KEY_BACKSPACE, NK_KEY_BACKSPACE,       false},
+    {KEY_C,         NK_KEY_COPY,            true},
+    {KEY_V,         NK_KEY_PASTE,           true},
+    {KEY_B,         NK_KEY_TEXT_LINE_START, true},
+    {KEY_E,         NK_KEY_TEXT_LINE_END,   true},
+    {KEY_Z,         NK_KEY_TEXT_UNDO,       true},
+    {KEY_R,         NK_KEY_TEXT_REDO,       true},
+    {KEY_A,         NK_KEY_TEXT_SELECT_ALL, true},
+    {KEY_LEFT,      NK_KEY_TEXT_WORD_LEFT,  true},
+    {KEY_RIGHT,     NK_KEY_TEXT_WORD_RIGHT, true},
+    {KEY_RIGHT,     NK_KEY_RIGHT,           false},
+    {KEY_LEFT,      NK_KEY_LEFT,            false},
+    {KEY_UP,        NK_KEY_UP,              false},
+    {KEY_DOWN,      NK_KEY_DOWN,            false}
 };
 
 /**
@@ -706,36 +732,16 @@ nk_raylib_input_keyboard(struct nk_context * ctx)
     bool control = IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL);
     bool command = IsKeyDown(KEY_LEFT_SUPER);
     bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
-    #define NK_RAYLIB_INPUT_KEYBOARD_CHECK_NUM 16
-    struct nk_raylib_input_keyboard_check checks[NK_RAYLIB_INPUT_KEYBOARD_CHECK_NUM] = {
-        (struct nk_raylib_input_keyboard_check) {KEY_DELETE, NK_KEY_DEL, true},
-        (struct nk_raylib_input_keyboard_check) {KEY_ENTER, NK_KEY_ENTER, true},
-        (struct nk_raylib_input_keyboard_check) {KEY_BACKSPACE, NK_KEY_BACKSPACE, true},
-        (struct nk_raylib_input_keyboard_check) {KEY_C, NK_KEY_COPY, (control || command)},
-        (struct nk_raylib_input_keyboard_check) {KEY_V, NK_KEY_PASTE, (control || command)},
-        (struct nk_raylib_input_keyboard_check) {KEY_B, NK_KEY_TEXT_LINE_START, (control || command)},
-        (struct nk_raylib_input_keyboard_check) {KEY_E, NK_KEY_TEXT_LINE_END, (control || command)},
-        (struct nk_raylib_input_keyboard_check) {KEY_Z, NK_KEY_TEXT_UNDO, (control || command)},
-        (struct nk_raylib_input_keyboard_check) {KEY_R, NK_KEY_TEXT_REDO, (control || command)},
-        (struct nk_raylib_input_keyboard_check) {KEY_A, NK_KEY_TEXT_SELECT_ALL, (control || command)},
-        (struct nk_raylib_input_keyboard_check) {KEY_LEFT, NK_KEY_TEXT_WORD_LEFT, (control || command)},
-        (struct nk_raylib_input_keyboard_check) {KEY_RIGHT, NK_KEY_TEXT_WORD_RIGHT, (control || command)},
-        (struct nk_raylib_input_keyboard_check) {KEY_RIGHT, NK_KEY_RIGHT, true},
-        (struct nk_raylib_input_keyboard_check) {KEY_LEFT, NK_KEY_LEFT, true},
-        (struct nk_raylib_input_keyboard_check) {KEY_UP, NK_KEY_UP, true},
-        (struct nk_raylib_input_keyboard_check) {KEY_DOWN, NK_KEY_DOWN, true}
-    };
     bool checked = false;
     for (int i = 0; i < NK_RAYLIB_INPUT_KEYBOARD_CHECK_NUM; i++) {
-        struct nk_raylib_input_keyboard_check check = checks[i];
-        if (IsKeyDown(check.key) && check.modifier) {
-            nk_input_key(ctx, (enum nk_keys)check.input_key, true);
+        bool modifier_active = !nk_raylib_keyboard_checks[i].needs_ctrl_cmd || (control || command);
+        if (IsKeyDown(nk_raylib_keyboard_checks[i].key) && modifier_active) {
+            nk_input_key(ctx, (enum nk_keys)nk_raylib_keyboard_checks[i].input_key, true);
             checked = true;
         } else {
-            nk_input_key(ctx, (enum nk_keys)check.input_key, false);
+            nk_input_key(ctx, (enum nk_keys)nk_raylib_keyboard_checks[i].input_key, false);
         }
     }
-    #undef NK_RAYLIB_INPUT_KEYBOARD_CHECK_NUM
 
     nk_input_key(ctx, NK_KEY_SHIFT, shift);
 
@@ -759,8 +765,9 @@ nk_raylib_input_keyboard(struct nk_context * ctx)
 
     // Unicode
     int code;
-    while ((code = GetCharPressed()) != 0)
+    while ((code = GetCharPressed()) != 0) {
         nk_input_unicode(ctx, (nk_rune)code);
+    }
 }
 
 /**
