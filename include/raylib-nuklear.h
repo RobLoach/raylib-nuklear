@@ -129,10 +129,12 @@ extern "C" {
 #define RAYLIB_NUKLEAR_DEFAULT_FONTSIZE 13
 #endif  // RAYLIB_NUKLEAR_DEFAULT_FONTSIZE
 
-/*
- * Spacing is determined by the font size multiplied by RAYLIB_NUKLEAR_FONT_SPACING_RATIO.
- */
 #ifndef RAYLIB_NUKLEAR_FONT_SPACING_RATIO
+/**
+ * For user fonts, spacing is determined by the font size multiplied by RAYLIB_NUKLEAR_FONT_SPACING_RATIO.
+ *
+ * The default font uses raylib's internal spacing logic (fontSize / 10) instead.
+ */
 #define RAYLIB_NUKLEAR_FONT_SPACING_RATIO 0.01f
 #endif // RAYLIB_NUKLEAR_FONT_SPACING_RATIO
 
@@ -167,13 +169,22 @@ nk_raylib_font_get_text_width(nk_handle handle, float height, const char *text, 
     NK_UNUSED(handle);
 
     if (len > 0) {
+        Font font = GetFontDefault();
+        if (font.texture.id == 0) return 0;
+
+        // Match raylib's MeasureText() internal spacing behavior, but use MeasureTextEx()
+        // to avoid int truncation that accumulates errors when measuring character by character.
+        int defaultFontSize = 10;
+        int fontSize = (int)height;
+        if (fontSize < defaultFontSize) fontSize = defaultFontSize;
+        float spacing = (float)(fontSize / defaultFontSize);
+
         // Grab the text with the cropped length so that it only measures the desired string length.
         const char* subtext = TextSubtext(text, 0, len);
 
-        // Spacing is determined by the font size multiplied by RAYLIB_NUKLEAR_FONT_SPACING_RATIO.
-        // Raylib only counts the spacing between characters, but Nuklear expects one spacing to be
-        // counter for every character in the string:
-        return (float)MeasureText(subtext, (int)height) + height * RAYLIB_NUKLEAR_FONT_SPACING_RATIO;
+        // MeasureTextEx adds spacing between characters (len-1 times), but Nuklear expects
+        // one spacing per character, so add one more spacing unit to compensate.
+        return MeasureTextEx(font, subtext, (float)fontSize, spacing).x + spacing;
     }
 
     return 0;
