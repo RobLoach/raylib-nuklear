@@ -5,7 +5,8 @@ if (NOT raylib_FOUND)
         FetchContent_Declare(
         raylib
         GIT_REPOSITORY https://github.com/raysan5/raylib.git
-        GIT_TAG 5.5
+        # TODO: Update to 6.0
+        GIT_TAG 6ef0044381c71d76ba0784e8c98aab28e26b817a
         GIT_SHALLOW 1
     )
     FetchContent_GetProperties(raylib)
