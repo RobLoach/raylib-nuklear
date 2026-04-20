@@ -486,6 +486,87 @@ NuklearImageToTexture(struct nk_image img)
 }
 
 /**
+ * Draw a filled polygon using Nuklear values.
+ *
+ * @see nk_rawfb_fill_polygon()
+ * @see https://github.com/Immediate-Mode-UI/Nuklear/blob/master/demo/rawfb/nuklear_rawfb.h
+ *
+ * @internal
+ * @todo Get a GPU rendered Polygon fill?
+ */
+static void raylib_nuklear_draw_polygon_fill(float scale, const struct nk_vec2i *pnts, int count, Color col) {
+    int i = 0;
+    #ifndef RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS
+    #define RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS 64
+    #endif
+    int left = 10000, top = 10000, bottom = 0, right = 0;
+    int nodes, nodeX[RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS], pixelX, pixelY, j, swap ;
+
+    if (count == 0) return;
+    if (count > RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS)
+        count = RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS;
+
+    /* Build scaled copy of points */
+    int scaled_x[RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS];
+    int scaled_y[RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS];
+    for (i = 0; i < count; i++) {
+        scaled_x[i] = (int)(pnts[i].x * scale);
+        scaled_y[i] = (int)(pnts[i].y * scale);
+    }
+
+    /* Get polygon dimensions */
+    for (i = 0; i < count; i++) {
+        if (left > scaled_x[i])
+            left = scaled_x[i];
+        if (right < scaled_x[i])
+            right = scaled_x[i];
+        if (top > scaled_y[i])
+            top = scaled_y[i];
+        if (bottom < scaled_y[i])
+            bottom = scaled_y[i];
+    } bottom++; right++;
+
+    /* Polygon scanline algorithm released under public-domain by Darel Rex Finley, 2007 */
+    /*  Loop through the rows of the image. */
+    for (pixelY = top; pixelY < bottom; pixelY ++) {
+        nodes = 0; /*  Build a list of nodes. */
+        j = count - 1;
+        for (i = 0; i < count; i++) {
+            if (((scaled_y[i] < pixelY) && (scaled_y[j] >= pixelY)) ||
+                ((scaled_y[j] < pixelY) && (scaled_y[i] >= pixelY))) {
+                nodeX[nodes++]= (int)((float)scaled_x[i]
+                     + ((float)pixelY - (float)scaled_y[i]) / ((float)scaled_y[j] - (float)scaled_y[i])
+                     * ((float)scaled_x[j] - (float)scaled_x[i]));
+            } j = i;
+        }
+
+        /*  Sort the nodes, via a simple “Bubble” sort. */
+        i = 0;
+        while (i < nodes - 1) {
+            if (nodeX[i] > nodeX[i+1]) {
+                swap = nodeX[i];
+                nodeX[i] = nodeX[i+1];
+                nodeX[i+1] = swap;
+                if (i) i--;
+            } else i++;
+        }
+        /*  Fill the pixels between node pairs. */
+        for (i = 0; i < nodes; i += 2) {
+            if (nodeX[i+0] >= right) break;
+            if (nodeX[i+1] > left) {
+                if (nodeX[i+0] < left) nodeX[i+0] = left ;
+                if (nodeX[i+1] > right) nodeX[i+1] = right;
+                for (pixelX = nodeX[i]; pixelX < nodeX[i + 1]; pixelX++) {
+                    DrawPixel(pixelX, pixelY, col);
+                }
+
+            }
+        }
+    }
+    #undef RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS
+}
+
+/**
  * Draw the given Nuklear context in raylib.
  *
  * @param ctx The nuklear context.
@@ -643,29 +724,20 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_POLYGON: {
                 const struct nk_command_polygon *p = (const struct nk_command_polygon*)cmd;
                 Color color = NuklearColorToColor(p->color);
-                struct Vector2* points = (struct Vector2*)MemAlloc((unsigned int)((size_t)(p->point_count + 1) * sizeof(Vector2)));
-                unsigned short i;
-                for (i = 0; i < p->point_count; i++) {
-                    points[i].x = p->points[i].x * scale;
-                    points[i].y = p->points[i].y * scale;
+                float thickness = (float)p->line_thickness * scale;
+                for (unsigned short i = 0; i < p->point_count - 1; i++) {
+                    Vector2 start = {(float)p->points[i].x * scale, (float)p->points[i].y * scale};
+                    Vector2 end = {(float)p->points[i + 1].x * scale, (float)p->points[i + 1].y * scale};
+                    DrawLineEx(start, end, thickness, color);
                 }
-                points[p->point_count] = points[0];
-                DrawLineStrip(points, p->point_count + 1, color);
-                MemFree(points);
+                Vector2 last = {(float)p->points[p->point_count - 1].x * scale, (float)p->points[p->point_count - 1].y * scale};
+                Vector2 first = {(float)p->points[0].x * scale, (float)p->points[0].y * scale};
+                DrawLineEx(last, first, thickness, color);
             } break;
 
             case NK_COMMAND_POLYGON_FILLED: {
-                // TODO: Implement NK_COMMAND_POLYGON_FILLED
                 const struct nk_command_polygon_filled *p = (const struct nk_command_polygon_filled*)cmd;
-                Color color = NuklearColorToColor(p->color);
-                struct Vector2* points = (struct Vector2*)MemAlloc((unsigned int)((size_t)(p->point_count + 1) * sizeof(Vector2)));
-                for (unsigned short i = 0; i < p->point_count; i++) {
-                    points[i].x = p->points[i].x * scale;
-                    points[i].y = p->points[i].y * scale;
-                }
-                points[p->point_count] = points[0];
-                DrawLineStrip(points, p->point_count + 1, color);
-                MemFree(points);
+                raylib_nuklear_draw_polygon_fill(scale, p->points, p->point_count, NuklearColorToColor(p->color));
             } break;
 
             case NK_COMMAND_POLYLINE: {
