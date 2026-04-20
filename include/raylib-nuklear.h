@@ -61,6 +61,7 @@ extern "C" {
 
 NK_API struct nk_context* InitNuklear(int fontSize);                // Initialize the Nuklear GUI context using raylib's font
 NK_API struct nk_context* InitNuklearEx(Font font, float fontSize); // Initialize the Nuklear GUI context, with a custom font
+NK_API bool IsNuklearValid(struct nk_context* ctx);                 // Checks if Nuklear was loaded successfully.
 NK_API Font LoadFontFromNuklear(int fontSize);                      // Loads the default Nuklear font
 NK_API void UpdateNuklear(struct nk_context * ctx);                 // Update the input state and internal components for Nuklear
 NK_API void UpdateNuklearEx(struct nk_context * ctx, float deltaTime); // Update the input state and internal components for Nuklear, with a custom frame time
@@ -376,6 +377,16 @@ InitNuklearEx(Font font, float fontSize)
 
     // Nuklear context.
     return InitNuklearContext(userFont);
+}
+
+/**
+ * Checks if Nuklear was loaded successfully.
+ *
+ * @param ctx The Nuklear context.
+ * @return True when the Nuklear context was loaded successfully, false otherwise.
+ */
+NK_API bool IsNuklearValid(struct nk_context* ctx) {
+    return ctx != NULL;
 }
 
 /**
@@ -891,7 +902,7 @@ UnloadNuklear(struct nk_context * ctx)
  * Convert the given Nuklear rectangle to a raylib Rectangle.
  */
 NK_API struct
-Rectangle RectangleFromNuklear(struct nk_context* ctx, struct nk_rect rect)
+Rectangle NuklearRectToRectangle(struct nk_context* ctx, struct nk_rect rect)
 {
     float scaling = GetNuklearScaling(ctx);
     Rectangle output;
@@ -906,7 +917,7 @@ Rectangle RectangleFromNuklear(struct nk_context* ctx, struct nk_rect rect)
  * Convert the given raylib Rectangle to a Nuklear rectangle.
  */
 NK_API struct
-nk_rect RectangleToNuklear(struct nk_context* ctx, Rectangle rect)
+nk_rect RectangleToNuklearRect(struct nk_context* ctx, Rectangle rect)
 {
     float scaling = GetNuklearScaling(ctx);
     return nk_rect(rect.x / scaling, rect.y / scaling, rect.width / scaling, rect.height / scaling);
