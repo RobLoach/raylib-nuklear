@@ -492,7 +492,7 @@ NuklearImageToTexture(struct nk_image img)
  * @see https://github.com/Immediate-Mode-UI/Nuklear/blob/master/demo/rawfb/nuklear_rawfb.h
  *
  * @internal
- * @todo Get a GPU rendered Polygon fill?
+ * @todo Replace this software rendering with a GPU renderer
  */
 static void raylib_nuklear_draw_polygon_fill(float scale, const struct nk_vec2i *pnts, int count, Color col) {
     int i = 0;
@@ -672,9 +672,19 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_CIRCLE: {
                 const struct nk_command_circle *c = (const struct nk_command_circle *)cmd;
                 Color color = NuklearColorToColor(c->color);
-                unsigned short size = (unsigned short)((float)c->line_thickness * scale);
-                for (unsigned short i = 0; i < size; i++) {
-                    DrawEllipseLines((int)(c->x * scale + c->w * scale / 2.0f), (int)(c->y * scale + c->h * scale / 2.0f), c->w * scale / 2.0f - (float)i / 2.0f, c->h * scale / 2.0f - (float)i / 2.0f, color);
+                float cx = (c->x + c->w / 2.0f) * scale;
+                float cy = (c->y + c->h / 2.0f) * scale;
+                float thick = (float)c->line_thickness * scale;
+                if (c->w == c->h) {
+                    float outerR = c->w * scale / 2.0f;
+                    float innerR = NK_MAX(outerR - thick, 0.0f);
+                    DrawRing((Vector2){cx, cy}, innerR, outerR, 0.0f, 360.0f, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
+                }
+                else {
+                    unsigned short size = (unsigned short)(thick * 2.0f);
+                    for (unsigned short i = 0; i < size; i++) {
+                        DrawEllipseLines((int)cx, (int)cy, c->w * scale / 2.0f - (float)i / 2.0f, c->h * scale / 2.0f - (float)i / 2.0f, color);
+                    }
                 }
             } break;
 
@@ -705,11 +715,11 @@ DrawNuklear(struct nk_context * ctx)
                 Vector2 point2 = CLITERAL(Vector2) {(float)t->a.x * scale, (float)t->a.y * scale};
                 Vector2 point3 = CLITERAL(Vector2) {(float)t->c.x * scale, (float)t->c.y * scale};
 
-                // DrawLineEx(point1, point2, t->line_thickness * scale, color);
-                // DrawLineEx(point2, point3, t->line_thickness * scale, color);
-                // DrawLineEx(point3, point1, t->line_thickness * scale, color);
+                DrawLineEx(point1, point2, t->line_thickness * scale, color);
+                DrawLineEx(point2, point3, t->line_thickness * scale, color);
+                DrawLineEx(point3, point1, t->line_thickness * scale, color);
                 // TODO: Add line thickness to DrawTriangleLines(), maybe via a DrawTriangleLinesEx()?
-                DrawTriangleLines(point1, point2, point3, color);
+                // DrawTriangleLines(point1, point2, point3, color);
             } break;
 
             case NK_COMMAND_TRIANGLE_FILLED: {
