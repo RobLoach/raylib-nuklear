@@ -621,15 +621,15 @@ DrawNuklear(struct nk_context * ctx)
                     float rad = NK_MIN((float)r->rounding * scale, NK_MIN(rect.width, rect.height) * 0.5f);
                     float thick = (float)r->line_thickness * scale;
                     // Straight edges
-                    DrawRectangleRec((Rectangle){rect.x + rad,                rect.y,                        rect.width - 2.0f * rad, thick}, color);
-                    DrawRectangleRec((Rectangle){rect.x + rad,                rect.y + rect.height - thick,  rect.width - 2.0f * rad, thick}, color);
-                    DrawRectangleRec((Rectangle){rect.x,                      rect.y + rad,                  thick, rect.height - 2.0f * rad}, color);
-                    DrawRectangleRec((Rectangle){rect.x + rect.width - thick, rect.y + rad,                  thick, rect.height - 2.0f * rad}, color);
+                    DrawRectangleRec((Rectangle){rect.x + rad, rect.y, rect.width - 2.0f * rad, thick}, color);
+                    DrawRectangleRec((Rectangle){rect.x + rad, rect.y + rect.height - thick, rect.width - 2.0f * rad, thick}, color);
+                    DrawRectangleRec((Rectangle){rect.x, rect.y + rad, thick, rect.height - 2.0f * rad}, color);
+                    DrawRectangleRec((Rectangle){rect.x + rect.width - thick, rect.y + rad, thick, rect.height - 2.0f * rad}, color);
                     // Corner quarter-arc rings
-                    DrawRing((Vector2){rect.x + rad,               rect.y + rad},               NK_MAX(rad - thick, 0.0f), rad, 180.0f, 270.0f, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
-                    DrawRing((Vector2){rect.x + rect.width - rad,  rect.y + rad},               NK_MAX(rad - thick, 0.0f), rad, 270.0f, 360.0f, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
-                    DrawRing((Vector2){rect.x + rect.width - rad,  rect.y + rect.height - rad}, NK_MAX(rad - thick, 0.0f), rad,   0.0f,  90.0f, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
-                    DrawRing((Vector2){rect.x + rad,               rect.y + rect.height - rad}, NK_MAX(rad - thick, 0.0f), rad,  90.0f, 180.0f, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
+                    DrawRing((Vector2){rect.x + rad, rect.y + rad}, NK_MAX(rad - thick, 0.0f), rad, 180.0f, 270.0f, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
+                    DrawRing((Vector2){rect.x + rect.width - rad,  rect.y + rad}, NK_MAX(rad - thick, 0.0f), rad, 270.0f, 360.0f, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
+                    DrawRing((Vector2){rect.x + rect.width - rad, rect.y + rect.height - rad}, NK_MAX(rad - thick, 0.0f), rad,   0.0f,  90.0f, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
+                    DrawRing((Vector2){rect.x + rad, rect.y + rect.height - rad}, NK_MAX(rad - thick, 0.0f), rad,  90.0f, 180.0f, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
                 }
                 else {
                     DrawRectangleLinesEx(rect, r->line_thickness * scale, color);
@@ -644,14 +644,14 @@ DrawNuklear(struct nk_context * ctx)
                 if (r->rounding > 0) {
                     float rad = NK_MIN((float)r->rounding * scale, NK_MIN(rect.width, rect.height) * 0.5f);
                     // Center vertical strip + top/bottom horizontal strips
-                    DrawRectangleRec((Rectangle){rect.x,         rect.y + rad,             rect.width,          rect.height - 2.0f * rad}, color);
-                    DrawRectangleRec((Rectangle){rect.x + rad,   rect.y,                   rect.width - 2.0f * rad, rad},                  color);
-                    DrawRectangleRec((Rectangle){rect.x + rad,   rect.y + rect.height - rad, rect.width - 2.0f * rad, rad},                color);
+                    DrawRectangleRec((Rectangle){rect.x, rect.y + rad, rect.width, rect.height - 2.0f * rad}, color);
+                    DrawRectangleRec((Rectangle){rect.x + rad, rect.y, rect.width - 2.0f * rad, rad}, color);
+                    DrawRectangleRec((Rectangle){rect.x + rad, rect.y + rect.height - rad, rect.width - 2.0f * rad, rad}, color);
                     // Corner quarter-circle arcs
-                    DrawCircleSector((Vector2){rect.x + rad,               rect.y + rad},               rad, 180.0f, 270.0f, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
-                    DrawCircleSector((Vector2){rect.x + rect.width - rad,  rect.y + rad},               rad, 270.0f, 360.0f, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
-                    DrawCircleSector((Vector2){rect.x + rect.width - rad,  rect.y + rect.height - rad}, rad,   0.0f,  90.0f, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
-                    DrawCircleSector((Vector2){rect.x + rad,               rect.y + rect.height - rad}, rad,  90.0f, 180.0f, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
+                    DrawCircleSector((Vector2){rect.x + rad, rect.y + rad}, rad, 180.0f, 270.0f, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
+                    DrawCircleSector((Vector2){rect.x + rect.width - rad, rect.y + rad}, rad, 270.0f, 360.0f, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
+                    DrawCircleSector((Vector2){rect.x + rect.width - rad, rect.y + rect.height - rad}, rad, 0.0f, 90.0f, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
+                    DrawCircleSector((Vector2){rect.x + rad, rect.y + rect.height - rad}, rad, 90.0f, 180.0f, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
                 }
                 else {
                     DrawRectangleRec(rect, color);
