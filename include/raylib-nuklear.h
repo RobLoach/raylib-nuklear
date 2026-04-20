@@ -698,7 +698,15 @@ DrawNuklear(struct nk_context * ctx)
                 const struct nk_command_arc *a = (const struct nk_command_arc*)cmd;
                 Color color = NuklearColorToColor(a->color);
                 Vector2 center = CLITERAL(Vector2) {(float)a->cx * scale, (float)a->cy * scale};
-                DrawRingLines(center, 0, a->r * scale, a->a[0] * RAD2DEG, a->a[1] * RAD2DEG, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
+                float outerRadius = a->r * scale;
+                float thick = a->line_thickness * scale;
+                float innerRadius = outerRadius - thick;
+                if (innerRadius < 0.0f) innerRadius = 0.0f;
+                DrawRing(center, innerRadius, outerRadius, a->a[0] * RAD2DEG, a->a[1] * RAD2DEG, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
+                Vector2 p0 = {center.x + outerRadius * cosf(a->a[0]), center.y + outerRadius * sinf(a->a[0])};
+                Vector2 p1 = {center.x + outerRadius * cosf(a->a[1]), center.y + outerRadius * sinf(a->a[1])};
+                DrawLineEx(center, p0, thick, color);
+                DrawLineEx(center, p1, thick, color);
             } break;
 
             case NK_COMMAND_ARC_FILLED: {
