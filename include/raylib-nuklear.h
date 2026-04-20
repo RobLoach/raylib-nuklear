@@ -535,22 +535,20 @@ DrawNuklear(struct nk_context * ctx)
                 const struct nk_command_rect *r = (const struct nk_command_rect *)cmd;
                 Color color = NuklearColorToColor(r->color);
                 Rectangle rect = CLITERAL(Rectangle) {(float)r->x * scale, (float)r->y * scale, (float)r->w * scale, (float)r->h * scale};
-                float roundness = (rect.width > rect.height) ?
-                        ((2 * r->rounding * scale)/rect.height) : ((2 * r->rounding * scale)/rect.width);
-                roundness = NK_CLAMP(0.0f, roundness, 1.0f);
-                if (roundness > 0.0f) {
-                    // DrawRectangleRoundedLines doesn't work in the same way as DrawRectangleLinesEx and it draws
-                    // the outline outside the region defined by the rectangle. To compensate for that, shrink
-                    // the rectangle by the thickness plus 1 (due to inconsistencies from DrawRectangleRoundedLines):
-                    rect.x += ((float) r->line_thickness) * scale + 1.0f;
-                    rect.y += ((float) r->line_thickness) * scale + 1.0f;
-                    rect.width = NK_MAX(rect.width - (2 * ((float) r->line_thickness) * scale + 1.0f), 0.0f);
-                    rect.height = NK_MAX(rect.height - (2 * ((float) r->line_thickness) * scale + 1.0f), 0.0f);
-#if RAYLIB_VERSION_MAJOR >= 5 && RAYLIB_VERSION_MINOR == 0
-                    DrawRectangleRoundedLines(rect, roundness, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, (float)r->line_thickness * scale, color);
-#else
-                    DrawRectangleRoundedLinesEx(rect, roundness, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, (float)r->line_thickness * scale, color);
-#endif
+                // We manually draw the rectangle with rounding instead of using DrawRectangleEx(), as we have more control over the corners.
+                if (r->rounding > 0) {
+                    float rad = NK_MIN((float)r->rounding * scale, NK_MIN(rect.width, rect.height) * 0.5f);
+                    float thick = (float)r->line_thickness * scale;
+                    // Straight edges
+                    DrawRectangleRec((Rectangle){rect.x + rad,                rect.y,                        rect.width - 2.0f * rad, thick}, color);
+                    DrawRectangleRec((Rectangle){rect.x + rad,                rect.y + rect.height - thick,  rect.width - 2.0f * rad, thick}, color);
+                    DrawRectangleRec((Rectangle){rect.x,                      rect.y + rad,                  thick, rect.height - 2.0f * rad}, color);
+                    DrawRectangleRec((Rectangle){rect.x + rect.width - thick, rect.y + rad,                  thick, rect.height - 2.0f * rad}, color);
+                    // Corner quarter-arc rings
+                    DrawRing((Vector2){rect.x + rad,               rect.y + rad},               NK_MAX(rad - thick, 0.0f), rad, 180.0f, 270.0f, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
+                    DrawRing((Vector2){rect.x + rect.width - rad,  rect.y + rad},               NK_MAX(rad - thick, 0.0f), rad, 270.0f, 360.0f, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
+                    DrawRing((Vector2){rect.x + rect.width - rad,  rect.y + rect.height - rad}, NK_MAX(rad - thick, 0.0f), rad,   0.0f,  90.0f, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
+                    DrawRing((Vector2){rect.x + rad,               rect.y + rect.height - rad}, NK_MAX(rad - thick, 0.0f), rad,  90.0f, 180.0f, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
                 }
                 else {
                     DrawRectangleLinesEx(rect, r->line_thickness * scale, color);
@@ -561,11 +559,18 @@ DrawNuklear(struct nk_context * ctx)
                 const struct nk_command_rect_filled *r = (const struct nk_command_rect_filled *)cmd;
                 Color color = NuklearColorToColor(r->color);
                 Rectangle rect = CLITERAL(Rectangle) {(float)r->x * scale, (float)r->y * scale, (float)r->w * scale, (float)r->h * scale};
-                float roundness = (rect.width > rect.height) ?
-                        ((2 * r->rounding * scale)/rect.height) : ((2 * r->rounding * scale)/rect.width);
-                roundness = NK_CLAMP(0.0f, roundness, 1.0f);
-                if (roundness > 0.0f) {
-                    DrawRectangleRounded(rect, roundness, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
+                // We manually draw the rectangle with rounding instead of using DrawRectangleEx(), as we have more control over the corners.
+                if (r->rounding > 0) {
+                    float rad = NK_MIN((float)r->rounding * scale, NK_MIN(rect.width, rect.height) * 0.5f);
+                    // Center vertical strip + top/bottom horizontal strips
+                    DrawRectangleRec((Rectangle){rect.x,         rect.y + rad,             rect.width,          rect.height - 2.0f * rad}, color);
+                    DrawRectangleRec((Rectangle){rect.x + rad,   rect.y,                   rect.width - 2.0f * rad, rad},                  color);
+                    DrawRectangleRec((Rectangle){rect.x + rad,   rect.y + rect.height - rad, rect.width - 2.0f * rad, rad},                color);
+                    // Corner quarter-circle arcs
+                    DrawCircleSector((Vector2){rect.x + rad,               rect.y + rad},               rad, 180.0f, 270.0f, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
+                    DrawCircleSector((Vector2){rect.x + rect.width - rad,  rect.y + rad},               rad, 270.0f, 360.0f, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
+                    DrawCircleSector((Vector2){rect.x + rect.width - rad,  rect.y + rect.height - rad}, rad,   0.0f,  90.0f, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
+                    DrawCircleSector((Vector2){rect.x + rad,               rect.y + rect.height - rad}, rad,  90.0f, 180.0f, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
                 }
                 else {
                     DrawRectangleRec(rect, color);
@@ -575,17 +580,19 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_RECT_MULTI_COLOR: {
                 const struct nk_command_rect_multi_color* rectangle = (const struct nk_command_rect_multi_color *)cmd;
                 Rectangle position = {(float)rectangle->x * scale, (float)rectangle->y * scale, (float)rectangle->w * scale, (float)rectangle->h * scale};
-                Color left = NuklearColorToColor(rectangle->left);
-                Color top = NuklearColorToColor(rectangle->top);
-                Color bottom = NuklearColorToColor(rectangle->bottom);
-                Color right = NuklearColorToColor(rectangle->right);
-                DrawRectangleGradientEx(position, left, bottom, right, top);
+                DrawRectangleGradientEx(position,
+                    NuklearColorToColor(rectangle->left), // Top Left
+                    NuklearColorToColor(rectangle->bottom), // Bottom Left
+                    NuklearColorToColor(rectangle->right), // Top Right
+                    NuklearColorToColor(rectangle->top) // Bottom Right
+                );
             } break;
 
             case NK_COMMAND_CIRCLE: {
                 const struct nk_command_circle *c = (const struct nk_command_circle *)cmd;
                 Color color = NuklearColorToColor(c->color);
-                for (unsigned short i = 0; i < (unsigned short)(c->line_thickness * scale); i++) {
+                unsigned short size = (unsigned short)((float)c->line_thickness * scale);
+                for (unsigned short i = 0; i < size; i++) {
                     DrawEllipseLines((int)(c->x * scale + c->w * scale / 2.0f), (int)(c->y * scale + c->h * scale / 2.0f), c->w * scale / 2.0f - (float)i / 2.0f, c->h * scale / 2.0f - (float)i / 2.0f, color);
                 }
             } break;
