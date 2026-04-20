@@ -75,21 +75,17 @@ int main() {
 struct nk_context* InitNuklear(int fontSize);                // Initialize the Nuklear GUI context using raylib's font
 struct nk_context* InitNuklearEx(Font font, float fontSize); // Initialize the Nuklear GUI context, with a custom font
 Font LoadFontFromNuklear(int fontSize);                      // Loads the default Nuklear font
-void UpdateNuklear(struct nk_context * ctx);                 // Update the input state and internal components for Nuklear
-void UpdateNuklearEx(struct nk_context * ctx, float deltaTime); // Update the input state and internal components for Nuklear, with a custom frame time
-void DrawNuklear(struct nk_context * ctx);                   // Render the Nuklear GUI on the screen
-void UnloadNuklear(struct nk_context * ctx);                 // Deinitialize the Nuklear context
-struct nk_color ColorToNuklear(Color color);                 // Convert a raylib Color to a Nuklear color object
-struct nk_colorf ColorToNuklearF(Color color);               // Convert a raylib Color to a Nuklear floating color
-struct Color ColorFromNuklear(struct nk_color color);        // Convert a Nuklear color to a raylib Color
-struct Color ColorFromNuklearF(struct nk_colorf color);      // Convert a Nuklear floating color to a raylib Color
-struct Rectangle RectangleFromNuklear(struct nk_context * ctx, struct nk_rect rect); // Convert a Nuklear rectangle to a raylib Rectangle
-struct nk_rect RectangleToNuklear(struct nk_context * ctx, Rectangle rect); // Convert a raylib Rectangle to a Nuklear Rectangle
-struct nk_image TextureToNuklear(Texture tex);               // Convert a raylib Texture to A Nuklear image
-struct Texture TextureFromNuklear(struct nk_image img);      // Convert a Nuklear image to a raylib Texture
-struct nk_image LoadNuklearImage(const char* path);          // Load a Nuklear image
-void UnloadNuklearImage(struct nk_image img);                // Unload a Nuklear image. And free its data
-void CleanupNuklearImage(struct nk_image img);               // Frees the data stored by the Nuklear image
+void UpdateNuklear(struct nk_context* ctx);                 // Update the input state and internal components for Nuklear
+void UpdateNuklearEx(struct nk_context* ctx, float deltaTime); // Update the input state and internal components for Nuklear, with a custom frame time
+void DrawNuklear(struct nk_context* ctx);                   // Render the Nuklear GUI on the screen
+void UnloadNuklear(struct nk_context* ctx);                 // Deinitialize the Nuklear context
+struct nk_color ColorToNuklearColor(Color color);                 // Convert a raylib Color to a Nuklear color object
+struct nk_colorf ColorToNuklearColorF(Color color);               // Convert a raylib Color to a Nuklear floating color
+struct Color NuklearColorToColor(struct nk_color color);        // Convert a Nuklear color to a raylib Color
+struct Color NuklearColorFToColor(struct nk_colorf color);      // Convert a Nuklear floating color to a raylib Color
+struct Rectangle NuklearRectToRectangle(struct nk_context* ctx, struct nk_rect rect); // Convert a Nuklear rectangle to a raylib Rectangle
+struct nk_rect RectangleToNuklearRect(struct nk_context* ctx, Rectangle rect); // Convert a raylib Rectangle to a Nuklear Rectangle
+struct nk_image TextureToNuklearImage(Texture tex);               // Convert a raylib Texture to A Nuklear image
 void SetNuklearScaling(struct nk_context * ctx, float scaling); // Sets the scaling for the given Nuklear context
 float GetNuklearScaling(struct nk_context * ctx);            // Retrieves the scaling of the given Nuklear context
 ```

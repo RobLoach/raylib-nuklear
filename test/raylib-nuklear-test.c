@@ -25,9 +25,10 @@ int main(int argc, char *argv[]) {
     Assert(ctx);
 
     // Image
-    struct nk_image image = LoadNuklearImage("resources/test-image.png");
-    Assert(image.handle.ptr);
-    Texture texture = TextureFromNuklear(image);
+    Texture texture = LoadTexture("resources/test-image.png");
+    AssertTexture(texture);
+    struct nk_image image = TextureToNuklearImage(texture);
+    AssertEqual(texture.id, (unsigned int)image.handle.id);
     Assert(texture.width > 0);
 
     // UpdateNuklear()
@@ -57,8 +58,7 @@ int main(int argc, char *argv[]) {
     // Save a screenshot for debugging.
     TakeScreenshot("raylib-nuklear-test.png");
 
-    // UnloadNuklearImage()
-    UnloadNuklearImage(image);
+    UnloadTexture(texture);
 
     // UnloadNuklear()
     UnloadNuklear(ctx);

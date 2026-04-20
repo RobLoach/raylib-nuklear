@@ -183,7 +183,7 @@ void UpdateDrawFrame(void) {
     /* Draw */
     BeginDrawing();
     {
-        ClearBackground(ColorFromNuklearF(bg));
+        ClearBackground(NuklearColorFToColor(bg));
         DrawNuklear(ctx);
     }
     EndDrawing();

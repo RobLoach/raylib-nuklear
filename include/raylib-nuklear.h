@@ -66,17 +66,13 @@ NK_API void UpdateNuklear(struct nk_context * ctx);                 // Update th
 NK_API void UpdateNuklearEx(struct nk_context * ctx, float deltaTime); // Update the input state and internal components for Nuklear, with a custom frame time
 NK_API void DrawNuklear(struct nk_context * ctx);                   // Render the Nuklear GUI on the screen
 NK_API void UnloadNuklear(struct nk_context * ctx);                 // Deinitialize the Nuklear context
-NK_API struct nk_color ColorToNuklear(Color color);                 // Convert a raylib Color to a Nuklear color object
-NK_API struct nk_colorf ColorToNuklearF(Color color);               // Convert a raylib Color to a Nuklear floating color
-NK_API struct Color ColorFromNuklear(struct nk_color color);        // Convert a Nuklear color to a raylib Color
-NK_API struct Color ColorFromNuklearF(struct nk_colorf color);      // Convert a Nuklear floating color to a raylib Color
-NK_API struct Rectangle RectangleFromNuklear(struct nk_context * ctx, struct nk_rect rect); // Convert a Nuklear rectangle to a raylib Rectangle
-NK_API struct nk_rect RectangleToNuklear(struct nk_context * ctx, Rectangle rect); // Convert a raylib Rectangle to a Nuklear Rectangle
-NK_API struct nk_image TextureToNuklear(Texture tex);               // Convert a raylib Texture to A Nuklear image
-NK_API struct Texture TextureFromNuklear(struct nk_image img);      // Convert a Nuklear image to a raylib Texture
-NK_API struct nk_image LoadNuklearImage(const char* path);          // Load a Nuklear image
-NK_API void UnloadNuklearImage(struct nk_image img);                // Unload a Nuklear image. And free its data
-NK_API void CleanupNuklearImage(struct nk_image img);               // Frees the data stored by the Nuklear image
+NK_API struct nk_color ColorToNuklearColor(Color color);                 // Convert a raylib Color to a Nuklear color object
+NK_API struct nk_colorf ColorToNuklearColorF(Color color);               // Convert a raylib Color to a Nuklear floating color
+NK_API struct Color NuklearColorToColor(struct nk_color color);        // Convert a Nuklear color to a raylib Color
+NK_API struct Color NuklearColorFToColor(struct nk_colorf color);      // Convert a Nuklear floating color to a raylib Color
+NK_API struct Rectangle NuklearRectToRectangle(struct nk_context * ctx, struct nk_rect rect); // Convert a Nuklear rectangle to a raylib Rectangle
+NK_API struct nk_rect RectangleToNuklearRect(struct nk_context * ctx, Rectangle rect); // Convert a raylib Rectangle to a Nuklear Rectangle
+NK_API struct nk_image TextureToNuklearImage(Texture texture);               // Get a Nuklear image from a Texture
 NK_API void SetNuklearScaling(struct nk_context * ctx, float scaling); // Sets the scaling for the given Nuklear context
 NK_API float GetNuklearScaling(struct nk_context * ctx);            // Retrieves the scaling of the given Nuklear context
 
@@ -420,7 +416,7 @@ NK_API Font LoadFontFromNuklear(int size) {
  * Convert the given Nuklear color to a raylib color.
  */
 NK_API Color
-ColorFromNuklear(struct nk_color color)
+NuklearColorToColor(struct nk_color color)
 {
     Color rc;
     rc.a = color.a;
@@ -434,7 +430,7 @@ ColorFromNuklear(struct nk_color color)
  * Convert the given raylib color to a Nuklear color.
  */
 NK_API struct nk_color
-ColorToNuklear(Color color)
+ColorToNuklearColor(Color color)
 {
     struct nk_color rc;
     rc.a = color.a;
@@ -448,18 +444,34 @@ ColorToNuklear(Color color)
  * Convert the given Nuklear float color to a raylib color.
  */
 NK_API Color
-ColorFromNuklearF(struct nk_colorf color)
+NuklearColorFToColor(struct nk_colorf color)
 {
-    return ColorFromNuklear(nk_rgba_cf(color));
+    return NuklearColorToColor(nk_rgba_cf(color));
 }
 
 /**
  * Convert the given raylib color to a raylib float color.
  */
 NK_API struct nk_colorf
-ColorToNuklearF(Color color)
+ColorToNuklearColorF(Color color)
 {
-    return nk_color_cf(ColorToNuklear(color));
+    return nk_color_cf(ColorToNuklearColor(color));
+}
+
+/**
+ * Convert the given Nuklear image to a raylib Texture
+ *
+ * @internal
+ */
+static struct Texture
+NuklearImageToTexture(struct nk_image img)
+{
+	Texture texture = {0};
+	texture.id = (unsigned int)img.handle.id;
+	texture.width = (int)img.w;
+	texture.height = (int)img.h;
+	texture.mipmaps = 1;
+	return texture;
 }
 
 /**
@@ -492,7 +504,7 @@ DrawNuklear(struct nk_context * ctx)
 
             case NK_COMMAND_LINE: {
                 const struct nk_command_line *l = (const struct nk_command_line *)cmd;
-                Color color = ColorFromNuklear(l->color);
+                Color color = NuklearColorToColor(l->color);
                 Vector2 startPos = CLITERAL(Vector2) {(float)l->begin.x * scale, (float)l->begin.y * scale};
                 Vector2 endPos = CLITERAL(Vector2) {(float)l->end.x * scale, (float)l->end.y * scale};
                 DrawLineEx(startPos, endPos, l->line_thickness * scale, color);
@@ -500,7 +512,7 @@ DrawNuklear(struct nk_context * ctx)
 
             case NK_COMMAND_CURVE: {
                 const struct nk_command_curve *q = (const struct nk_command_curve *)cmd;
-                Color color = ColorFromNuklear(q->color);
+                Color color = NuklearColorToColor(q->color);
                 Vector2 begin = CLITERAL(Vector2) {(float)q->begin.x * scale, (float)q->begin.y * scale};
                 Vector2 controlPoint1 = CLITERAL(Vector2) {(float)q->ctrl[0].x * scale, (float)q->ctrl[0].y * scale};
                 Vector2 controlPoint2 = CLITERAL(Vector2) {(float)q->ctrl[1].x * scale, (float)q->ctrl[1].y * scale};
@@ -510,7 +522,7 @@ DrawNuklear(struct nk_context * ctx)
 
             case NK_COMMAND_RECT: {
                 const struct nk_command_rect *r = (const struct nk_command_rect *)cmd;
-                Color color = ColorFromNuklear(r->color);
+                Color color = NuklearColorToColor(r->color);
                 Rectangle rect = CLITERAL(Rectangle) {(float)r->x * scale, (float)r->y * scale, (float)r->w * scale, (float)r->h * scale};
                 float roundness = (rect.width > rect.height) ?
                         ((2 * r->rounding * scale)/rect.height) : ((2 * r->rounding * scale)/rect.width);
@@ -536,7 +548,7 @@ DrawNuklear(struct nk_context * ctx)
 
             case NK_COMMAND_RECT_FILLED: {
                 const struct nk_command_rect_filled *r = (const struct nk_command_rect_filled *)cmd;
-                Color color = ColorFromNuklear(r->color);
+                Color color = NuklearColorToColor(r->color);
                 Rectangle rect = CLITERAL(Rectangle) {(float)r->x * scale, (float)r->y * scale, (float)r->w * scale, (float)r->h * scale};
                 float roundness = (rect.width > rect.height) ?
                         ((2 * r->rounding * scale)/rect.height) : ((2 * r->rounding * scale)/rect.width);
@@ -552,16 +564,16 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_RECT_MULTI_COLOR: {
                 const struct nk_command_rect_multi_color* rectangle = (const struct nk_command_rect_multi_color *)cmd;
                 Rectangle position = {(float)rectangle->x * scale, (float)rectangle->y * scale, (float)rectangle->w * scale, (float)rectangle->h * scale};
-                Color left = ColorFromNuklear(rectangle->left);
-                Color top = ColorFromNuklear(rectangle->top);
-                Color bottom = ColorFromNuklear(rectangle->bottom);
-                Color right = ColorFromNuklear(rectangle->right);
+                Color left = NuklearColorToColor(rectangle->left);
+                Color top = NuklearColorToColor(rectangle->top);
+                Color bottom = NuklearColorToColor(rectangle->bottom);
+                Color right = NuklearColorToColor(rectangle->right);
                 DrawRectangleGradientEx(position, left, bottom, right, top);
             } break;
 
             case NK_COMMAND_CIRCLE: {
                 const struct nk_command_circle *c = (const struct nk_command_circle *)cmd;
-                Color color = ColorFromNuklear(c->color);
+                Color color = NuklearColorToColor(c->color);
                 for (unsigned short i = 0; i < (unsigned short)(c->line_thickness * scale); i++) {
                     DrawEllipseLines((int)(c->x * scale + c->w * scale / 2.0f), (int)(c->y * scale + c->h * scale / 2.0f), c->w * scale / 2.0f - (float)i / 2.0f, c->h * scale / 2.0f - (float)i / 2.0f, color);
                 }
@@ -569,27 +581,27 @@ DrawNuklear(struct nk_context * ctx)
 
             case NK_COMMAND_CIRCLE_FILLED: {
                 const struct nk_command_circle_filled *c = (const struct nk_command_circle_filled *)cmd;
-                Color color = ColorFromNuklear(c->color);
+                Color color = NuklearColorToColor(c->color);
                 DrawEllipse((int)(c->x * scale + c->w * scale / 2.0f), (int)(c->y * scale + c->h * scale / 2.0f), (int)(c->w * scale / 2), (int)(c->h * scale / 2), color);
             } break;
 
             case NK_COMMAND_ARC: {
                 const struct nk_command_arc *a = (const struct nk_command_arc*)cmd;
-                Color color = ColorFromNuklear(a->color);
+                Color color = NuklearColorToColor(a->color);
                 Vector2 center = CLITERAL(Vector2) {(float)a->cx * scale, (float)a->cy * scale};
                 DrawRingLines(center, 0, a->r * scale, a->a[0] * RAD2DEG, a->a[1] * RAD2DEG, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
             } break;
 
             case NK_COMMAND_ARC_FILLED: {
                 const struct nk_command_arc_filled *a = (const struct nk_command_arc_filled*)cmd;
-                Color color = ColorFromNuklear(a->color);
+                Color color = NuklearColorToColor(a->color);
                 Vector2 center = CLITERAL(Vector2) {(float)a->cx * scale, (float)a->cy * scale};
                 DrawRing(center, 0, a->r * scale, a->a[0] * RAD2DEG, a->a[1] * RAD2DEG, RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS, color);
             } break;
 
             case NK_COMMAND_TRIANGLE: {
                 const struct nk_command_triangle *t = (const struct nk_command_triangle*)cmd;
-                Color color = ColorFromNuklear(t->color);
+                Color color = NuklearColorToColor(t->color);
                 Vector2 point1 = CLITERAL(Vector2) {(float)t->b.x * scale, (float)t->b.y * scale};
                 Vector2 point2 = CLITERAL(Vector2) {(float)t->a.x * scale, (float)t->a.y * scale};
                 Vector2 point3 = CLITERAL(Vector2) {(float)t->c.x * scale, (float)t->c.y * scale};
@@ -603,7 +615,7 @@ DrawNuklear(struct nk_context * ctx)
 
             case NK_COMMAND_TRIANGLE_FILLED: {
                 const struct nk_command_triangle_filled *t = (const struct nk_command_triangle_filled*)cmd;
-                Color color = ColorFromNuklear(t->color);
+                Color color = NuklearColorToColor(t->color);
                 Vector2 point1 = CLITERAL(Vector2) {(float)t->b.x * scale, (float)t->b.y * scale};
                 Vector2 point2 = CLITERAL(Vector2) {(float)t->a.x * scale, (float)t->a.y * scale};
                 Vector2 point3 = CLITERAL(Vector2) {(float)t->c.x * scale, (float)t->c.y * scale};
@@ -612,7 +624,7 @@ DrawNuklear(struct nk_context * ctx)
 
             case NK_COMMAND_POLYGON: {
                 const struct nk_command_polygon *p = (const struct nk_command_polygon*)cmd;
-                Color color = ColorFromNuklear(p->color);
+                Color color = NuklearColorToColor(p->color);
                 struct Vector2* points = (struct Vector2*)MemAlloc((unsigned int)((size_t)(p->point_count + 1) * sizeof(Vector2)));
                 unsigned short i;
                 for (i = 0; i < p->point_count; i++) {
@@ -627,7 +639,7 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_POLYGON_FILLED: {
                 // TODO: Implement NK_COMMAND_POLYGON_FILLED
                 const struct nk_command_polygon_filled *p = (const struct nk_command_polygon_filled*)cmd;
-                Color color = ColorFromNuklear(p->color);
+                Color color = NuklearColorToColor(p->color);
                 struct Vector2* points = (struct Vector2*)MemAlloc((unsigned int)((size_t)(p->point_count + 1) * sizeof(Vector2)));
                 for (unsigned short i = 0; i < p->point_count; i++) {
                     points[i].x = p->points[i].x * scale;
@@ -640,7 +652,7 @@ DrawNuklear(struct nk_context * ctx)
 
             case NK_COMMAND_POLYLINE: {
                 const struct nk_command_polyline *p = (const struct nk_command_polyline *)cmd;
-                Color color = ColorFromNuklear(p->color);
+                Color color = NuklearColorToColor(p->color);
                 for (unsigned short i = 0; i < p->point_count - 1; i++) {
                     Vector2 start = {(float)p->points[i].x * scale, (float)p->points[i].y * scale};
                     Vector2 end = {(float)p->points[i + 1].x * scale, (float)p->points[i + 1].y * scale};
@@ -650,7 +662,7 @@ DrawNuklear(struct nk_context * ctx)
 
             case NK_COMMAND_TEXT: {
                 const struct nk_command_text *text = (const struct nk_command_text*)cmd;
-                Color color = ColorFromNuklear(text->foreground);
+                Color color = NuklearColorToColor(text->foreground);
                 float fontSize = text->font->height * scale;
                 Font* font = (Font*)text->font->userdata.ptr;
                 if (font != NULL) {
@@ -664,11 +676,11 @@ DrawNuklear(struct nk_context * ctx)
 
             case NK_COMMAND_IMAGE: {
                 const struct nk_command_image *i = (const struct nk_command_image *)cmd;
-                Texture texture = *(Texture*)i->img.handle.ptr;
+                Texture texture = NuklearImageToTexture(i->img);
                 Rectangle source = CLITERAL(Rectangle) {(float)i->img.region[0], (float)i->img.region[1], (float)i->img.region[2], (float)i->img.region[3]};
                 Rectangle dest = CLITERAL(Rectangle) {(float)i->x * scale, (float)i->y * scale, (float)i->w * scale, (float)i->h * scale};
                 Vector2 origin = CLITERAL(Vector2) {0, 0};
-                Color tint = ColorFromNuklear(i->col);
+                Color tint = NuklearColorToColor(i->col);
                 DrawTexturePro(texture, source, dest, origin, 0, tint);
             } break;
 
@@ -904,89 +916,17 @@ nk_rect RectangleToNuklear(struct nk_context* ctx, Rectangle rect)
  * Convert the given raylib texture to a Nuklear image
  */
 NK_API struct nk_image
-TextureToNuklear(Texture tex)
+TextureToNuklearImage(Texture texture)
 {
-	// Declare the img to store data and allocate memory
-	// For the texture
-	struct nk_image img;
-	struct Texture* stored_tex = (struct Texture*)MemAlloc(sizeof(Texture));
-
-	// Copy the data from the texture given into the new texture
-	stored_tex->id = tex.id;
-	stored_tex->width = tex.width;
-	stored_tex->height = tex.height;
-	stored_tex->mipmaps = tex.mipmaps;
-	stored_tex->format = tex.format;
-
-	// Initialize the nk_image struct
-	img.handle.ptr = stored_tex;
-	img.w = (nk_ushort)stored_tex->width;
-	img.h = (nk_ushort)stored_tex->height;
-
-    // Set the region so we can sub-select the image later.
-    img.region[0] = (nk_ushort)0;
-    img.region[1] = (nk_ushort)0;
-    img.region[2] = img.w;
-    img.region[3] = img.h;
-
+	struct nk_image img = {0};
+	img.handle.id = (int)texture.id;
+	img.w = (nk_ushort)texture.width;
+	img.h = (nk_ushort)texture.height;
+	img.region[0] = 0;
+	img.region[1] = 0;
+	img.region[2] = img.w;
+	img.region[3] = img.h;
 	return img;
-}
-
-/**
- * Convert the given Nuklear image to a raylib Texture
- */
-NK_API struct Texture
-TextureFromNuklear(struct nk_image img)
-{
-	// Declare texture for storage
-	// And get back the stored texture
-	Texture tex;
-	Texture* stored_tex = (Texture*)img.handle.ptr;
-
-	// Copy the data from the stored texture to the texture
-	tex.id = stored_tex->id;
-	tex.width = stored_tex->width;
-	tex.height = stored_tex->height;
-	tex.mipmaps = stored_tex->mipmaps;
-	tex.format = stored_tex->format;
-
-	return tex;
-}
-
-/**
- * Load a Nuklear image directly
- *
- * @param path The path to the image
- */
-NK_API struct nk_image
-LoadNuklearImage(const char* path)
-{
-	return TextureToNuklear(LoadTexture(path));
-}
-
-/**
- * Unload a loaded Nuklear image
- *
- * @param img The Nuklear image to unload
- */
-NK_API void
-UnloadNuklearImage(struct nk_image img)
-{
-	Texture tex = TextureFromNuklear(img);
-	UnloadTexture(tex);
-	CleanupNuklearImage(img);
-}
-
-/**
- * Cleans up memory used by a Nuklear image
- * Does not unload the image.
- *
- * @param img The Nuklear image to cleanup
-*/
-NK_API void
-CleanupNuklearImage(struct nk_image img)
-{
-    MemFree(img.handle.ptr);
 }
 
 /**
