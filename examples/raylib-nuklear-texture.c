@@ -26,7 +26,8 @@ int main(void)
     SetNuklearScaling(ctx, 1.2f);
 
 	// Load the nk_image
-	struct nk_image img = LoadNuklearImage("resources/test-image.png");
+    Texture textImage = LoadTexture("resources/test-image.png");
+	struct nk_image img = TextureToNuklearImage(textImage);
 
 	while (!WindowShouldClose())
 	{
@@ -51,8 +52,7 @@ int main(void)
 		EndDrawing();
 	}
 
-	// Unload the Nuklear image
-	UnloadNuklearImage(img);
+    UnloadTexture(textImage);
 
 	CloseWindow();
 	return 0;

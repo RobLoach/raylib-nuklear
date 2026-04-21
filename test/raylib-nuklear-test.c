@@ -20,14 +20,18 @@ int main(int argc, char *argv[]) {
     const char* dir = GetDirectoryPath(argv[0]);
     Assert(ChangeDirectory(dir));
 
-    // InitNuklear()
-    struct nk_context *ctx = InitNuklear(10);
+    // InitNuklear(), IsNuklearValid()
+    struct nk_context *ctx = NULL;
+    AssertNot(IsNuklearValid(ctx));
+    ctx = InitNuklear(10);
     Assert(ctx);
+    Assert(IsNuklearValid(ctx));
 
     // Image
-    struct nk_image image = LoadNuklearImage("resources/test-image.png");
-    Assert(image.handle.ptr);
-    Texture texture = TextureFromNuklear(image);
+    Texture texture = LoadTexture("resources/test-image.png");
+    AssertTexture(texture);
+    struct nk_image image = TextureToNuklearImage(texture);
+    AssertEqual(texture.id, (unsigned int)image.handle.id);
     Assert(texture.width > 0);
 
     // UpdateNuklear()
@@ -57,8 +61,7 @@ int main(int argc, char *argv[]) {
     // Save a screenshot for debugging.
     TakeScreenshot("raylib-nuklear-test.png");
 
-    // UnloadNuklearImage()
-    UnloadNuklearImage(image);
+    UnloadTexture(texture);
 
     // UnloadNuklear()
     UnloadNuklear(ctx);
@@ -72,32 +75,32 @@ int main(int argc, char *argv[]) {
         UnloadFont(font);
     }
 
-    // RectangleFromNuklear()
+    // NuklearRectToRectangle()
     {
         ctx = NULL;
         struct nk_rect rect = nk_rect(10, 20, 30, 40);
-        Rectangle rectangle = RectangleFromNuklear(ctx, rect);
+        Rectangle rectangle = NuklearRectToRectangle(ctx, rect);
         AssertEqual(rect.x, rectangle.x);
         AssertEqual(rect.y, rectangle.y);
         AssertEqual(rect.w, rectangle.width);
         AssertEqual(rect.h, rectangle.height);
     }
 
-    // RectangleFromNuklear(), RectangleToNuklear(), with scaling
+    // NuklearRectToRectangle(), RectangleToNuklearRect(), with scaling
     {
         struct nk_rect rect = nk_rect(10, 20, 30, 40);
         ctx = InitNuklear(10);
         SetNuklearScaling(ctx, 2.0f);
         float scaling = GetNuklearScaling(ctx);
         AssertEqual(scaling, 2.0f, "Scaling was incorrectly set.");
-        Rectangle rectangle = RectangleFromNuklear(ctx, rect);
+        Rectangle rectangle = NuklearRectToRectangle(ctx, rect);
         AssertEqual(rect.x, rectangle.x / 2);
         AssertEqual(rect.y, rectangle.y / 2);
         AssertEqual(rect.w, rectangle.width / 2);
         AssertEqual(rect.h, rectangle.height / 2);
 
         rectangle = (Rectangle){20, 40, 60, 80};
-        rect = RectangleToNuklear(ctx, rectangle);
+        rect = RectangleToNuklearRect(ctx, rectangle);
         AssertEqual(rect.x, rectangle.x / 2);
         AssertEqual(rect.y, rectangle.y / 2);
         AssertEqual(rect.w, rectangle.width / 2);

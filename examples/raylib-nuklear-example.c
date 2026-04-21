@@ -43,7 +43,7 @@ int main(void)
     //--------------------------------------------------------------------------------------
 
     /* GUI */
-    struct nk_colorf bg = ColorToNuklearF(SKYBLUE);
+    struct nk_colorf bg = ColorToNuklearColorF(SKYBLUE);
     struct nk_context *ctx = InitNuklear(0);
 
     // Main game loop
@@ -92,7 +92,7 @@ int main(void)
         //----------------------------------------------------------------------------------
         BeginDrawing();
 
-            ClearBackground(ColorFromNuklearF(bg));
+            ClearBackground(NuklearColorFToColor(bg));
 
             DrawNuklear(ctx);
 
