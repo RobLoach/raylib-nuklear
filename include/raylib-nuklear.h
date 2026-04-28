@@ -45,8 +45,15 @@
 #define NK_INCLUDE_COMMAND_USERDATA
 #define NK_KEYSTATE_BASED_INPUT
 #ifdef RAYLIB_NUKLEAR_INCLUDE_DEFAULT_FONT
+    #ifndef NK_INCLUDE_FONT_BAKING
+        #define NK_INCLUDE_FONT_BAKING
+    #endif
     #ifndef NK_INCLUDE_DEFAULT_FONT
         #define NK_INCLUDE_DEFAULT_FONT
+    #endif
+    // Raylib already provides stbrp (rect pack) symbols with external linkage
+    #ifndef NK_NO_STB_RECT_PACK_IMPLEMENTATION
+        #define NK_NO_STB_RECT_PACK_IMPLEMENTATION
     #endif
 #endif
 
