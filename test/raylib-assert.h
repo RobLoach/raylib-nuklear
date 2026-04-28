@@ -3,12 +3,12 @@
 *   raylib-assert - Assertion library for raylib.
 *   https://github.com/robloach/raylib-assert
 *
-*   Version: v3.2.0
+*   Version: v3.3.0
 *
 *   Copyright 2026 Rob Loach (@RobLoach)
 *
 *   DEPENDENCIES:
-*       raylib 5.5+ https://www.raylib.com
+*       raylib 6.0+ https://www.raylib.com
 *
 *   LICENSE: zlib/libpng
 *
@@ -93,6 +93,12 @@ extern "C" {
 
 // Internal helper: true when two floats are within RAYLIB_ASSERT_EPSILON of each other.
 #define RAYLIB_ASSERT_FLOAT_EQ(a, b) (((float)(a) - (float)(b) >= 0 ? (float)(a) - (float)(b) : (float)(b) - (float)(a)) <= RAYLIB_ASSERT_EPSILON)
+
+// Internal helper: true when two color channels differ by no more than the given tolerance.
+#define RAYLIB_ASSERT_CHANNEL_WITHIN(a, b, tolerance) (((int)(a) - (int)(b) >= 0 ? (int)(a) - (int)(b) : (int)(b) - (int)(a)) <= (int)(tolerance))
+
+// Internal helper: true when a mesh contains basic CPU-side geometry data.
+#define RAYLIB_ASSERT_MESH_VALID(mesh) ((mesh).vertexCount > 0 && (mesh).triangleCount > 0 && (mesh).vertices != NULL)
 
 // Variadic Arguments
 #define RAYLIB_ASSERT_CAT( A, B ) A ## B
@@ -180,6 +186,19 @@ extern "C" {
 #define AssertImage(...) RAYLIB_ASSERT_VA_SELECT(AssertImage, __VA_ARGS__)
 
 /**
+ * Assert whether an image has the given dimensions.
+ *
+ * @param image The image to check.
+ * @param width The expected image width.
+ * @param height The expected image height.
+ * @param message (Optional) The message to provide on failed assertions.
+ * @param p1 (Optional) The first parameter in the message.
+ * @param p2 (Optional) The second parameter in the message.
+ * @param p3 (Optional) The third parameter in the message.
+ */
+#define AssertImageSize(...) RAYLIB_ASSERT_VA_SELECT(AssertImageSize, __VA_ARGS__)
+
+/**
  * Assert whether two images are the same.
  *
  * @param image1 The first image to check is equal to the second.
@@ -204,6 +223,19 @@ extern "C" {
  * @param p4 (Optional) The fourth parameter in the message.
  */
 #define AssertColorSame(...) RAYLIB_ASSERT_VA_SELECT(AssertColorSame, __VA_ARGS__)
+
+/**
+ * Assert whether two colors are approximately the same within a per-channel tolerance.
+ *
+ * @param color1 The first color to check.
+ * @param color2 The second color to check.
+ * @param tolerance The maximum allowed difference per RGBA channel.
+ * @param message (Optional) The message to provide on failed assertions.
+ * @param p1 (Optional) The first parameter in the message.
+ * @param p2 (Optional) The second parameter in the message.
+ * @param p3 (Optional) The third parameter in the message.
+ */
+#define AssertColorApprox(...) RAYLIB_ASSERT_VA_SELECT(AssertColorApprox, __VA_ARGS__)
 
 /**
  * Assert whether two Vector2s are the same.
@@ -401,6 +433,32 @@ extern "C" {
 #define AssertTexture(...) RAYLIB_ASSERT_VA_SELECT(AssertTexture, __VA_ARGS__)
 
 /**
+ * Assert whether a mesh contains valid CPU-side geometry data.
+ *
+ * @param mesh The mesh to check for valid data.
+ * @param message (Optional) The message to provide on failed assertions.
+ * @param p1 (Optional) The first parameter in the message.
+ * @param p2 (Optional) The second parameter in the message.
+ * @param p3 (Optional) The third parameter in the message.
+ * @param p4 (Optional) The fourth parameter in the message.
+ * @param p5 (Optional) The fifth parameter in the message.
+ */
+#define AssertMesh(...) RAYLIB_ASSERT_VA_SELECT(AssertMesh, __VA_ARGS__)
+
+/**
+ * Assert whether a material is loaded.
+ *
+ * @param material The material to check for valid data.
+ * @param message (Optional) The message to provide on failed assertions.
+ * @param p1 (Optional) The first parameter in the message.
+ * @param p2 (Optional) The second parameter in the message.
+ * @param p3 (Optional) The third parameter in the message.
+ * @param p4 (Optional) The fourth parameter in the message.
+ * @param p5 (Optional) The fifth parameter in the message.
+ */
+#define AssertMaterial(...) RAYLIB_ASSERT_VA_SELECT(AssertMaterial, __VA_ARGS__)
+
+/**
  * Assert whether a render texture is loaded.
  *
  * @param target The render texture to check for valid data.
@@ -451,6 +509,19 @@ extern "C" {
  * @param p5 (Optional) The fifth parameter in the message.
  */
 #define AssertModel(...) RAYLIB_ASSERT_VA_SELECT(AssertModel, __VA_ARGS__)
+
+/**
+ * Assert whether a model animation is valid for a given model.
+ *
+ * @param model The model to validate against.
+ * @param animation The animation to check.
+ * @param message (Optional) The message to provide on failed assertions.
+ * @param p1 (Optional) The first parameter in the message.
+ * @param p2 (Optional) The second parameter in the message.
+ * @param p3 (Optional) The third parameter in the message.
+ * @param p4 (Optional) The fourth parameter in the message.
+ */
+#define AssertModelAnimation(...) RAYLIB_ASSERT_VA_SELECT(AssertModelAnimation, __VA_ARGS__)
 
 /**
  * Assert whether a wave is loaded.
@@ -586,6 +657,16 @@ extern "C" {
 #define AssertImage_6(image, message, p1, p2, p3, p4) Assert_6(IsImageValid(image), message, p1, p2, p3, p4)
 #define AssertImage_7(image, message, p1, p2, p3, p4, p5) Assert_7(IsImageValid(image), message, p1, p2, p3, p4, p5)
 
+// AssertImageSize()
+#define AssertImageSize_0() AssertFail_1("No image provided for AssertImageSize()")
+#define AssertImageSize_1(image) AssertFail_1("Expected image, width, and height for AssertImageSize()")
+#define AssertImageSize_2(image, expectedWidth) AssertFail_1("Expected image, width, and height for AssertImageSize()")
+#define AssertImageSize_3(image, expectedWidth, expectedHeight) AssertImageSize_7(image, expectedWidth, expectedHeight, "AssertImageSize(%s, %s, %s) - Image size does not match", #image, #expectedWidth, #expectedHeight)
+#define AssertImageSize_4(image, expectedWidth, expectedHeight, message) Assert_2((image).width == (expectedWidth) && (image).height == (expectedHeight), message)
+#define AssertImageSize_5(image, expectedWidth, expectedHeight, message, p1) Assert_3((image).width == (expectedWidth) && (image).height == (expectedHeight), message, p1)
+#define AssertImageSize_6(image, expectedWidth, expectedHeight, message, p1, p2) Assert_4((image).width == (expectedWidth) && (image).height == (expectedHeight), message, p1, p2)
+#define AssertImageSize_7(image, expectedWidth, expectedHeight, message, p1, p2, p3) Assert_5((image).width == (expectedWidth) && (image).height == (expectedHeight), message, p1, p2, p3)
+
 // AssertTexture()
 #define AssertTexture_0() AssertFail_1("No texture provided for AssertTexture()")
 #define AssertTexture_1(texture) Assert_3(IsTextureValid(texture), "AssertTexture(%s) - Texture not loaded", #texture)
@@ -595,6 +676,26 @@ extern "C" {
 #define AssertTexture_5(texture, message, p1, p2, p3) Assert_5(IsTextureValid(texture), message, p1, p2, p3)
 #define AssertTexture_6(texture, message, p1, p2, p3, p4) Assert_6(IsTextureValid(texture), message, p1, p2, p3, p4)
 #define AssertTexture_7(texture, message, p1, p2, p3, p4, p5) Assert_7(IsTextureValid(texture), message, p1, p2, p3, p4, p5)
+
+// AssertMesh()
+#define AssertMesh_0() AssertFail_1("No mesh provided for AssertMesh()")
+#define AssertMesh_1(mesh) Assert_3(RAYLIB_ASSERT_MESH_VALID(mesh), "AssertMesh(%s) - Mesh not loaded", #mesh)
+#define AssertMesh_2(mesh, message) Assert_2(RAYLIB_ASSERT_MESH_VALID(mesh), message)
+#define AssertMesh_3(mesh, message, p1) Assert_3(RAYLIB_ASSERT_MESH_VALID(mesh), message, p1)
+#define AssertMesh_4(mesh, message, p1, p2) Assert_4(RAYLIB_ASSERT_MESH_VALID(mesh), message, p1, p2)
+#define AssertMesh_5(mesh, message, p1, p2, p3) Assert_5(RAYLIB_ASSERT_MESH_VALID(mesh), message, p1, p2, p3)
+#define AssertMesh_6(mesh, message, p1, p2, p3, p4) Assert_6(RAYLIB_ASSERT_MESH_VALID(mesh), message, p1, p2, p3, p4)
+#define AssertMesh_7(mesh, message, p1, p2, p3, p4, p5) Assert_7(RAYLIB_ASSERT_MESH_VALID(mesh), message, p1, p2, p3, p4, p5)
+
+// AssertMaterial()
+#define AssertMaterial_0() AssertFail_1("No material provided for AssertMaterial()")
+#define AssertMaterial_1(material) Assert_3(IsMaterialValid(material), "AssertMaterial(%s) - Material not loaded", #material)
+#define AssertMaterial_2(material, message) Assert_2(IsMaterialValid(material), message)
+#define AssertMaterial_3(material, message, p1) Assert_3(IsMaterialValid(material), message, p1)
+#define AssertMaterial_4(material, message, p1, p2) Assert_4(IsMaterialValid(material), message, p1, p2)
+#define AssertMaterial_5(material, message, p1, p2, p3) Assert_5(IsMaterialValid(material), message, p1, p2, p3)
+#define AssertMaterial_6(material, message, p1, p2, p3, p4) Assert_6(IsMaterialValid(material), message, p1, p2, p3, p4)
+#define AssertMaterial_7(material, message, p1, p2, p3, p4, p5) Assert_7(IsMaterialValid(material), message, p1, p2, p3, p4, p5)
 
 // AssertImageSame()
 #ifdef RAYLIB_ASSERT_NDEBUG
@@ -661,6 +762,31 @@ extern "C" {
 #define AssertColorSame_5(color1, color2, message, p1, p2) AssertColorSame_3(color1, color2, RAYLIB_ASSERT_TEXTFORMAT(message, p1, p2))
 #define AssertColorSame_6(color1, color2, message, p1, p2, p3) AssertColorSame_3(color1, color2, RAYLIB_ASSERT_TEXTFORMAT(message, p1, p2, p3))
 #define AssertColorSame_7(color1, color2, message, p1, p2, p3, p4) AssertColorSame_3(color1, color2, RAYLIB_ASSERT_TEXTFORMAT(message, p1, p2, p3, p4))
+#endif
+
+// AssertColorApprox()
+#ifdef RAYLIB_ASSERT_NDEBUG
+#define AssertColorApprox_0()
+#define AssertColorApprox_1(color)
+#define AssertColorApprox_2(color1, color2)
+#define AssertColorApprox_3(color1, color2, tolerance)
+#define AssertColorApprox_4(color1, color2, tolerance, message)
+#define AssertColorApprox_5(color1, color2, tolerance, message, p1)
+#define AssertColorApprox_6(color1, color2, tolerance, message, p1, p2)
+#define AssertColorApprox_7(color1, color2, tolerance, message, p1, p2, p3)
+#else
+#define AssertColorApprox_0() AssertFail_1("Colors not provided to AssertColorApprox()")
+#define AssertColorApprox_1(color) AssertFail_1("Expected two colors and a tolerance for AssertColorApprox()")
+#define AssertColorApprox_2(color1, color2) AssertFail_1("Expected two colors and a tolerance for AssertColorApprox()")
+#define AssertColorApprox_3(color1, color2, tolerance) AssertColorApprox_7(color1, color2, tolerance, "AssertColorApprox(%s, %s, %s) - Colors differ beyond tolerance", #color1, #color2, #tolerance)
+#define AssertColorApprox_4(color1, color2, tolerance, message) do { \
+    if (!RAYLIB_ASSERT_CHANNEL_WITHIN((color1).r, (color2).r, tolerance) || !RAYLIB_ASSERT_CHANNEL_WITHIN((color1).g, (color2).g, tolerance) || !RAYLIB_ASSERT_CHANNEL_WITHIN((color1).b, (color2).b, tolerance) || !RAYLIB_ASSERT_CHANNEL_WITHIN((color1).a, (color2).a, tolerance)) { \
+        AssertFail_1(message); \
+    }\
+} while (0)
+#define AssertColorApprox_5(color1, color2, tolerance, message, p1) AssertColorApprox_4(color1, color2, tolerance, RAYLIB_ASSERT_TEXTFORMAT(message, p1))
+#define AssertColorApprox_6(color1, color2, tolerance, message, p1, p2) AssertColorApprox_4(color1, color2, tolerance, RAYLIB_ASSERT_TEXTFORMAT(message, p1, p2))
+#define AssertColorApprox_7(color1, color2, tolerance, message, p1, p2, p3) AssertColorApprox_4(color1, color2, tolerance, RAYLIB_ASSERT_TEXTFORMAT(message, p1, p2, p3))
 #endif
 
 // AssertVector2Same()
@@ -902,6 +1028,16 @@ extern "C" {
 #define AssertModel_5(model, message, p1, p2, p3) Assert_5(IsModelValid(model), message, p1, p2, p3)
 #define AssertModel_6(model, message, p1, p2, p3, p4) Assert_6(IsModelValid(model), message, p1, p2, p3, p4)
 #define AssertModel_7(model, message, p1, p2, p3, p4, p5) Assert_7(IsModelValid(model), message, p1, p2, p3, p4, p5)
+
+// AssertModelAnimation()
+#define AssertModelAnimation_0() AssertFail_1("No model or animation provided for AssertModelAnimation()")
+#define AssertModelAnimation_1(model) AssertFail_1("Expected model and animation for AssertModelAnimation()")
+#define AssertModelAnimation_2(model, animation) Assert_4(IsModelAnimationValid(model, animation), "AssertModelAnimation(%s, %s) - Animation is not valid for model", #model, #animation)
+#define AssertModelAnimation_3(model, animation, message) Assert_2(IsModelAnimationValid(model, animation), message)
+#define AssertModelAnimation_4(model, animation, message, p1) Assert_3(IsModelAnimationValid(model, animation), message, p1)
+#define AssertModelAnimation_5(model, animation, message, p1, p2) Assert_4(IsModelAnimationValid(model, animation), message, p1, p2)
+#define AssertModelAnimation_6(model, animation, message, p1, p2, p3) Assert_5(IsModelAnimationValid(model, animation), message, p1, p2, p3)
+#define AssertModelAnimation_7(model, animation, message, p1, p2, p3, p4) Assert_6(IsModelAnimationValid(model, animation), message, p1, p2, p3, p4)
 
 // AssertWave()
 #define AssertWave_0() AssertFail_1("No wave provided for AssertWave()")
