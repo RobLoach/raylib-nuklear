@@ -816,6 +816,9 @@ struct nk_raylib_input_keyboard_check {
     bool needs_ctrl_cmd; // true = only active when ctrl or command is held
 };
 
+/**
+ * The number of entries in the nk_raylib_keyboard_checks map.
+ */
 #define NK_RAYLIB_INPUT_KEYBOARD_CHECK_NUM 17
 /**
  * A map determining the Nuklear to raylib keys.
