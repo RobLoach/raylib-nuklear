@@ -816,7 +816,7 @@ struct nk_raylib_input_keyboard_check {
     bool needs_ctrl_cmd; // true = only active when ctrl or command is held
 };
 
-#define NK_RAYLIB_INPUT_KEYBOARD_CHECK_NUM 16
+#define NK_RAYLIB_INPUT_KEYBOARD_CHECK_NUM 17
 /**
  * A map determining the Nuklear to raylib keys.
  */
@@ -836,7 +836,8 @@ static const struct nk_raylib_input_keyboard_check nk_raylib_keyboard_checks[NK_
     {KEY_RIGHT,     NK_KEY_RIGHT,           false},
     {KEY_LEFT,      NK_KEY_LEFT,            false},
     {KEY_UP,        NK_KEY_UP,              false},
-    {KEY_DOWN,      NK_KEY_DOWN,            false}
+    {KEY_DOWN,      NK_KEY_DOWN,            false},
+    {KEY_ESCAPE,    NK_KEY_TEXT_RESET_MODE, false}
 };
 
 /**
