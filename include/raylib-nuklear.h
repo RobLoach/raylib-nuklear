@@ -819,7 +819,7 @@ struct nk_raylib_input_keyboard_check {
 /**
  * The number of entries in the nk_raylib_keyboard_checks map.
  */
-#define NK_RAYLIB_INPUT_KEYBOARD_CHECK_NUM 17
+#define NK_RAYLIB_INPUT_KEYBOARD_CHECK_NUM 18
 /**
  * A map determining the Nuklear to raylib keys.
  */
@@ -840,7 +840,8 @@ static const struct nk_raylib_input_keyboard_check nk_raylib_keyboard_checks[NK_
     {KEY_LEFT,      NK_KEY_LEFT,            false},
     {KEY_UP,        NK_KEY_UP,              false},
     {KEY_DOWN,      NK_KEY_DOWN,            false},
-    {KEY_ESCAPE,    NK_KEY_TEXT_RESET_MODE, false}
+    {KEY_ESCAPE,    NK_KEY_TEXT_RESET_MODE, false},
+    {KEY_X,         NK_KEY_CUT,            true}
 };
 
 /**
@@ -868,6 +869,7 @@ nk_raylib_input_keyboard(struct nk_context * ctx)
     }
 
     nk_input_key(ctx, NK_KEY_SHIFT, shift);
+    nk_input_key(ctx, NK_KEY_CTRL, control);
 
     if (checked) {
         return;
@@ -884,8 +886,12 @@ nk_raylib_input_keyboard(struct nk_context * ctx)
     nk_input_key(ctx, NK_KEY_SCROLL_DOWN, IsKeyDown(KEY_PAGE_DOWN));
     nk_input_key(ctx, NK_KEY_SCROLL_UP, IsKeyDown(KEY_PAGE_UP));
 
-    // Functions
-    if (IsKeyPressed(KEY_TAB)) nk_input_unicode(ctx, 9);
+    nk_input_key(ctx, NK_KEY_TAB, IsKeyDown(KEY_TAB));
+
+    static bool nk_raylib_insert_mode = true;
+    if (IsKeyPressed(KEY_INSERT)) nk_raylib_insert_mode = !nk_raylib_insert_mode;
+    nk_input_key(ctx, NK_KEY_TEXT_INSERT_MODE, nk_raylib_insert_mode);
+    nk_input_key(ctx, NK_KEY_TEXT_REPLACE_MODE, !nk_raylib_insert_mode);
 
     // Unicode
     int code;
