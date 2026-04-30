@@ -1,6 +1,6 @@
 /**********************************************************************************************
 *
-*   raylib-nuklear-font - Example of using Nuklear with a custom Raylib font.
+*   raylib-nuklear-font - Example of using Nuklear with the default font provided from Nuklear.
 *
 *   LICENSE: zlib/libpng
 *

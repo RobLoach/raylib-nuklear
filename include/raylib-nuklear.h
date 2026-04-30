@@ -44,6 +44,18 @@
 #define NK_INCLUDE_STANDARD_BOOL
 #define NK_INCLUDE_COMMAND_USERDATA
 #define NK_KEYSTATE_BASED_INPUT
+#ifdef RAYLIB_NUKLEAR_INCLUDE_DEFAULT_FONT
+    #ifndef NK_INCLUDE_FONT_BAKING
+        #define NK_INCLUDE_FONT_BAKING
+    #endif
+    #ifndef NK_INCLUDE_DEFAULT_FONT
+        #define NK_INCLUDE_DEFAULT_FONT
+    #endif
+    // Raylib already provides stbrp (rect pack) symbols with external linkage
+    #ifndef NK_NO_STB_RECT_PACK_IMPLEMENTATION
+        #define NK_NO_STB_RECT_PACK_IMPLEMENTATION
+    #endif
+#endif
 
 #ifndef NK_ASSERT
 #ifdef NDEBUG
@@ -143,10 +155,6 @@ extern "C" {
  */
 #define RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS 20
 #endif  // RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS
-
-#ifdef RAYLIB_NUKLEAR_INCLUDE_DEFAULT_FONT
-    #include "raylib-nuklear-font.h"
-#endif
 
 /**
  * The user data that's leverages internally through Nuklear.
@@ -419,7 +427,19 @@ NK_API Font LoadFontFromNuklear(int size) {
     #define RAYLIB_NUKLEAR_DEFAULT_FONT_GLYPHS 95
     #endif
 
-    return LoadFontFromMemory(".ttf", RAYLIB_NUKLEAR_DEFAULT_FONT_NAME, RAYLIB_NUKLEAR_DEFAULT_FONT_SIZE, size, NULL, RAYLIB_NUKLEAR_DEFAULT_FONT_GLYPHS);
+    // Decode base85 -> compressed binary -> raw TTF
+    int compressed_size = (((int)nk_strlen(nk_proggy_clean_ttf_compressed_data_base85) + 4) / 5) * 4;
+    unsigned char *compressed_data = (unsigned char*)MemAlloc((unsigned int)compressed_size);
+    nk_decode_85(compressed_data, (const unsigned char*)nk_proggy_clean_ttf_compressed_data_base85);
+
+    unsigned int ttf_size = nk_decompress_length(compressed_data);
+    unsigned char *ttf_data = (unsigned char*)MemAlloc(ttf_size);
+    nk_decompress(ttf_data, compressed_data, (unsigned int)compressed_size);
+    MemFree(compressed_data);
+
+    Font font = LoadFontFromMemory(".ttf", ttf_data, (int)ttf_size, size, NULL, RAYLIB_NUKLEAR_DEFAULT_FONT_GLYPHS);
+    MemFree(ttf_data);
+    return font;
 #endif
 }
 
