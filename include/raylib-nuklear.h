@@ -836,7 +836,10 @@ struct nk_raylib_input_keyboard_check {
     bool needs_ctrl_cmd; // true = only active when ctrl or command is held
 };
 
-#define NK_RAYLIB_INPUT_KEYBOARD_CHECK_NUM 16
+/**
+ * The number of entries in the nk_raylib_keyboard_checks map.
+ */
+#define NK_RAYLIB_INPUT_KEYBOARD_CHECK_NUM 14
 /**
  * A map determining the Nuklear to raylib keys.
  */
@@ -853,10 +856,8 @@ static const struct nk_raylib_input_keyboard_check nk_raylib_keyboard_checks[NK_
     {KEY_A,         NK_KEY_TEXT_SELECT_ALL, true},
     {KEY_LEFT,      NK_KEY_TEXT_WORD_LEFT,  true},
     {KEY_RIGHT,     NK_KEY_TEXT_WORD_RIGHT, true},
-    {KEY_RIGHT,     NK_KEY_RIGHT,           false},
-    {KEY_LEFT,      NK_KEY_LEFT,            false},
-    {KEY_UP,        NK_KEY_UP,              false},
-    {KEY_DOWN,      NK_KEY_DOWN,            false}
+    {KEY_ESCAPE,    NK_KEY_TEXT_RESET_MODE, false},
+    {KEY_X,         NK_KEY_CUT,            true}
 };
 
 /**
@@ -872,36 +873,32 @@ nk_raylib_input_keyboard(struct nk_context * ctx)
     bool control = IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL);
     bool command = IsKeyDown(KEY_LEFT_SUPER);
     bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
-    bool checked = false;
     for (int i = 0; i < NK_RAYLIB_INPUT_KEYBOARD_CHECK_NUM; i++) {
         bool modifier_active = !nk_raylib_keyboard_checks[i].needs_ctrl_cmd || (control || command);
-        if (IsKeyDown(nk_raylib_keyboard_checks[i].key) && modifier_active) {
-            nk_input_key(ctx, (enum nk_keys)nk_raylib_keyboard_checks[i].input_key, true);
-            checked = true;
-        } else {
-            nk_input_key(ctx, (enum nk_keys)nk_raylib_keyboard_checks[i].input_key, false);
-        }
+        nk_input_key(ctx, (enum nk_keys)nk_raylib_keyboard_checks[i].input_key,
+            IsKeyDown(nk_raylib_keyboard_checks[i].key) && modifier_active);
     }
 
     nk_input_key(ctx, NK_KEY_SHIFT, shift);
+    nk_input_key(ctx, NK_KEY_CTRL, control || command);
 
-    if (checked) {
-        return;
-    }
-
-    nk_input_key(ctx, NK_KEY_LEFT, IsKeyDown(KEY_LEFT));
-    nk_input_key(ctx, NK_KEY_RIGHT, IsKeyDown(KEY_RIGHT));
+    nk_input_key(ctx, NK_KEY_LEFT, IsKeyDown(KEY_LEFT) && !control && !command);
+    nk_input_key(ctx, NK_KEY_RIGHT, IsKeyDown(KEY_RIGHT) && !control && !command);
     nk_input_key(ctx, NK_KEY_UP, IsKeyDown(KEY_UP));
     nk_input_key(ctx, NK_KEY_DOWN, IsKeyDown(KEY_DOWN));
-    nk_input_key(ctx, NK_KEY_TEXT_START, IsKeyDown(KEY_HOME));
-    nk_input_key(ctx, NK_KEY_TEXT_END, IsKeyDown(KEY_END));
+    nk_input_key(ctx, NK_KEY_TEXT_START, IsKeyDown(KEY_HOME) && !control);
+    nk_input_key(ctx, NK_KEY_TEXT_END, IsKeyDown(KEY_END) && !control);
     nk_input_key(ctx, NK_KEY_SCROLL_START, IsKeyDown(KEY_HOME) && control);
     nk_input_key(ctx, NK_KEY_SCROLL_END, IsKeyDown(KEY_END) && control);
     nk_input_key(ctx, NK_KEY_SCROLL_DOWN, IsKeyDown(KEY_PAGE_DOWN));
     nk_input_key(ctx, NK_KEY_SCROLL_UP, IsKeyDown(KEY_PAGE_UP));
 
-    // Functions
-    if (IsKeyPressed(KEY_TAB)) nk_input_unicode(ctx, 9);
+    nk_input_key(ctx, NK_KEY_TAB, IsKeyDown(KEY_TAB));
+
+    static bool nk_raylib_insert_mode = true;
+    if (IsKeyPressed(KEY_INSERT)) nk_raylib_insert_mode = !nk_raylib_insert_mode;
+    nk_input_key(ctx, NK_KEY_TEXT_INSERT_MODE, nk_raylib_insert_mode);
+    nk_input_key(ctx, NK_KEY_TEXT_REPLACE_MODE, !nk_raylib_insert_mode);
 
     // Unicode
     int code;

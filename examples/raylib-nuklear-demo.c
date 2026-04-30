@@ -83,10 +83,13 @@ void UpdateDrawFrame(void);     // Update and Draw one frame
 // Main Entry Point
 //----------------------------------------------------------------------------------
 int main(void) {
-        // Initialization
+    // Initialization
     //--------------------------------------------------------------------------------------
     SetConfigFlags(FLAG_WINDOW_RESIZABLE);
     InitWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "[raylib-nuklear] demo");
+
+    // This example disables ESC so that we can make sure it's usable
+    SetExitKey(KEY_NULL);
     SetTargetFPS(60);
 
     /* GUI */
