@@ -819,7 +819,7 @@ struct nk_raylib_input_keyboard_check {
 /**
  * The number of entries in the nk_raylib_keyboard_checks map.
  */
-#define NK_RAYLIB_INPUT_KEYBOARD_CHECK_NUM 18
+#define NK_RAYLIB_INPUT_KEYBOARD_CHECK_NUM 14
 /**
  * A map determining the Nuklear to raylib keys.
  */
@@ -836,10 +836,6 @@ static const struct nk_raylib_input_keyboard_check nk_raylib_keyboard_checks[NK_
     {KEY_A,         NK_KEY_TEXT_SELECT_ALL, true},
     {KEY_LEFT,      NK_KEY_TEXT_WORD_LEFT,  true},
     {KEY_RIGHT,     NK_KEY_TEXT_WORD_RIGHT, true},
-    {KEY_RIGHT,     NK_KEY_RIGHT,           false},
-    {KEY_LEFT,      NK_KEY_LEFT,            false},
-    {KEY_UP,        NK_KEY_UP,              false},
-    {KEY_DOWN,      NK_KEY_DOWN,            false},
     {KEY_ESCAPE,    NK_KEY_TEXT_RESET_MODE, false},
     {KEY_X,         NK_KEY_CUT,            true}
 };
@@ -866,6 +862,10 @@ nk_raylib_input_keyboard(struct nk_context * ctx)
     nk_input_key(ctx, NK_KEY_SHIFT, shift);
     nk_input_key(ctx, NK_KEY_CTRL, control || command);
 
+    nk_input_key(ctx, NK_KEY_LEFT, IsKeyDown(KEY_LEFT) && !control && !command);
+    nk_input_key(ctx, NK_KEY_RIGHT, IsKeyDown(KEY_RIGHT) && !control && !command);
+    nk_input_key(ctx, NK_KEY_UP, IsKeyDown(KEY_UP));
+    nk_input_key(ctx, NK_KEY_DOWN, IsKeyDown(KEY_DOWN));
     nk_input_key(ctx, NK_KEY_TEXT_START, IsKeyDown(KEY_HOME) && !control);
     nk_input_key(ctx, NK_KEY_TEXT_END, IsKeyDown(KEY_END) && !control);
     nk_input_key(ctx, NK_KEY_SCROLL_START, IsKeyDown(KEY_HOME) && control);
