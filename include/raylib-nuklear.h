@@ -857,30 +857,17 @@ nk_raylib_input_keyboard(struct nk_context * ctx)
     bool control = IsKeyDown(KEY_LEFT_CONTROL) || IsKeyDown(KEY_RIGHT_CONTROL);
     bool command = IsKeyDown(KEY_LEFT_SUPER);
     bool shift = IsKeyDown(KEY_LEFT_SHIFT) || IsKeyDown(KEY_RIGHT_SHIFT);
-    bool checked = false;
     for (int i = 0; i < NK_RAYLIB_INPUT_KEYBOARD_CHECK_NUM; i++) {
         bool modifier_active = !nk_raylib_keyboard_checks[i].needs_ctrl_cmd || (control || command);
-        if (IsKeyDown(nk_raylib_keyboard_checks[i].key) && modifier_active) {
-            nk_input_key(ctx, (enum nk_keys)nk_raylib_keyboard_checks[i].input_key, true);
-            checked = true;
-        } else {
-            nk_input_key(ctx, (enum nk_keys)nk_raylib_keyboard_checks[i].input_key, false);
-        }
+        nk_input_key(ctx, (enum nk_keys)nk_raylib_keyboard_checks[i].input_key,
+            IsKeyDown(nk_raylib_keyboard_checks[i].key) && modifier_active);
     }
 
     nk_input_key(ctx, NK_KEY_SHIFT, shift);
-    nk_input_key(ctx, NK_KEY_CTRL, control);
+    nk_input_key(ctx, NK_KEY_CTRL, control || command);
 
-    if (checked) {
-        return;
-    }
-
-    nk_input_key(ctx, NK_KEY_LEFT, IsKeyDown(KEY_LEFT));
-    nk_input_key(ctx, NK_KEY_RIGHT, IsKeyDown(KEY_RIGHT));
-    nk_input_key(ctx, NK_KEY_UP, IsKeyDown(KEY_UP));
-    nk_input_key(ctx, NK_KEY_DOWN, IsKeyDown(KEY_DOWN));
-    nk_input_key(ctx, NK_KEY_TEXT_START, IsKeyDown(KEY_HOME));
-    nk_input_key(ctx, NK_KEY_TEXT_END, IsKeyDown(KEY_END));
+    nk_input_key(ctx, NK_KEY_TEXT_START, IsKeyDown(KEY_HOME) && !control);
+    nk_input_key(ctx, NK_KEY_TEXT_END, IsKeyDown(KEY_END) && !control);
     nk_input_key(ctx, NK_KEY_SCROLL_START, IsKeyDown(KEY_HOME) && control);
     nk_input_key(ctx, NK_KEY_SCROLL_END, IsKeyDown(KEY_END) && control);
     nk_input_key(ctx, NK_KEY_SCROLL_DOWN, IsKeyDown(KEY_PAGE_DOWN));
