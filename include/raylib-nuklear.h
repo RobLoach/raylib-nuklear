@@ -1189,7 +1189,7 @@ KeyboardKeyToNuklearKey(KeyboardKey key)
         case KEY_ENTER:         return (nk_rune)NK_KEY_ENTER;
         case KEY_TAB:           return (nk_rune)NK_KEY_TAB;
         case KEY_LEFT_SHIFT:
-        case KEY_RIGHT_SHIFT:   return (nk_rune)NK_KEY_SHIFT;
+        case KEY_RIGHT_SHIFT:   return (nk_rune)NK_KEY_SHIFT; // Both map to NK_KEY_SHIFT; NuklearKeyToKeyboardKey returns only KEY_LEFT_SHIFT
         case KEY_BACKSPACE:     return (nk_rune)NK_KEY_BACKSPACE;
         case KEY_ESCAPE:        return (nk_rune)NK_KEY_TEXT_RESET_MODE;
         case KEY_DELETE:        return (nk_rune)NK_KEY_DEL;
