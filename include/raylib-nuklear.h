@@ -88,6 +88,8 @@ NK_API struct nk_rect RectangleToNuklearRect(struct nk_context * ctx, Rectangle 
 NK_API struct nk_image TextureToNuklearImage(Texture texture);               // Get a Nuklear image from a Texture
 NK_API void SetNuklearScaling(struct nk_context * ctx, float scaling); // Sets the scaling for the given Nuklear context
 NK_API float GetNuklearScaling(struct nk_context * ctx);            // Retrieves the scaling of the given Nuklear context
+NK_API KeyboardKey NuklearKeyToKeyboardKey(nk_rune key);                 // Convert an nk_rune key binding to a raylib KeyboardKey
+NK_API nk_rune KeyboardKeyToNuklearKey(KeyboardKey key);                 // Convert a raylib KeyboardKey to an nk_rune key binding
 
 // Internal Nuklear functions
 NK_API float nk_raylib_font_get_text_width(nk_handle handle, float height, const char *text, int len);
@@ -1114,6 +1116,101 @@ GetNuklearScaling(struct nk_context * ctx)
     }
 
     return 1.0f;
+}
+
+/**
+ * Convert an nk_rune key binding to a raylib KeyboardKey.
+ */
+NK_API KeyboardKey
+NuklearKeyToKeyboardKey(nk_rune key)
+{
+    if (key == 0 || key == (nk_rune)NK_KEY_MAX) return KEY_NULL;
+    if (key < (nk_rune)NK_KEY_MAX) {
+        switch ((enum nk_keys)key) {
+            case NK_KEY_ENTER:           return KEY_ENTER;
+            case NK_KEY_TAB:             return KEY_TAB;
+            case NK_KEY_SHIFT:           return KEY_LEFT_SHIFT; // KEY_RIGHT_SHIFT also maps to NK_KEY_SHIFT but is not reversible
+            case NK_KEY_BACKSPACE:       return KEY_BACKSPACE;
+            case NK_KEY_TEXT_RESET_MODE: return KEY_ESCAPE;
+            case NK_KEY_DEL:             return KEY_DELETE;
+            case NK_KEY_UP:              return KEY_UP;
+            case NK_KEY_DOWN:            return KEY_DOWN;
+            case NK_KEY_LEFT:            return KEY_LEFT;
+            case NK_KEY_RIGHT:           return KEY_RIGHT;
+            case NK_KEY_F1:              return KEY_F1;
+            case NK_KEY_F2:              return KEY_F2;
+            case NK_KEY_F3:              return KEY_F3;
+            case NK_KEY_F4:              return KEY_F4;
+            case NK_KEY_F5:              return KEY_F5;
+            case NK_KEY_F6:              return KEY_F6;
+            case NK_KEY_F7:              return KEY_F7;
+            case NK_KEY_F8:              return KEY_F8;
+            case NK_KEY_F9:              return KEY_F9;
+            case NK_KEY_F10:             return KEY_F10;
+            case NK_KEY_F11:             return KEY_F11;
+            case NK_KEY_F12:             return KEY_F12;
+            default:                     return KEY_NULL;
+        }
+    }
+    if (key >= 'a' && key <= 'z') key -= 32;
+    switch (key) {
+        case '+': return KEY_EQUAL;
+        case '_': return KEY_MINUS;
+        case '?': return KEY_SLASH;
+        case ':': return KEY_SEMICOLON;
+        case '"': return KEY_APOSTROPHE;
+        case '<': return KEY_COMMA;
+        case '>': return KEY_PERIOD;
+        case '{': return KEY_LEFT_BRACKET;
+        case '}': return KEY_RIGHT_BRACKET;
+        case '|': return KEY_BACKSLASH;
+        case '~': return KEY_GRAVE;
+        case '!': return KEY_ONE;
+        case '@': return KEY_TWO;
+        case '#': return KEY_THREE;
+        case '$': return KEY_FOUR;
+        case '%': return KEY_FIVE;
+        case '^': return KEY_SIX;
+        case '&': return KEY_SEVEN;
+        case '*': return KEY_EIGHT;
+        case '(': return KEY_NINE;
+        case ')': return KEY_ZERO;
+    }
+    return (KeyboardKey)(int)key;
+}
+
+/**
+ * Convert a raylib KeyboardKey to an nk_rune key binding.
+ */
+NK_API nk_rune
+KeyboardKeyToNuklearKey(KeyboardKey key)
+{
+    switch (key) {
+        case KEY_ENTER:         return (nk_rune)NK_KEY_ENTER;
+        case KEY_TAB:           return (nk_rune)NK_KEY_TAB;
+        case KEY_LEFT_SHIFT:
+        case KEY_RIGHT_SHIFT:   return (nk_rune)NK_KEY_SHIFT; // Both map to NK_KEY_SHIFT; NuklearKeyToKeyboardKey returns only KEY_LEFT_SHIFT
+        case KEY_BACKSPACE:     return (nk_rune)NK_KEY_BACKSPACE;
+        case KEY_ESCAPE:        return (nk_rune)NK_KEY_TEXT_RESET_MODE;
+        case KEY_DELETE:        return (nk_rune)NK_KEY_DEL;
+        case KEY_UP:            return (nk_rune)NK_KEY_UP;
+        case KEY_DOWN:          return (nk_rune)NK_KEY_DOWN;
+        case KEY_LEFT:          return (nk_rune)NK_KEY_LEFT;
+        case KEY_RIGHT:         return (nk_rune)NK_KEY_RIGHT;
+        case KEY_F1:            return (nk_rune)NK_KEY_F1;
+        case KEY_F2:            return (nk_rune)NK_KEY_F2;
+        case KEY_F3:            return (nk_rune)NK_KEY_F3;
+        case KEY_F4:            return (nk_rune)NK_KEY_F4;
+        case KEY_F5:            return (nk_rune)NK_KEY_F5;
+        case KEY_F6:            return (nk_rune)NK_KEY_F6;
+        case KEY_F7:            return (nk_rune)NK_KEY_F7;
+        case KEY_F8:            return (nk_rune)NK_KEY_F8;
+        case KEY_F9:            return (nk_rune)NK_KEY_F9;
+        case KEY_F10:           return (nk_rune)NK_KEY_F10;
+        case KEY_F11:           return (nk_rune)NK_KEY_F11;
+        case KEY_F12:           return (nk_rune)NK_KEY_F12;
+        default:                return (nk_rune)key;
+    }
 }
 
 #ifdef __cplusplus
