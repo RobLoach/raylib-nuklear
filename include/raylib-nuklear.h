@@ -1124,12 +1124,12 @@ GetNuklearScaling(struct nk_context * ctx)
 NK_API KeyboardKey
 NuklearKeyToKeyboardKey(nk_rune key)
 {
-    if (key == 0) return KEY_NULL;
+    if (key == 0 || key == (nk_rune)NK_KEY_MAX) return KEY_NULL;
     if (key < (nk_rune)NK_KEY_MAX) {
         switch ((enum nk_keys)key) {
             case NK_KEY_ENTER:           return KEY_ENTER;
             case NK_KEY_TAB:             return KEY_TAB;
-            case NK_KEY_SHIFT:           return KEY_LEFT_SHIFT;
+            case NK_KEY_SHIFT:           return KEY_LEFT_SHIFT; // KEY_RIGHT_SHIFT also maps to NK_KEY_SHIFT but is not reversible
             case NK_KEY_BACKSPACE:       return KEY_BACKSPACE;
             case NK_KEY_TEXT_RESET_MODE: return KEY_ESCAPE;
             case NK_KEY_DEL:             return KEY_DELETE;
