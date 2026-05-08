@@ -88,8 +88,8 @@ NK_API struct nk_rect RectangleToNuklearRect(struct nk_context * ctx, Rectangle 
 NK_API struct nk_image TextureToNuklearImage(Texture texture);               // Get a Nuklear image from a Texture
 NK_API void SetNuklearScaling(struct nk_context * ctx, float scaling); // Sets the scaling for the given Nuklear context
 NK_API float GetNuklearScaling(struct nk_context * ctx);            // Retrieves the scaling of the given Nuklear context
-NK_API KeyboardKey NkKeyToKeyboardKey(nk_rune key);                 // Convert an nk_rune key binding to a raylib KeyboardKey
-NK_API nk_rune KeyboardKeyToNkKey(KeyboardKey key);                 // Convert a raylib KeyboardKey to an nk_rune key binding
+NK_API KeyboardKey NuklearKeyToKeyboardKey(nk_rune key);                 // Convert an nk_rune key binding to a raylib KeyboardKey
+NK_API nk_rune KeyboardKeyToNuklearKey(KeyboardKey key);                 // Convert a raylib KeyboardKey to an nk_rune key binding
 
 // Internal Nuklear functions
 NK_API float nk_raylib_font_get_text_width(nk_handle handle, float height, const char *text, int len);
@@ -1122,7 +1122,7 @@ GetNuklearScaling(struct nk_context * ctx)
  * Convert an nk_rune key binding to a raylib KeyboardKey.
  */
 NK_API KeyboardKey
-NkKeyToKeyboardKey(nk_rune key)
+NuklearKeyToKeyboardKey(nk_rune key)
 {
     if (key == 0) return KEY_NULL;
     if (key < (nk_rune)NK_KEY_MAX) {
@@ -1183,7 +1183,7 @@ NkKeyToKeyboardKey(nk_rune key)
  * Convert a raylib KeyboardKey to an nk_rune key binding.
  */
 NK_API nk_rune
-KeyboardKeyToNkKey(KeyboardKey key)
+KeyboardKeyToNuklearKey(KeyboardKey key)
 {
     switch (key) {
         case KEY_ENTER:         return (nk_rune)NK_KEY_ENTER;
