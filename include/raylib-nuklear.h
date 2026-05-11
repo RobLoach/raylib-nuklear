@@ -1,6 +1,6 @@
 /**********************************************************************************************
 *
-*   raylib-nuklear v6.0.0 - Nuklear GUI for Raylib.
+*   raylib-nuklear v6.0.1 - Nuklear GUI for Raylib.
 *
 *   FEATURES:
 *       - Use the Nuklear immediate-mode graphical user interface in raylib.

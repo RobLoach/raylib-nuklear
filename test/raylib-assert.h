@@ -3,7 +3,7 @@
 *   raylib-assert - Assertion library for raylib.
 *   https://github.com/robloach/raylib-assert
 *
-*   Version: v3.3.0
+*   Version: v3.3.1
 *
 *   Copyright 2026 Rob Loach (@RobLoach)
 *
@@ -36,6 +36,10 @@
 #define RAYLIB_ASSERT_H
 
 #include <stddef.h> // NULL
+
+#ifndef RAYLIB_H
+#error "raylib-assert.h requires raylib.h to be included before raylib-assert.h"
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -92,17 +96,35 @@ extern "C" {
 #endif
 
 // Internal helper: true when two floats are within RAYLIB_ASSERT_EPSILON of each other.
-#define RAYLIB_ASSERT_FLOAT_EQ(a, b) (((float)(a) - (float)(b) >= 0 ? (float)(a) - (float)(b) : (float)(b) - (float)(a)) <= RAYLIB_ASSERT_EPSILON)
+static inline bool RaylibAssertFloatEq(float a, float b)
+{
+    float delta = a - b;
+    if (delta < 0.0f) delta = -delta;
+    return delta <= RAYLIB_ASSERT_EPSILON;
+}
 
 // Internal helper: true when two color channels differ by no more than the given tolerance.
-#define RAYLIB_ASSERT_CHANNEL_WITHIN(a, b, tolerance) (((int)(a) - (int)(b) >= 0 ? (int)(a) - (int)(b) : (int)(b) - (int)(a)) <= (int)(tolerance))
+static inline bool RaylibAssertChannelWithin(int a, int b, int tolerance)
+{
+    int delta = a - b;
+    if (delta < 0) delta = -delta;
+    return delta <= tolerance;
+}
 
 // Internal helper: true when a mesh contains basic CPU-side geometry data.
-#define RAYLIB_ASSERT_MESH_VALID(mesh) ((mesh).vertexCount > 0 && (mesh).triangleCount > 0 && (mesh).vertices != NULL)
+static inline bool RaylibAssertMeshValid(Mesh mesh)
+{
+    return mesh.vertexCount > 0 && mesh.triangleCount > 0 && mesh.vertices != NULL;
+}
+
+#define RAYLIB_ASSERT_FLOAT_EQ(a, b) RaylibAssertFloatEq((float)(a), (float)(b))
+#define RAYLIB_ASSERT_CHANNEL_WITHIN(a, b, tolerance) RaylibAssertChannelWithin((int)(a), (int)(b), (int)(tolerance))
+#define RAYLIB_ASSERT_MESH_VALID(mesh) RaylibAssertMeshValid((mesh))
 
 // Variadic Arguments
-#define RAYLIB_ASSERT_CAT( A, B ) A ## B
-#define RAYLIB_ASSERT_SELECT( NAME, NUM ) RAYLIB_ASSERT_CAT( NAME ## _, NUM )
+#define RAYLIB_ASSERT_CAT(a, b) RAYLIB_ASSERT_CAT_I(a, b)
+#define RAYLIB_ASSERT_CAT_I(a, b) a##b
+#define RAYLIB_ASSERT_SELECT(name, num) RAYLIB_ASSERT_CAT(name##_, num)
 #define RAYLIB_ASSERT_GET_COUNT( _1, _2, _3, _4, _5, _6, _7, RAYLIB_ASSERT_COUNT, ... ) RAYLIB_ASSERT_COUNT
 #define RAYLIB_ASSERT_VA_SIZE( ... ) RAYLIB_ASSERT_GET_COUNT( __VA_ARGS__, 7, 6, 5, 4, 3, 2, 1 )
 #define RAYLIB_ASSERT_VA_SELECT( NAME, ...) RAYLIB_ASSERT_SELECT( NAME, RAYLIB_ASSERT_VA_SIZE(__VA_ARGS__) )(__VA_ARGS__)
@@ -608,7 +630,7 @@ extern "C" {
 
 // AssertNotEqual()
 #define AssertNotEqual_0() AssertFail_1("No condition provided for AssertNotEqual()")
-#define AssertNotEqual_1(condition) AssertNot_2(condition, #condition)
+#define AssertNotEqual_1(condition) AssertFail_1("AssertNotEqual() requires at least two parameters.")
 #define AssertNotEqual_2(actual, expected) Assert_4((actual) != (expected), "AssertNotEqual(%s, %s) - Provided arguments are equal", #actual, #expected)
 #define AssertNotEqual_3(actual, expected, message) Assert_2((actual) != (expected), message)
 #define AssertNotEqual_4(actual, expected, message, p1) Assert_3((actual) != (expected), message, p1)
@@ -712,14 +734,16 @@ extern "C" {
 #define AssertImageSame_1(image) AssertFail_1("Only one image provided for AssertImageSame()")
 #define AssertImageSame_2(image1, image2) AssertImageSame_5(image1, image2, "AssertImageSame(%s, %s) - Images do not match", #image1, #image2)
 #define AssertImageSame_3(image1, image2, message) do { \
-    if (image1.width != image2.width || image1.height != image2.height || image1.format != image2.format) { \
+    Image raylibAssertImage1 = (image1); \
+    Image raylibAssertImage2 = (image2); \
+    if (raylibAssertImage1.width != raylibAssertImage2.width || raylibAssertImage1.height != raylibAssertImage2.height || raylibAssertImage1.format != raylibAssertImage2.format) { \
         AssertFail_1(message); \
         break; \
     } \
-    Color* colors1 = LoadImageColors(image1); \
-    Color* colors2 = LoadImageColors(image2); \
+    Color* colors1 = LoadImageColors(raylibAssertImage1); \
+    Color* colors2 = LoadImageColors(raylibAssertImage2); \
     bool failure = false; \
-    for (int i = 0; i < image1.width * image1.height; i++) { \
+    for (int i = 0; i < raylibAssertImage1.width * raylibAssertImage1.height; i++) { \
         Color color1 = colors1[i]; \
         Color color2 = colors2[i]; \
         if (color1.r != color2.r || color1.g != color2.g || color1.b != color2.b || color1.a != color2.a) { \
@@ -754,7 +778,9 @@ extern "C" {
 #define AssertColorSame_1(color) AssertFail_1("Expected two colors for AssertColorSame()")
 #define AssertColorSame_2(color1, color2) AssertColorSame_5(color1, color2, "AssertColorSame(%s, %s) - Colors do not match", #color1, #color2)
 #define AssertColorSame_3(color1, color2, message) do { \
-    if (color1.r != color2.r || color1.g != color2.g || color1.b != color2.b || color1.a != color2.a) { \
+    Color raylibAssertColor1 = (color1); \
+    Color raylibAssertColor2 = (color2); \
+    if (raylibAssertColor1.r != raylibAssertColor2.r || raylibAssertColor1.g != raylibAssertColor2.g || raylibAssertColor1.b != raylibAssertColor2.b || raylibAssertColor1.a != raylibAssertColor2.a) { \
         AssertFail_1(message); \
     }\
 } while (0)
@@ -780,7 +806,10 @@ extern "C" {
 #define AssertColorApprox_2(color1, color2) AssertFail_1("Expected two colors and a tolerance for AssertColorApprox()")
 #define AssertColorApprox_3(color1, color2, tolerance) AssertColorApprox_7(color1, color2, tolerance, "AssertColorApprox(%s, %s, %s) - Colors differ beyond tolerance", #color1, #color2, #tolerance)
 #define AssertColorApprox_4(color1, color2, tolerance, message) do { \
-    if (!RAYLIB_ASSERT_CHANNEL_WITHIN((color1).r, (color2).r, tolerance) || !RAYLIB_ASSERT_CHANNEL_WITHIN((color1).g, (color2).g, tolerance) || !RAYLIB_ASSERT_CHANNEL_WITHIN((color1).b, (color2).b, tolerance) || !RAYLIB_ASSERT_CHANNEL_WITHIN((color1).a, (color2).a, tolerance)) { \
+    Color raylibAssertColor1 = (color1); \
+    Color raylibAssertColor2 = (color2); \
+    int raylibAssertTolerance = (int)(tolerance); \
+    if (!RAYLIB_ASSERT_CHANNEL_WITHIN(raylibAssertColor1.r, raylibAssertColor2.r, raylibAssertTolerance) || !RAYLIB_ASSERT_CHANNEL_WITHIN(raylibAssertColor1.g, raylibAssertColor2.g, raylibAssertTolerance) || !RAYLIB_ASSERT_CHANNEL_WITHIN(raylibAssertColor1.b, raylibAssertColor2.b, raylibAssertTolerance) || !RAYLIB_ASSERT_CHANNEL_WITHIN(raylibAssertColor1.a, raylibAssertColor2.a, raylibAssertTolerance)) { \
         AssertFail_1(message); \
     }\
 } while (0)
@@ -804,7 +833,9 @@ extern "C" {
 #define AssertVector2Same_1(vector) AssertFail_1("Expected two vectors for AssertVector2Same()")
 #define AssertVector2Same_2(vector1, vector2) AssertVector2Same_5(vector1, vector2, "AssertVector2Same(%s, %s) - vectors do not match", #vector1, #vector2)
 #define AssertVector2Same_3(vector1, vector2, message) do { \
-    if (!RAYLIB_ASSERT_FLOAT_EQ(vector1.x, vector2.x) || !RAYLIB_ASSERT_FLOAT_EQ(vector1.y, vector2.y)) { \
+    Vector2 raylibAssertVector1 = (vector1); \
+    Vector2 raylibAssertVector2 = (vector2); \
+    if (!RAYLIB_ASSERT_FLOAT_EQ(raylibAssertVector1.x, raylibAssertVector2.x) || !RAYLIB_ASSERT_FLOAT_EQ(raylibAssertVector1.y, raylibAssertVector2.y)) { \
         AssertFail_1(message); \
     }\
 } while (0)
@@ -829,7 +860,9 @@ extern "C" {
 #define AssertVector3Same_1(vector) AssertFail_1("Expected two vectors for AssertVector3Same()")
 #define AssertVector3Same_2(vector1, vector2) AssertVector3Same_5(vector1, vector2, "AssertVector3Same(%s, %s) - vectors do not match", #vector1, #vector2)
 #define AssertVector3Same_3(vector1, vector2, message) do { \
-    if (!RAYLIB_ASSERT_FLOAT_EQ(vector1.x, vector2.x) || !RAYLIB_ASSERT_FLOAT_EQ(vector1.y, vector2.y) || !RAYLIB_ASSERT_FLOAT_EQ(vector1.z, vector2.z)) { \
+    Vector3 raylibAssertVector1 = (vector1); \
+    Vector3 raylibAssertVector2 = (vector2); \
+    if (!RAYLIB_ASSERT_FLOAT_EQ(raylibAssertVector1.x, raylibAssertVector2.x) || !RAYLIB_ASSERT_FLOAT_EQ(raylibAssertVector1.y, raylibAssertVector2.y) || !RAYLIB_ASSERT_FLOAT_EQ(raylibAssertVector1.z, raylibAssertVector2.z)) { \
         AssertFail_1(message); \
     }\
 } while (0)
@@ -854,7 +887,9 @@ extern "C" {
 #define AssertVector4Same_1(vector) AssertFail_1("Expected two vectors for AssertVector4Same()")
 #define AssertVector4Same_2(vector1, vector2) AssertVector4Same_5(vector1, vector2, "AssertVector4Same(%s, %s) - vectors do not match", #vector1, #vector2)
 #define AssertVector4Same_3(vector1, vector2, message) do { \
-    if (!RAYLIB_ASSERT_FLOAT_EQ(vector1.x, vector2.x) || !RAYLIB_ASSERT_FLOAT_EQ(vector1.y, vector2.y) || !RAYLIB_ASSERT_FLOAT_EQ(vector1.z, vector2.z) || !RAYLIB_ASSERT_FLOAT_EQ(vector1.w, vector2.w)) { \
+    Vector4 raylibAssertVector1 = (vector1); \
+    Vector4 raylibAssertVector2 = (vector2); \
+    if (!RAYLIB_ASSERT_FLOAT_EQ(raylibAssertVector1.x, raylibAssertVector2.x) || !RAYLIB_ASSERT_FLOAT_EQ(raylibAssertVector1.y, raylibAssertVector2.y) || !RAYLIB_ASSERT_FLOAT_EQ(raylibAssertVector1.z, raylibAssertVector2.z) || !RAYLIB_ASSERT_FLOAT_EQ(raylibAssertVector1.w, raylibAssertVector2.w)) { \
         AssertFail_1(message); \
     }\
 } while (0)
@@ -879,7 +914,9 @@ extern "C" {
 #define AssertRectangleSame_1(rect) AssertFail_1("Expected two rectangles for AssertRectangleSame()")
 #define AssertRectangleSame_2(rect1, rect2) AssertRectangleSame_5(rect1, rect2, "AssertRectangleSame(%s, %s) - rectangles do not match", #rect1, #rect2)
 #define AssertRectangleSame_3(rect1, rect2, message) do { \
-    if (!RAYLIB_ASSERT_FLOAT_EQ(rect1.x, rect2.x) || !RAYLIB_ASSERT_FLOAT_EQ(rect1.y, rect2.y) || !RAYLIB_ASSERT_FLOAT_EQ(rect1.width, rect2.width) || !RAYLIB_ASSERT_FLOAT_EQ(rect1.height, rect2.height)) { \
+    Rectangle raylibAssertRect1 = (rect1); \
+    Rectangle raylibAssertRect2 = (rect2); \
+    if (!RAYLIB_ASSERT_FLOAT_EQ(raylibAssertRect1.x, raylibAssertRect2.x) || !RAYLIB_ASSERT_FLOAT_EQ(raylibAssertRect1.y, raylibAssertRect2.y) || !RAYLIB_ASSERT_FLOAT_EQ(raylibAssertRect1.width, raylibAssertRect2.width) || !RAYLIB_ASSERT_FLOAT_EQ(raylibAssertRect1.height, raylibAssertRect2.height)) { \
         AssertFail_1(message); \
     }\
 } while (0)
