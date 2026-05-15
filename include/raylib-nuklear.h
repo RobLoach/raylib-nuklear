@@ -950,6 +950,22 @@ nk_raylib_input_mouse(struct nk_context * ctx)
     nk_input_button(ctx, NK_BUTTON_X1, mouseX, mouseY, IsMouseButtonDown(MOUSE_BUTTON_SIDE));
     nk_input_button(ctx, NK_BUTTON_X2, mouseX, mouseY, IsMouseButtonDown(MOUSE_BUTTON_EXTRA));
 
+    // Double-click: track time between left presses; signal NK_BUTTON_DOUBLE within threshold.
+    {
+        static double lastLeftPressTime = 0.0;
+        static nk_bool doubleClicking = nk_false;
+        const double doubleClickThreshold = 0.3;
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            double now = GetTime();
+            doubleClicking = (now - lastLeftPressTime <= doubleClickThreshold) ? nk_true : nk_false;
+            lastLeftPressTime = now;
+        }
+        else if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
+            doubleClicking = nk_false;
+        }
+        nk_input_button(ctx, NK_BUTTON_DOUBLE, mouseX, mouseY, doubleClicking);
+    }
+
     // Mouse Wheel
     float mouseWheel = GetMouseWheelMove();
     if (mouseWheel != 0.0f) {
