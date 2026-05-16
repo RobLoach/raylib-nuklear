@@ -158,6 +158,15 @@ extern "C" {
 #define RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS 20
 #endif  // RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS
 
+#ifndef RAYLIB_NUKLEAR_DOUBLE_CLICK_THRESHOLD
+/**
+ * The amount of time required to wait to determine a mouse click as a double click.
+ *
+ * @see nk_raylib_input_mouse()
+ */
+#define RAYLIB_NUKLEAR_DOUBLE_CLICK_THRESHOLD 0.3
+#endif  // RAYLIB_NUKLEAR_DOUBLE_CLICK_THRESHOLD
+
 /**
  * The user data that's leverages internally through Nuklear.
  */
@@ -949,6 +958,21 @@ nk_raylib_input_mouse(struct nk_context * ctx)
     // Appears raylib mislabels the BACK/FORWARD mouse enums. X1/X2 are SIDE/EXTRA.
     nk_input_button(ctx, NK_BUTTON_X1, mouseX, mouseY, IsMouseButtonDown(MOUSE_BUTTON_SIDE));
     nk_input_button(ctx, NK_BUTTON_X2, mouseX, mouseY, IsMouseButtonDown(MOUSE_BUTTON_EXTRA));
+
+    // Double Click
+    {
+        static double lastLeftPressTime = 0.0;
+        static nk_bool doubleClicking = nk_false;
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+            double now = GetTime();
+            doubleClicking = (now - lastLeftPressTime <= RAYLIB_NUKLEAR_DOUBLE_CLICK_THRESHOLD) ? nk_true : nk_false;
+            lastLeftPressTime = now;
+        }
+        else if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
+            doubleClicking = nk_false;
+        }
+        nk_input_button(ctx, NK_BUTTON_DOUBLE, mouseX, mouseY, doubleClicking);
+    }
 
     // Mouse Wheel
     float mouseWheel = GetMouseWheelMove();
