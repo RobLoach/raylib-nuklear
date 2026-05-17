@@ -620,9 +620,12 @@ DrawNuklear(struct nk_context * ctx)
             }
 
             case NK_COMMAND_SCISSOR: {
-                // TODO(RobLoach): Verify if NK_COMMAND_SCISSOR works.
-                const struct nk_command_scissor *s =(const struct nk_command_scissor*)cmd;
-                BeginScissorMode((int)(s->x * scale), (int)(s->y * scale), (int)(s->w * scale), (int)(s->h * scale));
+                const struct nk_command_scissor *s = (const struct nk_command_scissor*)cmd;
+                if (s->x <= -8000) {
+                    EndScissorMode();
+                } else {
+                    BeginScissorMode((int)(s->x * scale), (int)(s->y * scale), (int)(s->w * scale), (int)(s->h * scale));
+                }
             } break;
 
             case NK_COMMAND_LINE: {

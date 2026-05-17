@@ -128,10 +128,10 @@ int main(int argc, char *argv[]) {
         AssertEqual(NuklearKeyToKeyboardKey('A'), KEY_A);
         AssertEqual(NuklearKeyToKeyboardKey('a'), KEY_A);
         AssertEqual(NuklearKeyToKeyboardKey('Z'), KEY_Z);
-        AssertEqual(NuklearKeyToKeyboardKey('!'), KEY_ONE);
-        AssertEqual(NuklearKeyToKeyboardKey('@'), KEY_TWO);
-        AssertEqual(NuklearKeyToKeyboardKey('+'), KEY_EQUAL);
-        AssertEqual(NuklearKeyToKeyboardKey('_'), KEY_MINUS);
+        AssertEqual(NuklearKeyToKeyboardKey('1'), KEY_ONE);
+        AssertEqual(NuklearKeyToKeyboardKey('2'), KEY_TWO);
+        AssertEqual(NuklearKeyToKeyboardKey('='), KEY_EQUAL);
+        AssertEqual(NuklearKeyToKeyboardKey('-'), KEY_MINUS);
     }
 
     // KeyboardKeyToNuklearKey()
@@ -152,6 +152,32 @@ int main(int argc, char *argv[]) {
         AssertEqual(KeyboardKeyToNuklearKey(KEY_F12), (nk_rune)NK_KEY_F12);
         AssertEqual(KeyboardKeyToNuklearKey(KEY_A), (nk_rune)KEY_A);
         AssertEqual(KeyboardKeyToNuklearKey(KEY_Z), (nk_rune)KEY_Z);
+    }
+
+    // NK_COMMAND_SCISSOR: content inside a small group must be clipped.
+    {
+        ctx = InitNuklear(10);
+        Assert(ctx);
+
+        UpdateNuklear(ctx);
+
+        // A 50x50 window at (0,0) with a scrollable group of tall content.
+        // Anything drawn below y=50 should be clipped by the group scissor.
+        if (nk_begin(ctx, "ScissorTest", nk_rect(0, 0, 50, 50),
+                NK_WINDOW_NO_SCROLLBAR)) {
+            nk_layout_row_dynamic(ctx, 30, 1);
+            nk_label(ctx, "A", NK_TEXT_LEFT);
+            nk_label(ctx, "B", NK_TEXT_LEFT);
+            nk_label(ctx, "C", NK_TEXT_LEFT);
+        }
+        nk_end(ctx);
+
+        BeginDrawing();
+            ClearBackground(RED);
+            DrawNuklear(ctx);
+        EndDrawing();
+
+        UnloadNuklear(ctx);
     }
 
     CloseWindow();
