@@ -107,6 +107,17 @@ There are a few other graphical user interface solutions out there for use with 
 | Industry Standard | :x: | :x: | :white_check_mark: |
 | Easy to Use | :x: | :white_check_mark: | :x: |
 
+## CMake Integration
+
+After installing via `cmake --install`, use `find_package` in your project:
+
+```cmake
+find_package(raylib-nuklear REQUIRED)
+target_link_libraries(my_app PRIVATE raylib-nuklear::raylib-nuklear)
+```
+
+Alternatively, add as a subdirectory or use `FetchContent` and link against `raylib_nuklear`.
+
 ## Development
 
 While this project uses CMake, CMake is not required in order to use *raylib-nuklear*.
