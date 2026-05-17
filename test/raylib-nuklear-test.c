@@ -154,6 +154,38 @@ int main(int argc, char *argv[]) {
         AssertEqual(KeyboardKeyToNuklearKey(KEY_Z), (nk_rune)KEY_Z);
     }
 
+    // NK_COMMAND_SCISSOR: content inside a small group must be clipped.
+    {
+        ctx = InitNuklear(10);
+        Assert(ctx);
+
+        UpdateNuklear(ctx);
+
+        // A 50x50 window at (0,0) with a scrollable group of tall content.
+        // Anything drawn below y=50 should be clipped by the group scissor.
+        if (nk_begin(ctx, "ScissorTest", nk_rect(0, 0, 50, 50),
+                NK_WINDOW_NO_SCROLLBAR)) {
+            nk_layout_row_dynamic(ctx, 30, 1);
+            nk_label(ctx, "A", NK_TEXT_LEFT);
+            nk_label(ctx, "B", NK_TEXT_LEFT);
+            nk_label(ctx, "C", NK_TEXT_LEFT);
+        }
+        nk_end(ctx);
+
+        BeginDrawing();
+            ClearBackground(RED);
+            DrawNuklear(ctx);
+        EndDrawing();
+
+        // Sample a pixel well outside the 50x50 window — should still be RED.
+        Image screen = LoadImageFromScreen();
+        Color outside = GetImageColor(screen, 400, 400);
+        AssertColorSame(outside, RED);
+        UnloadImage(screen);
+
+        UnloadNuklear(ctx);
+    }
+
     CloseWindow();
     TraceLog(LOG_INFO, "================================");
     TraceLog(LOG_INFO, "raylib-nuklear tests succesful");
