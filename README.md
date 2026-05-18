@@ -1,5 +1,7 @@
 # raylib-nuklear
 
+[![Tests](https://github.com/RobLoach/raylib-nuklear/actions/workflows/Tests.yml/badge.svg)](https://github.com/RobLoach/raylib-nuklear/actions/workflows/Tests.yml)
+
 Use the [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear) immediate mode cross-platform GUI library in [raylib](https://www.raylib.com/).
 
 [![raylib-nuklear-example Screenshot](examples/raylib-nuklear-example.png)](examples)
