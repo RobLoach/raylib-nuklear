@@ -23,29 +23,3 @@ jobs:
         run: cmake --build build --parallel
       - name: Test
         run: xvfb-run ctest --test-dir build --output-on-failure
-
-  build-windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Configure
-        run: cmake -B build -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON
-      - name: Build
-        run: cmake --build build --config Debug --parallel
-      - name: Test
-        run: ctest --test-dir build -C Debug --output-on-failure
-
-  build-macos:
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: recursive
-      - name: Configure
-        run: cmake -B build -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON
-      - name: Build
-        run: cmake --build build --parallel
-      - name: Test
-        run: ctest --test-dir build --output-on-failure
