@@ -86,6 +86,8 @@ NK_API struct Color NuklearColorFToColor(struct nk_colorf color);      // Conver
 NK_API struct Rectangle NuklearRectToRectangle(struct nk_context * ctx, struct nk_rect rect); // Convert a Nuklear rectangle to a raylib Rectangle
 NK_API struct nk_rect RectangleToNuklearRect(struct nk_context * ctx, Rectangle rect); // Convert a raylib Rectangle to a Nuklear Rectangle
 NK_API struct nk_image TextureToNuklearImage(Texture texture);               // Get a Nuklear image from a Texture
+NK_API struct nk_vec2 Vector2ToNuklearVec2(Vector2 vec);                     // Convert a raylib Vector2 to a Nuklear nk_vec2
+NK_API Vector2 NuklearVec2ToVector2(struct nk_vec2 vec);                     // Convert a Nuklear nk_vec2 to a raylib Vector2
 NK_API struct nk_image TextureToNuklearImageEx(Texture texture, Rectangle region); // Get a Nuklear image from a sub-region of a Texture
 NK_API void SetNuklearScaling(struct nk_context * ctx, float scaling); // Sets the scaling for the given Nuklear context
 NK_API float GetNuklearScaling(struct nk_context * ctx);            // Retrieves the scaling of the given Nuklear context
@@ -1102,6 +1104,19 @@ TextureToNuklearImageEx(Texture texture, Rectangle region)
 	img.region[2] = (nk_ushort)region.width;
 	img.region[3] = (nk_ushort)region.height;
 	return img;
+}
+
+NK_API struct nk_vec2
+Vector2ToNuklearVec2(Vector2 vec)
+{
+    return nk_vec2(vec.x, vec.y);
+}
+
+NK_API Vector2
+NuklearVec2ToVector2(struct nk_vec2 vec)
+{
+    Vector2 v = { vec.x, vec.y };
+    return v;
 }
 
 NK_API struct nk_image

@@ -120,6 +120,17 @@ int main(int argc, char *argv[]) {
         UnloadNuklear(ctx);
     }
 
+    // Vector2ToNuklearVec2() / NuklearVec2ToVector2() round-trip
+    {
+        Vector2 v = { 3.5f, 7.25f };
+        struct nk_vec2 nv = Vector2ToNuklearVec2(v);
+        AssertEqual(nv.x, v.x);
+        AssertEqual(nv.y, v.y);
+        Vector2 rt = NuklearVec2ToVector2(nv);
+        AssertEqual(rt.x, v.x);
+        AssertEqual(rt.y, v.y);
+    }
+
     // NuklearKeyToKeyboardKey()
     {
         AssertEqual(NuklearKeyToKeyboardKey(0), KEY_NULL);
