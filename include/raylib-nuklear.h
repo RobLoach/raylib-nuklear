@@ -172,6 +172,7 @@ extern "C" {
  */
 typedef struct NuklearUserData {
     float scaling; // The scaling of the Nuklear user interface.
+    bool customCommandWarned; // Whether the NK_COMMAND_CUSTOM warning has already been emitted.
 } NuklearUserData;
 
 /**
@@ -612,6 +613,7 @@ DrawNuklear(struct nk_context * ctx)
 
     const struct nk_command *cmd;
     const float scale = GetNuklearScaling(ctx);
+    struct NuklearUserData* userData = (struct NuklearUserData*)ctx->userdata.ptr;
 
     nk_foreach(cmd, ctx) {
         switch (cmd->type) {
@@ -827,7 +829,10 @@ DrawNuklear(struct nk_context * ctx)
             } break;
 
             case NK_COMMAND_CUSTOM: {
-                TraceLog(LOG_WARNING, "NUKLEAR: Unverified custom callback implementation NK_COMMAND_CUSTOM");
+                if (userData != NULL && !userData->customCommandWarned) {
+                    TraceLog(LOG_WARNING, "NUKLEAR: Unverified custom callback implementation NK_COMMAND_CUSTOM");
+                    userData->customCommandWarned = true;
+                }
                 const struct nk_command_custom *custom = (const struct nk_command_custom *)cmd;
                 custom->callback(NULL, (short)(custom->x * scale), (short)(custom->y * scale), (unsigned short)(custom->w * scale), (unsigned short)(custom->h * scale), custom->callback_data);
             } break;
