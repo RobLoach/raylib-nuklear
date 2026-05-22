@@ -88,6 +88,7 @@ NK_API struct nk_rect RectangleToNuklearRect(struct nk_context * ctx, Rectangle 
 NK_API struct nk_image TextureToNuklearImage(Texture texture);               // Get a Nuklear image from a Texture
 NK_API struct nk_vec2 Vector2ToNuklearVec2(Vector2 vec);                     // Convert a raylib Vector2 to a Nuklear nk_vec2
 NK_API Vector2 NuklearVec2ToVector2(struct nk_vec2 vec);                     // Convert a Nuklear nk_vec2 to a raylib Vector2
+NK_API struct nk_image TextureToNuklearImageEx(Texture texture, Rectangle region); // Get a Nuklear image from a sub-region of a Texture
 NK_API void SetNuklearScaling(struct nk_context * ctx, float scaling); // Sets the scaling for the given Nuklear context
 NK_API float GetNuklearScaling(struct nk_context * ctx);            // Retrieves the scaling of the given Nuklear context
 NK_API KeyboardKey NuklearKeyToKeyboardKey(nk_rune key);                 // Convert an nk_rune key binding to a raylib KeyboardKey
@@ -536,8 +537,10 @@ static void raylib_nuklear_draw_polygon_fill(float scale, const struct nk_vec2i 
     int nodes, nodeX[RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS], pixelX, pixelY, j, swap ;
 
     if (count == 0) return;
-    if (count > RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS)
+    if (count > RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS) {
+        TraceLog(LOG_WARNING, "NUKLEAR: NK_COMMAND_POLYGON_FILLED point count %d exceeds max %d, truncating. Define RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS to increase.", count, RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS);
         count = RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS;
+    }
 
     /* Build scaled copy of points */
     int scaled_x[RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS];
@@ -1090,16 +1093,16 @@ nk_rect RectangleToNuklearRect(struct nk_context* ctx, Rectangle rect)
  * Convert the given raylib texture to a Nuklear image
  */
 NK_API struct nk_image
-TextureToNuklearImage(Texture texture)
+TextureToNuklearImageEx(Texture texture, Rectangle region)
 {
 	struct nk_image img = {0};
 	img.handle.id = (int)texture.id;
 	img.w = (nk_ushort)texture.width;
 	img.h = (nk_ushort)texture.height;
-	img.region[0] = 0;
-	img.region[1] = 0;
-	img.region[2] = img.w;
-	img.region[3] = img.h;
+	img.region[0] = (nk_ushort)region.x;
+	img.region[1] = (nk_ushort)region.y;
+	img.region[2] = (nk_ushort)region.width;
+	img.region[3] = (nk_ushort)region.height;
 	return img;
 }
 
@@ -1114,6 +1117,13 @@ NuklearVec2ToVector2(struct nk_vec2 vec)
 {
     Vector2 v = { vec.x, vec.y };
     return v;
+}
+
+NK_API struct nk_image
+TextureToNuklearImage(Texture texture)
+{
+	Rectangle region = { 0, 0, (float)texture.width, (float)texture.height };
+	return TextureToNuklearImageEx(texture, region);
 }
 
 /**

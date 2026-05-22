@@ -34,6 +34,17 @@ int main(int argc, char *argv[]) {
     AssertEqual(texture.id, (unsigned int)image.handle.id);
     Assert(texture.width > 0);
 
+    // TextureToNuklearImageEx()
+    {
+        Rectangle region = { 16, 0, 16, 16 };
+        struct nk_image imgEx = TextureToNuklearImageEx(texture, region);
+        AssertEqual((unsigned int)imgEx.handle.id, texture.id);
+        AssertEqual(imgEx.region[0], (nk_ushort)region.x);
+        AssertEqual(imgEx.region[1], (nk_ushort)region.y);
+        AssertEqual(imgEx.region[2], (nk_ushort)region.width);
+        AssertEqual(imgEx.region[3], (nk_ushort)region.height);
+    }
+
     // UpdateNuklear()
     UpdateNuklear(ctx);
 
