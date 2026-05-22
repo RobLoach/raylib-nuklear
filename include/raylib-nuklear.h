@@ -828,7 +828,8 @@ DrawNuklear(struct nk_context * ctx)
 
             case NK_COMMAND_CUSTOM: {
                 static bool nk_command_custom_warned = false;
-                if (userData != NULL && !nk_command_custom_warned) {
+
+                if (!nk_command_custom_warned) {
                     TraceLog(LOG_WARNING, "NUKLEAR: Unverified custom callback implementation NK_COMMAND_CUSTOM");
                     nk_command_custom_warned = true;
                 }
