@@ -86,6 +86,7 @@ NK_API struct Color NuklearColorFToColor(struct nk_colorf color);      // Conver
 NK_API struct Rectangle NuklearRectToRectangle(struct nk_context * ctx, struct nk_rect rect); // Convert a Nuklear rectangle to a raylib Rectangle
 NK_API struct nk_rect RectangleToNuklearRect(struct nk_context * ctx, Rectangle rect); // Convert a raylib Rectangle to a Nuklear Rectangle
 NK_API struct nk_image TextureToNuklearImage(Texture texture);               // Get a Nuklear image from a Texture
+NK_API struct nk_image TextureToNuklearImageEx(Texture texture, Rectangle region); // Get a Nuklear image from a sub-region of a Texture
 NK_API void SetNuklearScaling(struct nk_context * ctx, float scaling); // Sets the scaling for the given Nuklear context
 NK_API float GetNuklearScaling(struct nk_context * ctx);            // Retrieves the scaling of the given Nuklear context
 NK_API KeyboardKey NuklearKeyToKeyboardKey(nk_rune key);                 // Convert an nk_rune key binding to a raylib KeyboardKey
@@ -1088,17 +1089,24 @@ nk_rect RectangleToNuklearRect(struct nk_context* ctx, Rectangle rect)
  * Convert the given raylib texture to a Nuklear image
  */
 NK_API struct nk_image
-TextureToNuklearImage(Texture texture)
+TextureToNuklearImageEx(Texture texture, Rectangle region)
 {
 	struct nk_image img = {0};
 	img.handle.id = (int)texture.id;
 	img.w = (nk_ushort)texture.width;
 	img.h = (nk_ushort)texture.height;
-	img.region[0] = 0;
-	img.region[1] = 0;
-	img.region[2] = img.w;
-	img.region[3] = img.h;
+	img.region[0] = (nk_ushort)region.x;
+	img.region[1] = (nk_ushort)region.y;
+	img.region[2] = (nk_ushort)region.width;
+	img.region[3] = (nk_ushort)region.height;
 	return img;
+}
+
+NK_API struct nk_image
+TextureToNuklearImage(Texture texture)
+{
+	Rectangle region = { 0, 0, (float)texture.width, (float)texture.height };
+	return TextureToNuklearImageEx(texture, region);
 }
 
 /**
