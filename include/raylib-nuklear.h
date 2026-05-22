@@ -832,7 +832,6 @@ DrawNuklear(struct nk_context * ctx)
             } break;
 
             case NK_COMMAND_CUSTOM: {
-                TraceLog(LOG_WARNING, "NUKLEAR: Unverified custom callback implementation NK_COMMAND_CUSTOM");
                 const struct nk_command_custom *custom = (const struct nk_command_custom *)cmd;
                 custom->callback(NULL, (short)(custom->x * scale), (short)(custom->y * scale), (unsigned short)(custom->w * scale), (unsigned short)(custom->h * scale), custom->callback_data);
             } break;
