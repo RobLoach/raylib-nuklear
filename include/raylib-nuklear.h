@@ -535,8 +535,10 @@ static void raylib_nuklear_draw_polygon_fill(float scale, const struct nk_vec2i 
     int nodes, nodeX[RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS], pixelX, pixelY, j, swap ;
 
     if (count == 0) return;
-    if (count > RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS)
+    if (count > RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS) {
+        TraceLog(LOG_WARNING, "NUKLEAR: NK_COMMAND_POLYGON_FILLED point count %d exceeds max %d, truncating. Define RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS to increase.", count, RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS);
         count = RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS;
+    }
 
     /* Build scaled copy of points */
     int scaled_x[RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS];
