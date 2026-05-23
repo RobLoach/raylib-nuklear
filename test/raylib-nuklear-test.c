@@ -206,9 +206,6 @@ int main(int argc, char *argv[]) {
     Assert(RAYLIB_NUKLEAR_VERSION_MAJOR >= 1);
     Assert(RAYLIB_NUKLEAR_VERSION_MINOR >= 0);
     Assert(RAYLIB_NUKLEAR_VERSION_PATCH >= 0);
-    #if RAYLIB_NUKLEAR_VERSION_MAJOR >= 6
-    Assert(1);
-    #endif
     Assert(TextIsEqual(RAYLIB_NUKLEAR_VERSION, "6.0.1"));
 
     CloseWindow();
