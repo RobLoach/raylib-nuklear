@@ -987,12 +987,10 @@ nk_raylib_input_mouse(struct nk_context * ctx)
     }
 
     // Mouse Wheel
-    float mouseWheel = GetMouseWheelMove();
-    if (mouseWheel != 0.0f) {
-        struct nk_vec2 mouseWheelMove;
-        mouseWheelMove.x = 0.0f;
-        mouseWheelMove.y = mouseWheel;
-        nk_input_scroll(ctx, mouseWheelMove);
+    Vector2 mouseWheel = GetMouseWheelMoveV();
+    if (mouseWheel.x != 0.0f || mouseWheel.y != 0.0f) {
+        struct nk_vec2 scroll = {mouseWheel.x, mouseWheel.y};
+        nk_input_scroll(ctx, scroll);
     }
 }
 
