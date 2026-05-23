@@ -202,6 +202,11 @@ int main(int argc, char *argv[]) {
         UnloadNuklear(ctx);
     }
 
+    // RAYLIB_NUKLEAR_VERSION macros
+    Assert(RAYLIB_NUKLEAR_VERSION_MAJOR >= 1);
+    Assert(RAYLIB_NUKLEAR_VERSION_MINOR >= 0);
+    Assert(RAYLIB_NUKLEAR_VERSION_PATCH >= 0);
+
     CloseWindow();
     TraceLog(LOG_INFO, "================================");
     TraceLog(LOG_INFO, "raylib-nuklear tests succesful");

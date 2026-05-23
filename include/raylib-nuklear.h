@@ -36,6 +36,11 @@
 #ifndef RAYLIB_NUKLEAR_H
 #define RAYLIB_NUKLEAR_H
 
+#define RAYLIB_NUKLEAR_VERSION "6.0.1"
+#define RAYLIB_NUKLEAR_VERSION_MAJOR 6
+#define RAYLIB_NUKLEAR_VERSION_MINOR 0
+#define RAYLIB_NUKLEAR_VERSION_PATCH 1
+
 #include "raylib.h"
 
 // Nuklear defines
