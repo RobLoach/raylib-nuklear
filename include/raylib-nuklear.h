@@ -86,9 +86,9 @@ NK_API void DrawNuklear(struct nk_context * ctx);                   // Render th
 NK_API void UnloadNuklear(struct nk_context * ctx);                 // Deinitialize the Nuklear context
 NK_API struct nk_color ColorToNuklearColor(Color color);                 // Convert a raylib Color to a Nuklear color object
 NK_API struct nk_colorf ColorToNuklearColorF(Color color);               // Convert a raylib Color to a Nuklear floating color
-NK_API struct Color NuklearColorToColor(struct nk_color color);        // Convert a Nuklear color to a raylib Color
-NK_API struct Color NuklearColorFToColor(struct nk_colorf color);      // Convert a Nuklear floating color to a raylib Color
-NK_API struct Rectangle NuklearRectToRectangle(struct nk_context * ctx, struct nk_rect rect); // Convert a Nuklear rectangle to a raylib Rectangle
+NK_API Color NuklearColorToColor(struct nk_color color);               // Convert a Nuklear color to a raylib Color
+NK_API Color NuklearColorFToColor(struct nk_colorf color);             // Convert a Nuklear floating color to a raylib Color
+NK_API Rectangle NuklearRectToRectangle(struct nk_context * ctx, struct nk_rect rect); // Convert a Nuklear rectangle to a raylib Rectangle
 NK_API struct nk_rect RectangleToNuklearRect(struct nk_context * ctx, Rectangle rect); // Convert a raylib Rectangle to a Nuklear Rectangle
 NK_API struct nk_image TextureToNuklearImage(Texture texture);               // Get a Nuklear image from a Texture
 NK_API struct nk_vec2 Vector2ToNuklearVec2(Vector2 vec);                     // Convert a raylib Vector2 to a Nuklear nk_vec2
@@ -357,6 +357,10 @@ InitNuklear(int fontSize)
 {
     // User font.
     struct nk_user_font* userFont = (struct nk_user_font*)MemAlloc(sizeof(struct nk_user_font));
+    if (userFont == NULL) {
+        TraceLog(LOG_ERROR, "NUKLEAR: Failed to allocate nuklear font");
+        return NULL;
+    }
 
     // Use the default font size if desired.
     if (fontSize <= 0) {
@@ -384,6 +388,10 @@ InitNuklearEx(Font font, float fontSize)
 {
     // Copy the font to a new raylib font pointer.
     struct Font* newFont = (struct Font*)MemAlloc(sizeof(struct Font));
+    if (newFont == NULL) {
+        TraceLog(LOG_ERROR, "NUKLEAR: Failed to allocate font");
+        return NULL;
+    }
 
     // Use the default font size if desired.
     if (fontSize <= 0.0f) {
@@ -398,6 +406,11 @@ InitNuklearEx(Font font, float fontSize)
 
     // Create the nuklear user font.
     struct nk_user_font* userFont = (struct nk_user_font*)MemAlloc(sizeof(struct nk_user_font));
+    if (userFont == NULL) {
+        TraceLog(LOG_ERROR, "NUKLEAR: Failed to allocate nuklear font");
+        MemFree(newFont);
+        return NULL;
+    }
     userFont->userdata = nk_handle_ptr(newFont);
     userFont->height = fontSize;
     userFont->width = nk_raylib_font_get_text_width_user_font;
@@ -705,11 +718,15 @@ DrawNuklear(struct nk_context * ctx)
             case NK_COMMAND_RECT_MULTI_COLOR: {
                 const struct nk_command_rect_multi_color* rectangle = (const struct nk_command_rect_multi_color *)cmd;
                 Rectangle position = {(float)rectangle->x * scale, (float)rectangle->y * scale, (float)rectangle->w * scale, (float)rectangle->h * scale};
+                // raylib's DrawRectangleGradientEx() takes corners in the order
+                // (topLeft, bottomLeft, bottomRight, topRight). Nuklear maps its
+                // rect_multi_color fields to corners as left=topLeft, top=topRight,
+                // right=bottomRight, bottom=bottomLeft (see nk_draw_list_fill_rect_multi_color).
                 DrawRectangleGradientEx(position,
-                    NuklearColorToColor(rectangle->left), // Top Left
+                    NuklearColorToColor(rectangle->left),   // Top Left
                     NuklearColorToColor(rectangle->bottom), // Bottom Left
-                    NuklearColorToColor(rectangle->right), // Top Right
-                    NuklearColorToColor(rectangle->top) // Bottom Right
+                    NuklearColorToColor(rectangle->right),  // Bottom Right
+                    NuklearColorToColor(rectangle->top)     // Top Right
                 );
             } break;
 
@@ -1069,8 +1086,8 @@ UnloadNuklear(struct nk_context * ctx)
 /**
  * Convert the given Nuklear rectangle to a raylib Rectangle.
  */
-NK_API struct
-Rectangle NuklearRectToRectangle(struct nk_context* ctx, struct nk_rect rect)
+NK_API Rectangle
+NuklearRectToRectangle(struct nk_context* ctx, struct nk_rect rect)
 {
     float scaling = GetNuklearScaling(ctx);
     Rectangle output;
