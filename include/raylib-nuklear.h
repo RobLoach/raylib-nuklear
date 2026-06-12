@@ -983,7 +983,7 @@ nk_raylib_input_mouse(struct nk_context * ctx)
     nk_bool leftDown = IsMouseButtonDown(MOUSE_LEFT_BUTTON) ? nk_true : nk_false;
 
     // Route single-finger touch as left-button click
-    if (GetTouchCount() > 0) {
+    if (GetTouchPointCount() > 0) {
         Vector2 touchPos = GetTouchPosition(0);
         mouseX = (int)(touchPos.x / scale);
         mouseY = (int)(touchPos.y / scale);
