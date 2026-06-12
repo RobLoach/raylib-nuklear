@@ -978,8 +978,11 @@ NK_API void
 nk_raylib_input_mouse(struct nk_context * ctx)
 {
     const float scale = GetNuklearScaling(ctx);
-    int mouseX = (int)((float)GetMouseX() / scale);
-    int mouseY = (int)((float)GetMouseY() / scale);
+
+    // Determine the mouse position.
+    const Vector2 mousePosition = GetMousePosition();
+    int mouseX = (int)(mousePosition.x / scale);
+    int mouseY = (int)(mousePosition.y / scale);
     nk_bool leftDown = IsMouseButtonDown(MOUSE_LEFT_BUTTON) ? nk_true : nk_false;
 
     // Route single-finger touch as left-button click
