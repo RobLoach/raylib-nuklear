@@ -182,7 +182,7 @@ typedef struct NuklearUserData {
     float scaling;           // The scaling of the Nuklear user interface.
     bool insert_mode;        // Whether keyboard insert mode is active.
     double last_left_press;  // Time of the last left-button press, for double-click detection.
-    nk_bool double_clicking; // Whether a double-click is currently in progress.
+    bool double_clicking; // Whether a double-click is currently in progress.
 } NuklearUserData;
 
 /**
@@ -340,7 +340,7 @@ InitNuklearContext(struct nk_user_font* userFont)
     userData->scaling = 1.0f;
     userData->insert_mode = true;
     userData->last_left_press = 0.0;
-    userData->double_clicking = nk_false;
+    userData->double_clicking = false;
     nk_handle userDataHandle;
     userDataHandle.id = 1;
     userDataHandle.ptr = (void*)userData;
@@ -995,11 +995,11 @@ nk_raylib_input_mouse(struct nk_context * ctx)
         NuklearUserData* userData = (NuklearUserData*)ctx->userdata.ptr;
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             double now = GetTime();
-            userData->double_clicking = (now - userData->last_left_press <= RAYLIB_NUKLEAR_DOUBLE_CLICK_THRESHOLD) ? nk_true : nk_false;
+            userData->double_clicking = now - userData->last_left_press <= RAYLIB_NUKLEAR_DOUBLE_CLICK_THRESHOLD;
             userData->last_left_press = now;
         }
         else if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
-            userData->double_clicking = nk_false;
+            userData->double_clicking = false;
         }
         nk_input_button(ctx, NK_BUTTON_DOUBLE, mouseX, mouseY, userData->double_clicking);
     }
