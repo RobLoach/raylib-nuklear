@@ -179,7 +179,10 @@ extern "C" {
  * The user data that's leverages internally through Nuklear.
  */
 typedef struct NuklearUserData {
-    float scaling; // The scaling of the Nuklear user interface.
+    float scaling;           // The scaling of the Nuklear user interface.
+    bool insert_mode;        // Whether keyboard insert mode is active.
+    double last_left_press;  // Time of the last left-button press, for double-click detection.
+    bool double_clicking; // Whether a double-click is currently in progress.
 } NuklearUserData;
 
 /**
@@ -335,6 +338,9 @@ InitNuklearContext(struct nk_user_font* userFont)
 
     // Set the internal user data.
     userData->scaling = 1.0f;
+    userData->insert_mode = true;
+    userData->last_left_press = 0.0;
+    userData->double_clicking = false;
     nk_handle userDataHandle;
     userDataHandle.id = 1;
     userDataHandle.ptr = (void*)userData;
@@ -914,11 +920,6 @@ static const struct nk_raylib_input_keyboard_check nk_raylib_keyboard_checks[NK_
 };
 
 /**
- * Toggles keyboard insert mode.
- */
-static bool nk_raylib_insert_mode = true;
-
-/**
  * Update the Nuklear context for the keyboard input from raylib.
  *
  * @param ctx The nuklear context.
@@ -955,9 +956,10 @@ nk_raylib_input_keyboard(struct nk_context * ctx)
 
     nk_input_key(ctx, NK_KEY_TAB, IsKeyDown(KEY_TAB));
 
-    if (IsKeyPressed(KEY_INSERT)) nk_raylib_insert_mode = !nk_raylib_insert_mode;
-    nk_input_key(ctx, NK_KEY_TEXT_INSERT_MODE, nk_raylib_insert_mode);
-    nk_input_key(ctx, NK_KEY_TEXT_REPLACE_MODE, !nk_raylib_insert_mode);
+    NuklearUserData* userData = (NuklearUserData*)ctx->userdata.ptr;
+    if (IsKeyPressed(KEY_INSERT)) userData->insert_mode = !userData->insert_mode;
+    nk_input_key(ctx, NK_KEY_TEXT_INSERT_MODE, userData->insert_mode);
+    nk_input_key(ctx, NK_KEY_TEXT_REPLACE_MODE, !userData->insert_mode);
 
     int code;
     while ((code = GetCharPressed()) != 0) {
@@ -999,17 +1001,16 @@ nk_raylib_input_mouse(struct nk_context * ctx)
 
     // Double Click
     {
-        static double lastLeftPressTime = 0.0;
-        static nk_bool doubleClicking = nk_false;
+        NuklearUserData* userData = (NuklearUserData*)ctx->userdata.ptr;
         if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
             double now = GetTime();
-            doubleClicking = (now - lastLeftPressTime <= RAYLIB_NUKLEAR_DOUBLE_CLICK_THRESHOLD) ? nk_true : nk_false;
-            lastLeftPressTime = now;
+            userData->double_clicking = now - userData->last_left_press <= RAYLIB_NUKLEAR_DOUBLE_CLICK_THRESHOLD;
+            userData->last_left_press = now;
         }
         else if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
-            doubleClicking = nk_false;
+            userData->double_clicking = false;
         }
-        nk_input_button(ctx, NK_BUTTON_DOUBLE, mouseX, mouseY, doubleClicking);
+        nk_input_button(ctx, NK_BUTTON_DOUBLE, mouseX, mouseY, userData->double_clicking);
     }
 
     // Mouse Wheel
