@@ -95,6 +95,17 @@ float GetNuklearScaling(struct nk_context * ctx);            // Retrieves the sc
 
 See the [Nuklear API documenation](https://immediate-mode-ui.github.io/Nuklear/doc/nuklear.html) for more how to use Nuklear.
 
+## Configuration
+
+The following macros can be defined before including `raylib-nuklear.h` to tune behavior:
+
+| Macro | Description |
+|---|---|
+| `RAYLIB_NUKLEAR_DOUBLE_CLICK_THRESHOLD` | Max seconds between clicks to register a double-click |
+| `RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS` | Max points allowed for `NK_COMMAND_POLYGON_FILLED` |
+| `RAYLIB_NUKLEAR_INCLUDE_DEFAULT_FONT` | Define to enable Nuklear's built-in baked font |
+| `RAYLIB_NUKLEAR_FONT_SPACING_RATIO` | Character spacing as a fraction of the font size |
+
 ## Comparision
 
 There are a few other graphical user interface solutions out there for use with raylib. [raygui](https://github.com/raysan5/raygui), [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear), and [ImGui](https://github.com/ocornut/imgui) with [rlImGui](https://github.com/raylib-extras/rlImGui), are popular choices. It's best to choose the GUI that fits your needs best. Generally, if you're unsure which GUI to use with raylib, use [raygui](https://github.com/raysan5/raygui).
