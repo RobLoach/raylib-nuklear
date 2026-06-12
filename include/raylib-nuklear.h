@@ -976,11 +976,20 @@ NK_API void
 nk_raylib_input_mouse(struct nk_context * ctx)
 {
     const float scale = GetNuklearScaling(ctx);
-    const int mouseX = (int)((float)GetMouseX() / scale);
-    const int mouseY = (int)((float)GetMouseY() / scale);
+    int mouseX = (int)((float)GetMouseX() / scale);
+    int mouseY = (int)((float)GetMouseY() / scale);
+    nk_bool leftDown = IsMouseButtonDown(MOUSE_LEFT_BUTTON) ? nk_true : nk_false;
+
+    // Route single-finger touch as left-button click
+    if (GetTouchCount() > 0) {
+        Vector2 touchPos = GetTouchPosition(0);
+        mouseX = (int)(touchPos.x / scale);
+        mouseY = (int)(touchPos.y / scale);
+        leftDown = nk_true;
+    }
 
     nk_input_motion(ctx, mouseX, mouseY);
-    nk_input_button(ctx, NK_BUTTON_LEFT, mouseX, mouseY, IsMouseButtonDown(MOUSE_LEFT_BUTTON));
+    nk_input_button(ctx, NK_BUTTON_LEFT, mouseX, mouseY, leftDown);
     nk_input_button(ctx, NK_BUTTON_RIGHT, mouseX, mouseY, IsMouseButtonDown(MOUSE_RIGHT_BUTTON));
     nk_input_button(ctx, NK_BUTTON_MIDDLE, mouseX, mouseY, IsMouseButtonDown(MOUSE_MIDDLE_BUTTON));
 
