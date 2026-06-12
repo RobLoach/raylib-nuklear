@@ -99,12 +99,12 @@ See the [Nuklear API documenation](https://immediate-mode-ui.github.io/Nuklear/d
 
 The following macros can be defined before including `raylib-nuklear.h` to tune behavior:
 
-| Macro | Default | Description |
-|---|---|---|
-| `RAYLIB_NUKLEAR_DOUBLE_CLICK_THRESHOLD` | `0.3` | Max seconds between clicks to register a double-click |
-| `RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS` | `64` | Max points allowed for `NK_COMMAND_POLYGON_FILLED` |
-| `RAYLIB_NUKLEAR_INCLUDE_DEFAULT_FONT` | *(unset)* | Define to enable Nuklear's built-in baked font |
-| `RAYLIB_NUKLEAR_FONT_SPACING_RATIO` | `0.01` | Character spacing as a fraction of the font size |
+| Macro | Description |
+|---|---|
+| `RAYLIB_NUKLEAR_DOUBLE_CLICK_THRESHOLD` | Max seconds between clicks to register a double-click |
+| `RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS` | Max points allowed for `NK_COMMAND_POLYGON_FILLED` |
+| `RAYLIB_NUKLEAR_INCLUDE_DEFAULT_FONT` | Define to enable Nuklear's built-in baked font |
+| `RAYLIB_NUKLEAR_FONT_SPACING_RATIO` | Character spacing as a fraction of the font size |
 
 ## Comparision
 
