@@ -672,7 +672,12 @@ DrawNuklear(struct nk_context * ctx)
                 Vector2 controlPoint1 = CLITERAL(Vector2) {(float)q->ctrl[0].x * scale, (float)q->ctrl[0].y * scale};
                 Vector2 controlPoint2 = CLITERAL(Vector2) {(float)q->ctrl[1].x * scale, (float)q->ctrl[1].y * scale};
                 Vector2 end = CLITERAL(Vector2) {(float)q->end.x * scale, (float)q->end.y * scale};
+#if defined(RAYLIB_VERSION_MAJOR) && RAYLIB_VERSION_MAJOR >= 5
                 DrawSplineSegmentBezierCubic(begin, controlPoint1, controlPoint2, end, (float)q->line_thickness * scale, color);
+#else
+                // raylib < 5.0 named this DrawLineBezierCubic
+                DrawLineBezierCubic(begin, controlPoint1, controlPoint2, end, (float)q->line_thickness * scale, color);
+#endif
             } break;
 
             case NK_COMMAND_RECT: {
