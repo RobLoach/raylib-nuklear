@@ -157,6 +157,15 @@ extern "C" {
 #define RAYLIB_NUKLEAR_FONT_SPACING_RATIO 0.01f
 #endif // RAYLIB_NUKLEAR_FONT_SPACING_RATIO
 
+#ifndef RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS
+/**
+ * The maximum amount of points allowed when drawing a filled polygon.
+ *
+ * @see NK_COMMAND_POLYGON_FILLED
+ */
+#define RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS 64
+#endif  // RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS
+
 #ifndef RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS
 /**
  * The amount of segments used when drawing an arc.
@@ -563,9 +572,6 @@ NuklearImageToTexture(struct nk_image img)
  */
 static void raylib_nuklear_draw_polygon_fill(float scale, const struct nk_vec2i *pnts, int count, Color col) {
     int i = 0;
-    #ifndef RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS
-    #define RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS 64
-    #endif
     int left = 10000, top = 10000, bottom = 0, right = 0;
     int nodes, nodeX[RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS], pixelX, pixelY, j, swap ;
 
@@ -620,7 +626,7 @@ static void raylib_nuklear_draw_polygon_fill(float scale, const struct nk_vec2i 
             } else i++;
         }
         /*  Fill the pixels between node pairs. */
-        for (i = 0; i < nodes; i += 2) {
+        for (i = 0; i + 1 < nodes; i += 2) {
             if (nodeX[i+0] >= right) break;
             if (nodeX[i+1] > left) {
                 if (nodeX[i+0] < left) nodeX[i+0] = left ;
@@ -632,7 +638,6 @@ static void raylib_nuklear_draw_polygon_fill(float scale, const struct nk_vec2i 
             }
         }
     }
-    #undef RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS
 }
 
 /**
@@ -829,9 +834,11 @@ DrawNuklear(struct nk_context * ctx)
                     Vector2 end = {(float)p->points[i + 1].x * scale, (float)p->points[i + 1].y * scale};
                     DrawLineEx(start, end, thickness, color);
                 }
-                Vector2 last = {(float)p->points[p->point_count - 1].x * scale, (float)p->points[p->point_count - 1].y * scale};
-                Vector2 first = {(float)p->points[0].x * scale, (float)p->points[0].y * scale};
-                DrawLineEx(last, first, thickness, color);
+                if (p->point_count >= 2) {
+                    Vector2 last = {(float)p->points[p->point_count - 1].x * scale, (float)p->points[p->point_count - 1].y * scale};
+                    Vector2 first = {(float)p->points[0].x * scale, (float)p->points[0].y * scale};
+                    DrawLineEx(last, first, thickness, color);
+                }
             } break;
 
             case NK_COMMAND_POLYGON_FILLED: {

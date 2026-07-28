@@ -202,6 +202,51 @@ int main(int argc, char *argv[]) {
         UnloadNuklear(ctx);
     }
 
+    // Degenerate polygons must not crash DrawNuklear().
+    // https://github.com/RobLoach/raylib-nuklear/issues/131
+    {
+        ctx = InitNuklear(10);
+        Assert(ctx);
+
+        UpdateNuklear(ctx);
+
+        if (nk_begin(ctx, "PolygonTest", nk_rect(0, 0, 100, 100),
+                NK_WINDOW_NO_SCROLLBAR)) {
+            struct nk_command_buffer* canvas = nk_window_get_canvas(ctx);
+            struct nk_color color = nk_rgb(230, 20, 20);
+
+            // No points.
+            nk_fill_polygon(canvas, NULL, 0, color);
+            nk_stroke_polygon(canvas, NULL, 0, 1.0f, color);
+
+            // A single point.
+            float single[] = {10.0f, 10.0f};
+            nk_fill_polygon(canvas, single, 1, color);
+            nk_stroke_polygon(canvas, single, 1, 1.0f, color);
+
+            // A self-touching polygon, where a repeated vertex touches the
+            // outline and can leave the scanline fill with an odd node count.
+            float touching[] = {
+                10.0f, 10.0f,
+                30.0f, 10.0f,
+                20.0f, 20.0f,
+                30.0f, 30.0f,
+                10.0f, 30.0f,
+                20.0f, 20.0f
+            };
+            nk_fill_polygon(canvas, touching, 6, color);
+            nk_stroke_polygon(canvas, touching, 6, 1.0f, color);
+        }
+        nk_end(ctx);
+
+        BeginDrawing();
+            ClearBackground(RAYWHITE);
+            DrawNuklear(ctx);
+        EndDrawing();
+
+        UnloadNuklear(ctx);
+    }
+
     // A NULL context must not crash any of the public entry points.
     {
         UpdateNuklear(NULL);
