@@ -18,7 +18,7 @@ Use the [Nuklear](https://github.com/Immediate-Mode-UI/Nuklear) immediate mode c
     ```
 3. Use `InitNuklear(fontSize)` or `InitNuklearEx(font, fontSize)` to create the nuklear context...
     ``` c
-    struct nk_context *ctx = InitNuklear(10);
+    struct nk_context *ctx = InitNuklear(13);
     ```
 4. Build your Nuklear GUI through the standard [Nuklear API](https://github.com/Immediate-Mode-UI/Nuklear/wiki/Window)
 5. Update the input for the GUI using `UpdateNuklear(ctx)`
@@ -35,7 +35,7 @@ int main() {
     InitWindow(640, 480, "raylib-nuklear example");
 
     // Create the Nuklear Context
-    int fontSize = 10;
+    int fontSize = 13;
     struct nk_context *ctx = InitNuklear(fontSize);
 
     while (!WindowShouldClose()) {
@@ -78,19 +78,24 @@ struct nk_context* InitNuklear(int fontSize);                // Initialize the N
 struct nk_context* InitNuklearEx(Font font, float fontSize); // Initialize the Nuklear GUI context, with a custom font
 bool IsNuklearValid(struct nk_context* ctx);                 // Check if the Nuklear context is valid
 Font LoadFontFromNuklear(int fontSize);                      // Loads the default Nuklear font
-void UpdateNuklear(struct nk_context* ctx);                 // Update the input state and internal components for Nuklear
+void UpdateNuklear(struct nk_context* ctx);                  // Update the input state and internal components for Nuklear
 void UpdateNuklearEx(struct nk_context* ctx, float deltaTime); // Update the input state and internal components for Nuklear, with a custom frame time
-void DrawNuklear(struct nk_context* ctx);                   // Render the Nuklear GUI on the screen
-void UnloadNuklear(struct nk_context* ctx);                 // Deinitialize the Nuklear context
-struct nk_color ColorToNuklearColor(Color color);                 // Convert a raylib Color to a Nuklear color object
-struct nk_colorf ColorToNuklearColorF(Color color);               // Convert a raylib Color to a Nuklear floating color
-struct Color NuklearColorToColor(struct nk_color color);        // Convert a Nuklear color to a raylib Color
-struct Color NuklearColorFToColor(struct nk_colorf color);      // Convert a Nuklear floating color to a raylib Color
-struct Rectangle NuklearRectToRectangle(struct nk_context* ctx, struct nk_rect rect); // Convert a Nuklear rectangle to a raylib Rectangle
+void DrawNuklear(struct nk_context* ctx);                    // Render the Nuklear GUI on the screen
+void UnloadNuklear(struct nk_context* ctx);                  // Deinitialize the Nuklear context
+struct nk_color ColorToNuklearColor(Color color);            // Convert a raylib Color to a Nuklear color object
+struct nk_colorf ColorToNuklearColorF(Color color);          // Convert a raylib Color to a Nuklear floating color
+Color NuklearColorToColor(struct nk_color color);            // Convert a Nuklear color to a raylib Color
+Color NuklearColorFToColor(struct nk_colorf color);          // Convert a Nuklear floating color to a raylib Color
+Rectangle NuklearRectToRectangle(struct nk_context* ctx, struct nk_rect rect); // Convert a Nuklear rectangle to a raylib Rectangle
 struct nk_rect RectangleToNuklearRect(struct nk_context* ctx, Rectangle rect); // Convert a raylib Rectangle to a Nuklear Rectangle
-struct nk_image TextureToNuklearImage(Texture tex);               // Get a Nuklear image from a Texture
-void SetNuklearScaling(struct nk_context * ctx, float scaling); // Sets the scaling for the given Nuklear context
-float GetNuklearScaling(struct nk_context * ctx);            // Retrieves the scaling of the given Nuklear context
+struct nk_image TextureToNuklearImage(Texture texture);      // Get a Nuklear image from a Texture
+struct nk_image TextureToNuklearImageEx(Texture texture, Rectangle region); // Get a Nuklear image from a sub-region of a Texture
+struct nk_vec2 Vector2ToNuklearVec2(Vector2 vec);            // Convert a raylib Vector2 to a Nuklear nk_vec2
+Vector2 NuklearVec2ToVector2(struct nk_vec2 vec);            // Convert a Nuklear nk_vec2 to a raylib Vector2
+void SetNuklearScaling(struct nk_context* ctx, float scaling); // Sets the scaling for the given Nuklear context
+float GetNuklearScaling(struct nk_context* ctx);             // Retrieves the scaling of the given Nuklear context
+KeyboardKey NuklearKeyToKeyboardKey(nk_rune key);            // Convert an nk_rune key binding to a raylib KeyboardKey
+nk_rune KeyboardKeyToNuklearKey(KeyboardKey key);            // Convert a raylib KeyboardKey to an nk_rune key binding
 ```
 
 See the [Nuklear API documenation](https://immediate-mode-ui.github.io/Nuklear/doc/nuklear.html) for more how to use Nuklear.
@@ -102,12 +107,15 @@ See the [Nuklear API documenation](https://immediate-mode-ui.github.io/Nuklear/d
 
 The following macros can be defined before including `raylib-nuklear.h` to tune behavior:
 
-| Macro | Description |
-|---|---|
-| `RAYLIB_NUKLEAR_DOUBLE_CLICK_THRESHOLD` | Max seconds between clicks to register a double-click |
-| `RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS` | Max points allowed for `NK_COMMAND_POLYGON_FILLED` |
-| `RAYLIB_NUKLEAR_INCLUDE_DEFAULT_FONT` | Define to enable Nuklear's built-in baked font |
-| `RAYLIB_NUKLEAR_FONT_SPACING_RATIO` | Character spacing as a fraction of the font size |
+| Macro | Default | Description |
+|---|---|---|
+| `RAYLIB_NUKLEAR_DEFAULT_FONTSIZE` | `13` | Font size used when a font size of 0 is provided |
+| `RAYLIB_NUKLEAR_DEFAULT_ARC_SEGMENTS` | `20` | Amount of segments used when drawing an arc |
+| `RAYLIB_NUKLEAR_DEFAULT_FONT_GLYPHS` | `95` | Amount of glyphs to load for the default font |
+| `RAYLIB_NUKLEAR_DOUBLE_CLICK_THRESHOLD` | `0.3` | Max seconds between clicks to register a double-click |
+| `RAYLIB_NUKLEAR_POLYGON_FILL_MAX_POINTS` | `64` | Max points allowed for `NK_COMMAND_POLYGON_FILLED` |
+| `RAYLIB_NUKLEAR_INCLUDE_DEFAULT_FONT` | undefined | Define to enable Nuklear's built-in baked font |
+| `RAYLIB_NUKLEAR_FONT_SPACING_RATIO` | `0.01f` | Character spacing as a fraction of the font size |
 
 ## Comparision
 
