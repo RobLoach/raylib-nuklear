@@ -354,7 +354,7 @@ InitNuklearContext(struct nk_user_font* userFont)
 /**
  * Initialize the Nuklear context for use with Raylib.
  *
- * @param fontSize The size of the font to use for GUI text. Use 0 to use the default font size of 10.
+ * @param fontSize The size of the font to use for GUI text. Use 0 to use RAYLIB_NUKLEAR_DEFAULT_FONTSIZE.
  *
  * @return The nuklear context, or NULL on error.
  */
@@ -385,7 +385,7 @@ InitNuklear(int fontSize)
  * Initialize the Nuklear context for use with Raylib, with a supplied custom font.
  *
  * @param font The custom raylib font to use with Nuklear.
- * @param fontSize The desired size of the font. Use 0 to set the default size of 10.
+ * @param fontSize The desired size of the font. Use 0 to use RAYLIB_NUKLEAR_DEFAULT_FONTSIZE.
  *
  * @return The nuklear context, or NULL on error.
  */
@@ -438,7 +438,7 @@ NK_API bool IsNuklearValid(struct nk_context* ctx) {
 /**
  * Load the default Nuklear font. Requires `RAYLIB_NUKLEAR_INCLUDE_DEFAULT_FONT` to be defined.
  *
- * @param size The size of the font to load (optional). Provide 0 if you'd like to use the default size from Nuklear.
+ * @param size The size of the font to load (optional). Provide 0 to use RAYLIB_NUKLEAR_DEFAULT_FONTSIZE.
  *
  * @return The loaded font, or an empty font on error.
  *
