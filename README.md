@@ -95,6 +95,9 @@ float GetNuklearScaling(struct nk_context * ctx);            // Retrieves the sc
 
 See the [Nuklear API documenation](https://immediate-mode-ui.github.io/Nuklear/doc/nuklear.html) for more how to use Nuklear.
 
+> [!WARNING]
+> *raylib-nuklear* stores its own state (scaling, insert mode, double-click tracking) in the context's user data. Calling `nk_set_user_data()` replaces it, which disables scaling, insert mode and double-click detection. Save `ctx->userdata` beforehand and restore it before `UnloadNuklear()`.
+
 ## Configuration
 
 The following macros can be defined before including `raylib-nuklear.h` to tune behavior:
