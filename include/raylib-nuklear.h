@@ -468,10 +468,19 @@ NK_API Font LoadFontFromNuklear(int size) {
     // Decode base85 -> compressed binary -> raw TTF
     int compressed_size = (((int)nk_strlen(nk_proggy_clean_ttf_compressed_data_base85) + 4) / 5) * 4;
     unsigned char *compressed_data = (unsigned char*)MemAlloc((unsigned int)compressed_size);
+    if (compressed_data == NULL) {
+        TraceLog(LOG_ERROR, "NUKLEAR: Failed to allocate the default font data");
+        return CLITERAL(Font) {0};
+    }
     nk_decode_85(compressed_data, (const unsigned char*)nk_proggy_clean_ttf_compressed_data_base85);
 
     unsigned int ttf_size = nk_decompress_length(compressed_data);
     unsigned char *ttf_data = (unsigned char*)MemAlloc(ttf_size);
+    if (ttf_data == NULL) {
+        TraceLog(LOG_ERROR, "NUKLEAR: Failed to allocate the default font data");
+        MemFree(compressed_data);
+        return CLITERAL(Font) {0};
+    }
     nk_decompress(ttf_data, compressed_data, (unsigned int)compressed_size);
     MemFree(compressed_data);
 
@@ -962,9 +971,11 @@ nk_raylib_input_keyboard(struct nk_context * ctx)
     nk_input_key(ctx, NK_KEY_TAB, IsKeyDown(KEY_TAB));
 
     NuklearUserData* userData = (NuklearUserData*)ctx->userdata.ptr;
-    if (IsKeyPressed(KEY_INSERT)) userData->insert_mode = !userData->insert_mode;
-    nk_input_key(ctx, NK_KEY_TEXT_INSERT_MODE, userData->insert_mode);
-    nk_input_key(ctx, NK_KEY_TEXT_REPLACE_MODE, !userData->insert_mode);
+    if (userData != NULL) {
+        if (IsKeyPressed(KEY_INSERT)) userData->insert_mode = !userData->insert_mode;
+        nk_input_key(ctx, NK_KEY_TEXT_INSERT_MODE, userData->insert_mode);
+        nk_input_key(ctx, NK_KEY_TEXT_REPLACE_MODE, !userData->insert_mode);
+    }
 
     int code;
     while ((code = GetCharPressed()) != 0) {
@@ -1014,15 +1025,17 @@ nk_raylib_input_mouse(struct nk_context * ctx)
     // Double Click
     {
         NuklearUserData* userData = (NuklearUserData*)ctx->userdata.ptr;
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
-            double now = GetTime();
-            userData->double_clicking = now - userData->last_left_press <= RAYLIB_NUKLEAR_DOUBLE_CLICK_THRESHOLD;
-            userData->last_left_press = now;
+        if (userData != NULL) {
+            if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) {
+                double now = GetTime();
+                userData->double_clicking = now - userData->last_left_press <= RAYLIB_NUKLEAR_DOUBLE_CLICK_THRESHOLD;
+                userData->last_left_press = now;
+            }
+            else if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
+                userData->double_clicking = false;
+            }
+            nk_input_button(ctx, NK_BUTTON_DOUBLE, mouseX, mouseY, userData->double_clicking);
         }
-        else if (IsMouseButtonReleased(MOUSE_LEFT_BUTTON)) {
-            userData->double_clicking = false;
-        }
-        nk_input_button(ctx, NK_BUTTON_DOUBLE, mouseX, mouseY, userData->double_clicking);
     }
 
     // Mouse Wheel
@@ -1053,6 +1066,11 @@ UpdateNuklear(struct nk_context * ctx)
 NK_API void
 UpdateNuklearEx(struct nk_context * ctx, float deltaTime)
 {
+    // Skip updating if it's not set.
+    if (ctx == NULL) {
+        return;
+    }
+
     // Update the time that has changed since last frame.
     ctx->delta_time_seconds = deltaTime;
 

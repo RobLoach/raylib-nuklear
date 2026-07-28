@@ -202,6 +202,38 @@ int main(int argc, char *argv[]) {
         UnloadNuklear(ctx);
     }
 
+    // A NULL context must not crash any of the public entry points.
+    {
+        UpdateNuklear(NULL);
+        UpdateNuklearEx(NULL, 1.0f / 60.0f);
+        DrawNuklear(NULL);
+        SetNuklearScaling(NULL, 2.0f);
+        AssertEqual(GetNuklearScaling(NULL), 1.0f);
+        UnloadNuklear(NULL);
+    }
+
+    // Replacing the context user data with nk_set_user_data() must not crash.
+    {
+        ctx = InitNuklear(10);
+        Assert(ctx);
+
+        nk_handle original = ctx->userdata;
+        nk_set_user_data(ctx, nk_handle_ptr(NULL));
+
+        UpdateNuklear(ctx);
+        UpdateNuklearEx(ctx, 1.0f / 60.0f);
+        AssertEqual(GetNuklearScaling(ctx), 1.0f);
+
+        BeginDrawing();
+            ClearBackground(RAYWHITE);
+            DrawNuklear(ctx);
+        EndDrawing();
+
+        // Restore the internal user data so that it's still freed on unload.
+        nk_set_user_data(ctx, original);
+        UnloadNuklear(ctx);
+    }
+
     // RAYLIB_NUKLEAR_VERSION macros
     Assert(RAYLIB_NUKLEAR_VERSION_MAJOR >= 1);
     Assert(RAYLIB_NUKLEAR_VERSION_MINOR >= 0);
