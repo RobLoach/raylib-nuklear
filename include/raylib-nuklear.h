@@ -544,19 +544,6 @@ ColorToNuklearColorF(Color color)
 static struct Texture
 NuklearImageToTexture(struct nk_image img)
 {
-	// nk_handle is a union, so there is no flag telling whether the image was
-	// built from a texture id (nk_image_id(), TextureToNuklearImage()) or from
-	// a Texture pointer (nk_image_ptr(&texture)). Texture ids are small
-	// sequential OpenGL texture names, while pointers are addresses far beyond
-	// that range, so any handle value above RAYLIB_NUKLEAR_MAX_TEXTURE_ID is
-	// treated as a Texture pointer.
-	#ifndef RAYLIB_NUKLEAR_MAX_TEXTURE_ID
-	#define RAYLIB_NUKLEAR_MAX_TEXTURE_ID 0x100000
-	#endif
-	if ((nk_ptr)img.handle.ptr > (nk_ptr)RAYLIB_NUKLEAR_MAX_TEXTURE_ID) {
-		return *(Texture*)img.handle.ptr;
-	}
-
 	Texture texture = {0};
 	texture.id = (unsigned int)img.handle.id;
 	texture.width = (int)img.w;
