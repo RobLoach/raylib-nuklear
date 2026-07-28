@@ -952,10 +952,10 @@ nk_raylib_input_keyboard(struct nk_context * ctx)
     nk_input_key(ctx, NK_KEY_RIGHT, IsKeyDown(KEY_RIGHT) && !control && !command);
     nk_input_key(ctx, NK_KEY_UP, IsKeyDown(KEY_UP));
     nk_input_key(ctx, NK_KEY_DOWN, IsKeyDown(KEY_DOWN));
-    nk_input_key(ctx, NK_KEY_TEXT_START, IsKeyDown(KEY_HOME) && !control);
-    nk_input_key(ctx, NK_KEY_TEXT_END, IsKeyDown(KEY_END) && !control);
-    nk_input_key(ctx, NK_KEY_SCROLL_START, IsKeyDown(KEY_HOME) && control);
-    nk_input_key(ctx, NK_KEY_SCROLL_END, IsKeyDown(KEY_END) && control);
+    nk_input_key(ctx, NK_KEY_TEXT_START, IsKeyDown(KEY_HOME) && !control && !command);
+    nk_input_key(ctx, NK_KEY_TEXT_END, IsKeyDown(KEY_END) && !control && !command);
+    nk_input_key(ctx, NK_KEY_SCROLL_START, IsKeyDown(KEY_HOME) && (control || command));
+    nk_input_key(ctx, NK_KEY_SCROLL_END, IsKeyDown(KEY_END) && (control || command));
     nk_input_key(ctx, NK_KEY_SCROLL_DOWN, IsKeyDown(KEY_PAGE_DOWN));
     nk_input_key(ctx, NK_KEY_SCROLL_UP, IsKeyDown(KEY_PAGE_UP));
 
@@ -990,8 +990,12 @@ nk_raylib_input_mouse(struct nk_context * ctx)
     int mouseY = (int)(mousePosition.y / scale);
     nk_bool leftDown = IsMouseButtonDown(MOUSE_LEFT_BUTTON) ? nk_true : nk_false;
 
-    // Route single-finger touch as left-button click
-    if (GetTouchPointCount() > 0) {
+    // Route single-finger touch as left-button click. On desktop, raylib reports a touch
+    // point for any mouse button, so only do this when no mouse button is actually down.
+    if (GetTouchPointCount() > 0 &&
+            !IsMouseButtonDown(MOUSE_LEFT_BUTTON) &&
+            !IsMouseButtonDown(MOUSE_RIGHT_BUTTON) &&
+            !IsMouseButtonDown(MOUSE_MIDDLE_BUTTON)) {
         Vector2 touchPos = GetTouchPosition(0);
         mouseX = (int)(touchPos.x / scale);
         mouseY = (int)(touchPos.y / scale);
