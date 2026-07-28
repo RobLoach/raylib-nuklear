@@ -874,6 +874,18 @@ DrawNuklear(struct nk_context * ctx)
                 const struct nk_command_image *i = (const struct nk_command_image *)cmd;
                 Texture texture = NuklearImageToTexture(i->img);
                 Rectangle source = CLITERAL(Rectangle) {(float)i->img.region[0], (float)i->img.region[1], (float)i->img.region[2], (float)i->img.region[3]};
+                if (source.width <= 0 || source.height <= 0) {
+                    // Images from nk_image_id(), nk_image_ptr() or nk_image_handle() have an empty region; use the full texture instead.
+                    source.width = (i->img.w > 0) ? (float)i->img.w : (float)texture.width;
+                    source.height = (i->img.h > 0) ? (float)i->img.h : (float)texture.height;
+                    if (source.width <= 0 || source.height <= 0) {
+                        // The texture size is unknown (nk_image_id() only carries the id), so map the whole texture onto the destination.
+                        texture.width = 1;
+                        texture.height = 1;
+                        source.width = 1;
+                        source.height = 1;
+                    }
+                }
                 Rectangle dest = CLITERAL(Rectangle) {(float)i->x * scale, (float)i->y * scale, (float)i->w * scale, (float)i->h * scale};
                 Vector2 origin = CLITERAL(Vector2) {0, 0};
                 Color tint = NuklearColorToColor(i->col);
