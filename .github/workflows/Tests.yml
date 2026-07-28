@@ -15,6 +15,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
+      - name: Check Nuklear Sync
+        run: diff -q include/nuklear.h vendor/nuklear/nuklear.h
       - name: Install Dependencies
         run: sudo apt-get update && sudo apt-get install -y xorg-dev libglu1-mesa-dev
       - name: Configure
