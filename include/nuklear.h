@@ -6474,34 +6474,34 @@ nk_stbtt_free(void *ptr, void *user_data) {
  *                              MATH
  *
  * ===============================================================*/
-/*/// ### Math
-///  Since nuklear is supposed to work on all systems providing floating point
-///  math without any dependencies I also had to implement my own math functions
-///  for sqrt, sin and cos. Since the actual highly accurate implementations for
-///  the standard library functions are quite complex and I do not need high
-///  precision for my use cases I use approximations.
-///
-///  Sqrt
-///  ----
-///  For square root nuklear uses the famous fast inverse square root:
-///  https://en.wikipedia.org/wiki/Fast_inverse_square_root with
-///  slightly tweaked magic constant. While on today's hardware it is
-///  probably not faster it is still fast and accurate enough for
-///  nuklear's use cases. IMPORTANT: this requires float format IEEE 754
-///
-///  Sine/Cosine
-///  -----------
-///  All constants inside both function are generated Remez's minimax
-///  approximations for value range 0...2*PI. The reason why I decided to
-///  approximate exactly that range is that nuklear only needs sine and
-///  cosine to generate circles which only requires that exact range.
-///  In addition I used Remez instead of Taylor for additional precision:
-///  www.lolengine.net/blog/2011/12/21/better-function-approximations.
-///
-///  The tool I used to generate constants for both sine and cosine
-///  (it can actually approximate a lot more functions) can be
-///  found here: www.lolengine.net/wiki/oss/lolremez
-*/
+/**
+ * \page Math
+ * Since nuklear is supposed to work on all systems providing floating point
+ * math without any dependencies I also had to implement my own math functions
+ * for sqrt, sin and cos. Since the actual highly accurate implementations for
+ * the standard library functions are quite complex and I do not need high
+ * precision for my use cases I use approximations.
+ *
+ * # Sqrt
+ * For square root nuklear uses the famous fast inverse square root:
+ * https://en.wikipedia.org/wiki/Fast_inverse_square_root with
+ * slightly tweaked magic constant. While on today's hardware it is
+ * probably not faster it is still fast and accurate enough for
+ * nuklear's use cases. IMPORTANT: this requires float format IEEE 754
+ *
+ * # Sine/Cosine
+ * All constants inside both function are generated Remez's minimax
+ * approximations for value range 0...2*PI. The reason why I decided to
+ * approximate exactly that range is that nuklear only needs sine and
+ * cosine to generate circles which only requires that exact range.
+ * In addition I used Remez instead of Taylor for additional precision:
+ * https://web.archive.org/web/20220629122951/www.lolengine.net/blog/2011/12/21/better-function-approximations
+ *
+ * The tool I used to generate constants for both sine and cosine
+ * (it can actually approximate a lot more functions) can be found here:
+ * https://github.com/samhocevar/lolremez
+ * https://web.archive.org/web/20160306205304/www.lolengine.net/wiki/oss/lolremez
+ */
 #ifdef NK_INV_SQRT_NEEDED
 NK_LIB float
 nk_inv_sqrt(float n)
@@ -7744,7 +7744,10 @@ nk_strfmt(char *buf, int buf_size, const char *fmt, va_list args)
 NK_API nk_hash
 nk_murmur_hash(const void * key, int len, nk_hash seed)
 {
-    /* 32-Bit MurmurHash3: https://code.google.com/p/smhasher/wiki/MurmurHash3*/
+    /* 32-Bit MurmurHash3: https://github.com/aappleby/smhasher
+     * https://github.com/aappleby/smhasher/blob/07bb4de10a63e8cc2e1724865454eba635742383/src/MurmurHash3.cpp#L94-L146
+     * https://web.archive.org/web/20150906085947/https://code.google.com/p/smhasher/wiki/MurmurHash3 */
+
     #define NK_ROTL(x,r) ((x) << (r) | ((x) >> (32 - r)))
 
     nk_uint h1 = seed;
@@ -17713,7 +17716,7 @@ nk_font_config(float pixel_height)
     cfg.ttf_size = 0;
     cfg.ttf_data_owned_by_atlas = 0;
     cfg.size = pixel_height;
-    cfg.oversample_h = 3;
+    cfg.oversample_h = 1;
     cfg.oversample_v = 1;
     cfg.pixel_snap = 0;
     cfg.coord_type = NK_COORD_UV;
@@ -18021,9 +18024,21 @@ nk_font_atlas_bake(struct nk_font_atlas *atlas, int *width, int *height,
 
 #ifdef NK_INCLUDE_DEFAULT_FONT
     /* no font added so just use default font */
-    if (!atlas->font_num)
-        atlas->default_font = nk_font_atlas_add_default(atlas, 13.0f, 0);
+    /* FIXME(sleeptightAnsiC): This "fallback" exists for compatibility
+     * with code that creates empty atlas and immediately bakes it.
+     * Several demos do this, but it doesn't make sense for API to allow it.
+     * It was never documented anywhere and it's more of a hack than feature.
+     * App/backend should call nk_font_atlas_add_default() on it's own
+     * with whatever config it wants, and treat it like any other font.
+     * Worth to consider this for removal during next major release... */
+    if (!atlas->font_num) {
+        struct nk_font_config config;
+        config = nk_font_config(0);
+        config.oversample_h = 3;
+        atlas->default_font = nk_font_atlas_add_default(atlas, 13.0f, &config);
+    }
 #endif
+
     NK_ASSERT(atlas->font_num);
     if (!atlas->font_num) return 0;
 
@@ -21538,6 +21553,7 @@ nk_nonblock_begin(struct nk_context *ctx,
             root->flags |= NK_WINDOW_REMOVE_ROM;
             root = root->parent;
         }
+        win->popup.buf.active = 0;
         return is_active;
     }
     popup->bounds = body;
