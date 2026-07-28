@@ -544,6 +544,19 @@ ColorToNuklearColorF(Color color)
 static struct Texture
 NuklearImageToTexture(struct nk_image img)
 {
+	// nk_handle is a union, so there is no flag telling whether the image was
+	// built from a texture id (nk_image_id(), TextureToNuklearImage()) or from
+	// a Texture pointer (nk_image_ptr(&texture)). Texture ids are small
+	// sequential OpenGL texture names, while pointers are addresses far beyond
+	// that range, so any handle value above RAYLIB_NUKLEAR_MAX_TEXTURE_ID is
+	// treated as a Texture pointer.
+	#ifndef RAYLIB_NUKLEAR_MAX_TEXTURE_ID
+	#define RAYLIB_NUKLEAR_MAX_TEXTURE_ID 0x100000
+	#endif
+	if ((nk_ptr)img.handle.ptr > (nk_ptr)RAYLIB_NUKLEAR_MAX_TEXTURE_ID) {
+		return *(Texture*)img.handle.ptr;
+	}
+
 	Texture texture = {0};
 	texture.id = (unsigned int)img.handle.id;
 	texture.width = (int)img.w;
@@ -867,6 +880,18 @@ DrawNuklear(struct nk_context * ctx)
                 const struct nk_command_image *i = (const struct nk_command_image *)cmd;
                 Texture texture = NuklearImageToTexture(i->img);
                 Rectangle source = CLITERAL(Rectangle) {(float)i->img.region[0], (float)i->img.region[1], (float)i->img.region[2], (float)i->img.region[3]};
+                if (source.width <= 0 || source.height <= 0) {
+                    // Images from nk_image_id(), nk_image_ptr() or nk_image_handle() have an empty region; use the full texture instead.
+                    source.width = (i->img.w > 0) ? (float)i->img.w : (float)texture.width;
+                    source.height = (i->img.h > 0) ? (float)i->img.h : (float)texture.height;
+                    if (source.width <= 0 || source.height <= 0) {
+                        // The texture size is unknown (nk_image_id() only carries the id), so map the whole texture onto the destination.
+                        texture.width = 1;
+                        texture.height = 1;
+                        source.width = 1;
+                        source.height = 1;
+                    }
+                }
                 Rectangle dest = CLITERAL(Rectangle) {(float)i->x * scale, (float)i->y * scale, (float)i->w * scale, (float)i->h * scale};
                 Vector2 origin = CLITERAL(Vector2) {0, 0};
                 Color tint = NuklearColorToColor(i->col);

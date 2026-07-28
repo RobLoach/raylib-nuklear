@@ -234,6 +234,49 @@ int main(int argc, char *argv[]) {
         UnloadNuklear(ctx);
     }
 
+    // NK_COMMAND_IMAGE: images from nk_image_id() and nk_image_ptr() must render (#130).
+    {
+        ctx = InitNuklear(10);
+        Assert(ctx);
+
+        Texture imageTexture = LoadTexture("resources/test-image.png");
+        AssertTexture(imageTexture);
+
+        // Neither constructor fills in the size or region of the image.
+        struct nk_image imageFromId = nk_image_id((int)imageTexture.id);
+        struct nk_image imageFromPtr = nk_image_ptr(&imageTexture);
+
+        UpdateNuklear(ctx);
+
+        struct nk_rect idBounds = nk_rect(0, 0, 0, 0);
+        struct nk_rect ptrBounds = nk_rect(0, 0, 0, 0);
+        if (nk_begin(ctx, "ImageTest", nk_rect(0, 0, 200, 100), NK_WINDOW_NO_SCROLLBAR)) {
+            nk_layout_row_static(ctx, 64, 64, 2);
+            idBounds = nk_widget_bounds(ctx);
+            nk_image(ctx, imageFromId);
+            ptrBounds = nk_widget_bounds(ctx);
+            nk_image(ctx, imageFromPtr);
+        }
+        nk_end(ctx);
+
+        BeginDrawing();
+            ClearBackground(RED);
+            DrawNuklear(ctx);
+        EndDrawing();
+
+        // The test image is white in the middle, so both widgets must show it.
+        Image screen = LoadImageFromScreen();
+        Color idColor = GetImageColor(screen, (int)(idBounds.x + idBounds.w / 2), (int)(idBounds.y + idBounds.h / 2));
+        Color ptrColor = GetImageColor(screen, (int)(ptrBounds.x + ptrBounds.w / 2), (int)(ptrBounds.y + ptrBounds.h / 2));
+        Color white = WHITE;
+        AssertColorSame(idColor, white, "nk_image_id() image did not render");
+        AssertColorSame(ptrColor, white, "nk_image_ptr() image did not render");
+        UnloadImage(screen);
+
+        UnloadTexture(imageTexture);
+        UnloadNuklear(ctx);
+    }
+
     // RAYLIB_NUKLEAR_VERSION macros
     Assert(RAYLIB_NUKLEAR_VERSION_MAJOR >= 1);
     Assert(RAYLIB_NUKLEAR_VERSION_MINOR >= 0);
