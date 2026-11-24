@@ -53,7 +53,7 @@ int main(void)
         UpdateNuklear(ctx);
 
         // GUI
-        if (nk_begin(ctx, "Demo", nk_rect(50, 50, 230, 250),
+        if (nk_begin(ctx, "Demo", nk_rect(50, 50, 230, 280),
             NK_WINDOW_BORDER|NK_WINDOW_MOVABLE|NK_WINDOW_SCALABLE|
             NK_WINDOW_MINIMIZABLE|NK_WINDOW_TITLE))
         {
@@ -84,6 +84,10 @@ int main(void)
                 bg.a = nk_propertyf(ctx, "#A:", 0, bg.a, 1.0f, 0.01f,0.005f);
                 nk_combo_end(ctx);
             }
+
+            nk_layout_row_dynamic(ctx, 20, 1);
+            if (nk_link_label(ctx, "raylib.com", NK_TEXT_LEFT))
+                OpenURL("https://www.raylib.com");
         }
 
         nk_end(ctx);
