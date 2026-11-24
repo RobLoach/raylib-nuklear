@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
     // Make sure we're running in the correct directory.
     Assert(argc > 0);
     const char* dir = GetDirectoryPath(argv[0]);
-    Assert(ChangeDirectory(dir));
+    Assert(ChangeDirectory(dir) == 0);
 
     // InitNuklear(), IsNuklearValid()
     struct nk_context *ctx = NULL;
