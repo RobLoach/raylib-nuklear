@@ -80,6 +80,10 @@ else()
   target_compile_options(raylib-nuklear-demo PRIVATE -Wall -Wextra -Wpedantic -Werror)
   target_compile_options(raylib-nuklear-font PRIVATE -Wall -Wextra -Wpedantic -Werror)
   target_compile_options(raylib-nuklear-texture PRIVATE -Wall -Wextra -Wpedantic -Werror)
+  # nuklear.h has variables only read in NK_ASSERT, unused in release builds
+  foreach(target raylib-nuklear-example raylib-nuklear-demo raylib-nuklear-font raylib-nuklear-texture)
+    target_compile_options(${target} PRIVATE -Wno-unused-but-set-variable)
+  endforeach()
 endif()
 
 # Resources
